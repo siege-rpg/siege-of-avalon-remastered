@@ -227,7 +227,7 @@ begin
     InvisColor := $00FFFF00;
   //Load the Background Bitmap and plot it
 {$IFDEF DirectX}
-//  BMBack.LoadFromFile(ExtractFilePath(Application.ExeName) + '\BaseInterface.bmp');
+//  BMBack.LoadFromFile(ExtractFilePath(Application.ExeName) + '/BaseInterface.bmp');
 //  DXBack := DDGetImage(lpDD, BMBack, InvisColor, False);
 //  WrapperBltFast( lpDDSBack, 0,0,DXBack,rect(0,0,800,600),DDBLTFAST_WAIT);
     BMBack.LoadFromFile( InterfacePath + 'staRightArrow.bmp' );

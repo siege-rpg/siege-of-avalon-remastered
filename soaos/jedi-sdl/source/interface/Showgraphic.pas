@@ -187,9 +187,9 @@ begin
 
     if assigned( pMusic ) then
     begin
-      if FileExists( SoundPath + 'Theme\' + MusicFileName ) then
+      if FileExists( SoundPath + 'Theme/' + MusicFileName ) then
       begin
-        pMusic.OpenThisSong( SoundPath + 'Theme\' + MusicFileName );
+        pMusic.OpenThisSong( SoundPath + 'Theme/' + MusicFileName );
         pMusic.PlayThisSong;
         pMusic.SetSongVolume( 99 );
       end;

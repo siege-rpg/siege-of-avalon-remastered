@@ -556,7 +556,7 @@ var
   F : TextFile;
 begin
 
-  AssignFile( F, 'd:' + '\mylog.txt' );
+  AssignFile( F, 'd:' + '/mylog.txt' );
   Append( F );
   Write( F, S );
   WriteLn( F );

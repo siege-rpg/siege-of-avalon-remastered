@@ -153,7 +153,7 @@ type
   public
     frmMain : TForm; //we need the  form passed into handle form mouse events
     LoadThisFile : string; //This is the file to Save To or to Load From right here!
-    LastSavedFile : string; //The caller loads this string so we know what the last file saved to\Loaded from is.
+    LastSavedFile : string; //The caller loads this string so we know what the last file saved to/Loaded from is.
     LoadFile : boolean;
     SceneName : string;
     MapName : string;
@@ -391,7 +391,7 @@ begin
 {$ENDIF}
   try
    //Search for the first file meeting our criteria - create a Find file structure, and assign it a handle
-    FileNotFound := FindFirst( ExtractFilePath( Application.ExeName ) + 'Games\*.sav', faAnyFile, FileData );
+    FileNotFound := FindFirst( ExtractFilePath( Application.ExeName ) + 'Games/*.sav', faAnyFile, FileData );
     i := 0;
     while FileNotFound = 0 do
     begin
@@ -403,7 +403,7 @@ begin
         new( pTextItem );
         pTextItem.text := TheFileName;
           //Get the last time this file was accessed
-        pTextitem.time := FileAge( ExtractFilePath( Application.ExeName ) + 'Games\' + FileData.Name );
+        pTextitem.time := FileAge( ExtractFilePath( Application.ExeName ) + 'Games/' + FileData.Name );
         DecodeDate( FileDateToDateTime( pTextitem.time ), fYear, fMonth, fDay );
         DecodeTime( FileDateToDateTime( pTextitem.time ), fHour, fMin, fSec, fMsec );
         if fMin > 10 then
@@ -843,7 +843,7 @@ begin
         begin
           if CurrentSelectedListItem > -1 then
           begin
-               //LoadThisFile:=ExtractFilePath(Application.ExeName) + 'Games\'+pItem(SelectRect.items[CurrentSelectedListItem]).text + '.sav';
+               //LoadThisFile:=ExtractFilePath(Application.ExeName) + 'Games/'+pItem(SelectRect.items[CurrentSelectedListItem]).text + '.sav';
             LoadThisFile := pItem( SelectRect.items[ CurrentSelectedListItem ] ).text;
             Close;
           end;
@@ -894,17 +894,17 @@ begin
            //if PtInRect(rect(422,509,474,541),point(x,y)) then begin //Yes pressed- del file
         if PtInRect( rect( nRect.left - 10 + 53, nRect.top + 32 + 78, nRect.left - 10 + 104, nRect.top + 32 + 109 ), point( x, y ) ) then
         begin //Yes pressed- del file
-          DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.sav' ) );
-          if FileExists( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.bmp' ) then
-            DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.bmp' ) );
+          DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.sav' ) );
+          if FileExists( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.bmp' ) then
+            DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.bmp' ) );
           try
-            if FileExists( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.idx' ) then
-              DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.idx' ) );
+            if FileExists( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.idx' ) then
+              DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.idx' ) );
           except
           end;
           try
-            if FileExists( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.map' ) then
-              DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.map' ) );
+            if FileExists( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.map' ) then
+              DeleteFile( PChar( ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.map' ) );
           except
           end;
           a := ChangeFileExt( ArtPath + CharacterGif, '.pox' );
@@ -928,7 +928,7 @@ begin
         begin //Yes pressed- overwritefile
           OverwriteBoxVisible := false;
              //paint;
-             //LoadThisFile:=ExtractFilePath(Application.ExeName) + 'Games\'+pItem(SelectRect.items[CurrentSelectedListItem]).text + '.sav';
+             //LoadThisFile:=ExtractFilePath(Application.ExeName) + 'Games/'+pItem(SelectRect.items[CurrentSelectedListItem]).text + '.sav';
           LoadThisFile := SavedFileName; //pItem(SelectRect.items[CurrentSelectedListItem]).text;
           Close;
         end
@@ -1241,7 +1241,7 @@ begin
     end; //endif
 
     if CurrentSelectedListItem > -1 then
-      PicName := ExtractFilePath( Application.ExeName ) + 'Games\' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.bmp'
+      PicName := ExtractFilePath( Application.ExeName ) + 'Games/' + pItem( SelectRect.items[ CurrentSelectedListItem ] ).text + '.bmp'
     else
       PicName := '';
 
@@ -1440,9 +1440,9 @@ begin
     TravelBlock := '';
     FoundCharacters := false;
     try
-      Filename := ExtractFilePath( Application.ExeName ) + 'games\' + GameName + '.idx';
+      Filename := ExtractFilePath( Application.ExeName ) + 'games/' + GameName + '.idx';
       if not FileExists( Filename ) then
-        Filename := ExtractFilePath( Application.ExeName ) + 'games\' + GameName + '.sav';
+        Filename := ExtractFilePath( Application.ExeName ) + 'games/' + GameName + '.sav';
     //Level:=lowercase(ChangeFileExt(ExtractFilename(LVLFile),''));
     //Scene:=CurrentScene;
       Stream := TFileStream.Create( Filename, fmOpenRead or fmShareCompat );

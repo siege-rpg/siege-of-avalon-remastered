@@ -188,7 +188,7 @@ begin
     begin
       for i := 0 to NameListCount - 1 do
       begin
-        S := SoundPath + 'sfx\' + SoundParser.strings[ i ] + '.wav';
+        S := SoundPath + 'sfx/' + SoundParser.strings[ i ] + '.wav';
         if FileExists( S ) then
         begin
           if DaSoundCardAvailable then

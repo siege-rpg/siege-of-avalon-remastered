@@ -279,10 +279,10 @@ var
   F : TextFile;
 begin
 
-  AssignFile( F, ExtractFilePath( Application.ExeName ) + '\mylog.txt' );
+  AssignFile( F, ExtractFilePath( Application.ExeName ) + '/mylog.txt' );
   //Reset(F);
   //Readln(F, S);
-  Append( F ); //, extractfilepath(application.exename) + '\mylog.txt' );
+  Append( F ); //, extractfilepath(application.exename) + '/mylog.txt' );
   //Writeln(F);
   Write( F, S );
   WriteLn( F );

@@ -519,7 +519,7 @@ begin
   //Create the DirectDraw surfaces - don't load the same graphic more than once, just reuse the surface
    //The first item automatically gets a DXSurface - this is an init of sorts
   if ItemList.Count > 0 then begin      //if we have any items at all
-    BMBack.LoadFromFile(InterfacePath +'items\' + ItemList.Strings[0]);
+    BMBack.LoadFromFile(InterfacePath +'items/' + ItemList.Strings[0]);
     pTempItems(ItemList.Items[0]).W := BMBack.width; //set the width and height here
     pTempItems(ItemList.Items[0]).H := BMBack.Height;
 
@@ -533,7 +533,7 @@ begin
       pTempItems(ItemList.Items[i]).H := pTempItems(ItemList.Items[i - 1]).H;
     end
     else begin                          //if this item has a different filename, then create a new dxsurface
-      BMBack.LoadFromFile(InterfacePath +'items\' + ItemList.Strings[i]);
+      BMBack.LoadFromFile(InterfacePath +'items/' + ItemList.Strings[i]);
       pTempItems(ItemList.Items[i]).W := BMBack.width; //set the width and height here
       pTempItems(ItemList.Items[i]).H := BMBack.Height;
 

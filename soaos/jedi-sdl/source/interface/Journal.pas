@@ -195,19 +195,19 @@ begin
       inc( StartLogIndex );
 
   //JournalLog.create:=TAdventureLog.create;
-  //JournalLog.LogDirectory:=ExtractFilePath(Application.ExeName) + 'Journal\';
+  //JournalLog.LogDirectory:=ExtractFilePath(Application.ExeName) + 'Journal/';
     INI := TIniFile.Create( DefaultPath + 'siege.ini' );
 
     if ( INI.readinteger( 'Settings', 'JournalFont', 0 ) = 1 ) and DirectoryExists( ArtPath + 'journalalt' ) then
-      JournalLog.LogDirectory := ArtPath + 'journalalt\'
+      JournalLog.LogDirectory := ArtPath + 'journalalt/'
     else
-      JournalLog.LogDirectory := ArtPath + 'journal\';
+      JournalLog.LogDirectory := ArtPath + 'journal/';
 
     ini.free;
   //LogText:=JournalLog.ReadLogByName(LogFile);
   //Show Latest Log
   //LogText:=JournalLog.ReadLogByIndex(JournalLog.LogFileList.count-1);
-  //LogText:=ReadALog(ExtractFilePath(Application.ExeName) + 'Journal\' + LogFile);
+  //LogText:=ReadALog(ExtractFilePath(Application.ExeName) + 'Journal/' + LogFile);
 
     CurrentLogIndex := StartLogIndex; //JournalLog.LogFileList.count-1;
     if CurrentLogIndex >= JournalLog.LogFileList.count then
@@ -226,7 +226,7 @@ begin
   //WrapperBltFast( lpDDSBack, 0, 0, DXBack, Rect(0, 0, BMBack.width, BMBack.Height), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT);
 
   {//Now for the Alpha'ed edges
-  BMBack.LoadFromFile(ExtractFilePath(Application.ExeName) + 'Options\Dialog-Shadow.bmp');
+  BMBack.LoadFromFile(ExtractFilePath(Application.ExeName) + 'Options/Dialog-Shadow.bmp');
   DXBorders := DDGetImage(lpDD, BMBack, InvisColor, False);
   DrawSub(lpDDSBack, Rect(296+XAdj, 175+YAdj, 296+XAdj + BMBack.Width, 175+YAdj+BMBack.Height), Rect(0, 0, BMBack.Width, BMBack.Height), DXBorders, True, 128);
 
