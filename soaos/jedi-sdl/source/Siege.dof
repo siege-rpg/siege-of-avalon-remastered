@@ -90,7 +90,7 @@ MaxStackSize=8388608
 ImageBase=8388608
 ExeDescription=
 [Directories]
-OutputDir=..\..\game
+OutputDir=..\..\..\game
 UnitOutputDir=dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=
@@ -155,7 +155,8 @@ Item0=dcu
 Item1=..\dcu
 Item2=$(DELPHI)\dcu
 [HistoryLists\hlOutputDirectorry]
-Count=3
-Item0=..\..\game
-Item1=../../game
-Item2=E:\Games\SOAOS
+Count=4
+Item0=..\..\..\game
+Item1=..\..\game
+Item2=../../game
+Item3=E:\Games\SOAOS

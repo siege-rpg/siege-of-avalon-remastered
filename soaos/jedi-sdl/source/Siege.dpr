@@ -65,7 +65,7 @@ uses
   SysUtils,
   IniFiles,
   Controls,
-  AniDemo in 'engine\AniDemo.pas' {Form1},
+  AniDemo in 'engine\AniDemo.pas' {frmMain},
   Loader in 'engine\Loader.pas',
   Resource in 'engine\Resource.pas',
   Engine in 'engine\Engine.pas',
@@ -221,7 +221,7 @@ begin
   Application.Initialize;
   Application.HelpFile := 'help.htm';
   Application.Title := 'Siege of Avalon';
-  Application.CreateForm(TForm1, Form1);
+  Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
 
   ReleaseMutex( hMutex );
