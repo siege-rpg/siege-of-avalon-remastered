@@ -1,4 +1,4 @@
-unit GameMainMenu;
+unit YesNoDialog;
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
@@ -70,24 +70,21 @@ interface
 
 uses
   sdl,
+  sdlgameinterface,
   SiegeInterfaces;
 
 type
-  TMainMenuRect = record
-    Rect : TSDL_Rect;
-    Image : PSDL_Surface;
-    Enabled : boolean;
-  end;
-
-  TMainMenu = class( TSimpleSoAInterface )
+  TDialogResult = ( drYes, drNo );
+  
+  TYesNoDialog = class( TSimpleSoAInterface )
   private
-    FMenuChoice : integer;
-    FPrevChoice : integer;
-    procedure GetMenuRect( var MenuItem : TMainMenuRect; X, Y : integer; BM : PSDL_Surface );
-    procedure SetNextGameInterface;
-    function Exit : boolean;
+    DxTextMessage : PSDL_Surface;
+    FQuestionText: string;
+    FDialogResult: TDialogResult;
+    procedure SetDialogResult(const Value: TDialogResult);
   public
-    MenuItems : array[ 1..8 ] of TMainMenuRect;
+    property QuestionText : string read FQuestionText write FQuestionText;
+    property DialogResult : TDialogResult read FDialogResult write SetDialogResult;
     procedure FreeSurfaces; override;
     procedure LoadSurfaces; override;
     procedure Render; override;
@@ -100,221 +97,93 @@ implementation
 
 uses
   globals,
-  NewGame,
-  LoadSaveGame,
-  GameOptions,
-  GameJournal,
-  GameCredits,
-  YesNoDialog;
+  GameMainMenu;
 
-const
-  XFrame = 106;
-  YFrame = 41;
+{ TYesNoDialog }
 
-{ TMainMenu }
-
-procedure TMainMenu.FreeSurfaces;
-var
-  i : integer;
+procedure TYesNoDialog.FreeSurfaces;
 begin
-  for i := Low( MenuItems ) to High( MenuItems ) do
-  begin
-    SDL_FreeSurface( MenuItems[ i ].Image );
-  end;
+  SDL_FreeSurface( DxTextMessage );
   inherited;
 end;
 
-procedure TMainMenu.KeyDown( var Key : TSDLKey; Shift : TSDLMod; unicode : UInt16 );
+procedure TYesNoDialog.KeyDown( var Key : TSDLKey; Shift : TSDLMod; unicode : UInt16 );
 begin
   inherited;
   case Key of
-    SDLK_RETURN :
+    SDLK_RETURN, SDLK_KP_ENTER :
       begin
-        SetNextGameInterface;
+        DialogResult := drYes;
       end;
 
     SDLK_ESCAPE :
       begin
-        FMenuChoice := 7;
-        SetNextGameInterface;
+        DialogResult := drNo;
       end;
-
-    SDLK_UP : dec( FMenuChoice );
-
-    SDLK_DOWN : inc( FMenuChoice );
   end;
-
-  if FMenuChoice > High( MenuItems ) then
-    FMenuChoice := Low( MenuItems )
-  else if FMenuChoice < Low( MenuItems ) then
-    FMenuChoice := High( MenuItems );
 end;
 
-procedure TMainMenu.LoadSurfaces;
-const
-  XFrame = 106;
-  YFrame = 41;
+procedure TYesNoDialog.LoadSurfaces;
 var
   Flags : Cardinal;
-  Rect : TSDL_Rect;
-  MainText : PSDL_Surface;
-  Y1 : integer;
+  C : TSDL_Color;
 begin
   inherited;
-  FPrevChoice := 0; // Reset menu item
-  FMenuChoice := 1; // Highlight new game
-
   Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'gMainMenuBlank.bmp' ) );
+  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldChooseBox.bmp' ) );
   SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-  MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'gMainMenuText.bmp' ) );
-  SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
-  Rect.x := 106;
-  Rect.y := 41;
-  Rect.w := 582;
-  Rect.h := 416;
+  C.r := 231;
+  C.g := 156;
+  C.b := 0;
+  GameFont.ForeGroundColour := C;
+  C.r := 0;
+  C.g := 0;
+  C.b := 0;
+  GameFont.BackGroundColour := C;
+  GameFont.FontSize := 18;
 
-  SDL_BlitSurface( MainText, nil, DXBack, @Rect );
-
-  SDL_FreeSurface( MainText );
-
-  MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'gMainMenuTextBttns.bmp' ) );
-  Y1 := YFrame;
-  GetMenuRect( MenuItems[ 1 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 2 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 3 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 4 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 5 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 6 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 7 ], XFrame, Y1, MainText );
-
-  inc( Y1, 52 );
-  GetMenuRect( MenuItems[ 8 ], XFrame, Y1, MainText );
-
-  ExText.Open( 'Intro' );
-  
-  SDL_FreeSurface( MainText );
+  DxTextMessage := GameFont.DrawText( FQuestionText, 261, 55 );
+  SDL_SetColorKey( DxTextMessage, Flags, SDL_MapRGB( DxTextMessage.format, 0, 0, 0 ) );
 end;
 
-procedure TMainMenu.GetMenuRect( var MenuItem : TMainMenuRect; X, Y : integer; BM : PSDL_Surface );
-const
-  W = 582;
-  H = 52;
-var
-  Flags : Cardinal;
-begin
-  MenuItem.Rect.x := X - XFrame;
-  MenuItem.Rect.y := Y - YFrame;
-  MenuItem.Rect.w := X + W;
-  MenuItem.Rect.h := Y + H;
-
-  MenuItem.Image := SDL_CreateRGBSurface( SDL_SWSURFACE, W, H,
-    MainWindow.DisplaySurface.format.BitsPerPixel, MainWindow.DisplaySurface.format.RMask, MainWindow.DisplaySurface.format.GMask,
-    MainWindow.DisplaySurface.format.BMask, MainWindow.DisplaySurface.format.AMask );
-
-  Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
-  SDL_SetColorKey( MenuItem.Image, Flags, SDL_MapRGB( MenuItem.Image.format, 255, 0, 255 ) );
-  SDL_BlitSurface( BM, @MenuItem.Rect, MenuItem.Image, nil );
-end;
-
-procedure TMainMenu.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
-var
-  i : integer;
+procedure TYesNoDialog.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
 begin
   inherited;
-  for i := 1 to 8 do
-  begin
-    if {MenuItems[ i ].enabled
-    and}PointIsInRect( CurrentPos, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.w, MenuItems[ i ].Rect.h ) then
-    begin
-      FMenuChoice := i;
-      SetNextGameInterface;
-      break;
-    end;
+  if PointIsInRect( CurrentPos, 304, 318, 357, 350 ) then
+  begin //Yes pressed- quit game
+    DialogResult := drYes;
+  end
+  else if PointIsInRect( CurrentPos, 440, 318, 492, 350 ) then
+  begin //No pressed- just show screen
+    DialogResult := drNo;
   end;
 end;
 
-procedure TMainMenu.MouseMove( Shift : TSDLMod; CurrentPos, RelativePos : TPoint );
-var
-  i : integer;
+procedure TYesNoDialog.MouseMove( Shift : TSDLMod; CurrentPos,
+  RelativePos : TPoint );
 begin
   inherited;
-  for i := 1 to 8 do
-  begin
-    if {MenuItems[ i ].enabled
-    and}PointIsInRect( CurrentPos, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.w, MenuItems[ i ].Rect.h ) then
-    begin
-      FMenuChoice := i;
-      break;
-    end;
-  end;
+
 end;
 
-procedure TMainMenu.Render;
+procedure TYesNoDialog.Render;
 var
   Rect : TSDL_Rect;
 begin
   inherited;
-  if FMenuChoice <> FPrevChoice then
-  begin
-    Rect.x := MenuItems[ FMenuChoice ].Rect.x + 105;
-    Rect.y := MenuItems[ FMenuChoice ].Rect.y + 45;
-    Rect.w := MenuItems[ FMenuChoice ].Rect.w - MenuItems[ FMenuChoice ].Rect.x;
-    Rect.h := MenuItems[ FMenuChoice ].Rect.h - MenuItems[ FMenuChoice ].Rect.y;
-    SDL_BlitSurface( MenuItems[ FMenuChoice ].Image, nil, MainWindow.DisplaySurface, @Rect );
-  end;
+  Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage.w ) shr 1;
+  Rect.y := ( ( MainWindow.DisplaySurface.h - DxTextMessage.h ) shr 1 ) - 20;
+  Rect.w := DxTextMessage.w;
+  Rect.h := DxTextMessage.h;
+  SDL_BlitSurface( DxTextMessage, nil, MainWindow.DisplaySurface, @Rect );
 end;
 
-procedure TMainMenu.SetNextGameInterface;
+procedure TYesNoDialog.SetDialogResult(const Value: TDialogResult);
 begin
+  FDialogResult := Value;
   MainWindow.Rendering := false;
-  case FMenuChoice of
-    1 : NextGameInterface := TNewGame;
-    2 : NextGameInterface := TLoadGame;
-    3 : NextGameInterface := TSaveGame;
-    4 : NextGameInterface := TGameOptions;
-    5 : NextGameInterface := TGameJournal;
-    6 : NextGameInterface := TGameCredits;
-    7 :
-    begin
-      if Exit then
-        NextGameInterface := nil
-      else
-        MainWindow.Rendering := true;
-    end ;
-    8 : NextGameInterface := TMainMenu;
-  end;
-end;
-
-function TMainMenu.Exit: boolean;
-var
-  YesNo : TYesNoDialog;
-begin
-  YesNo := TYesNoDialog.Create( SoAoSGame );
-  try
-    YesNo.QuestionText := ExText.GetText( 'Message0' );
-    YesNo.LoadSurfaces;
-    SoAoSGame.Show;
-    Result := ( YesNo.DialogResult = drYes );
-  finally
-    YesNo.Free;
-  end;
-  ResetInputManager;
 end;
 
 end.
- 
