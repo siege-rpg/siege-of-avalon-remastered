@@ -575,7 +575,7 @@ begin
 
   for i := AllCastResourceList.Count - 1 downto 0 do
   begin
-    if LowerCase( TResource( AllCastResourceList.Items[ i ] ).filename ) = 'engine\spells\' + s then
+    if LowerCase( TResource( AllCastResourceList.Items[ i ] ).filename ) = 'engine/spells/' + s then
     begin
       Result := TResource( AllCastResourceList.Items[ i ] );
       break;
@@ -2090,7 +2090,7 @@ begin
   // indicator that the player should talk to this character next
     S := LowerCase( Character.Properties[ 'TalkToMe' ] );
     try
-      if ( S <> '' ) and TalkToMe and FileExists( ArtPath + 'engine\weaponprojectiles\mageblueball.pox' ) then
+      if ( S <> '' ) and TalkToMe and FileExists( ArtPath + 'engine/weaponprojectiles/mageblueball.pox' ) then
       begin
 //          TalkToMeTitles := s;
         TalkToMeCount := StrTokenCount( s, '|' );
@@ -2111,7 +2111,7 @@ begin
         StrStripLast( TalkToMeTitle );
         TalkToMeCount := StrTokenCount( TalkToMeTitle, '|' );
 
-        TalkToMeResource := LoadArtResource( 'engine\weaponprojectiles\mageblueball.gif' );
+        TalkToMeResource := LoadArtResource( 'engine/weaponprojectiles/mageblueball.gif' );
         TalkToMeResource.Alpha := 100;
         TalkToMeResource.SpecialEffect := seadd;
         TalkToMeResource.DrawShadow := false;
@@ -5568,11 +5568,11 @@ begin
     begin
       CastEffect := GetSpellEffect( s );
 
-//      CastEffect := LoadArtResource('engine\spells\' + s);
+//      CastEffect := LoadArtResource('engine/spells/' + s);
 //            CastEffect.Alpha := 100;
 //      CastEffect.SpecialEffect := seadd;
 //      CastEffect.DrawShadow := false;
-//      PushEffect := LoadArtResource('engine\spells\PushCast(LVL3).gif');
+//      PushEffect := LoadArtResource('engine/spells/PushCast(LVL3).gif');
 //      PushEffect.Alpha := 50;
 //      PushEffect.SpecialEffect := seadd;
 //      PushEffect.DrawShadow := false;
@@ -5723,13 +5723,13 @@ begin
       FSummonGuid := '';
     end;
 
-{    if FileExists(ArtPath + 'engine\spells\SummonReceive.pox') and FileExists(ArtPath + 'engine\spells\SummonCast.pox') then
+{    if FileExists(ArtPath + 'engine/spells/SummonReceive.pox') and FileExists(ArtPath + 'engine/spells/SummonCast.pox') then
     begin
-      FSummonResource := LoadArtResource('engine\spells\SummonReceive.gif');
+      FSummonResource := LoadArtResource('engine/spells/SummonReceive.gif');
       FSummonResource.Alpha := 75;
       FSummonResource.SpecialEffect := seadd;
       FSummonResource.DrawShadow := false;
-      FSummonCastResource := LoadArtResource('engine\spells\SummonCast.gif');
+      FSummonCastResource := LoadArtResource('engine/spells/SummonCast.gif');
       FSummonCastResource.Alpha := 75;
       FSummonCastResource.SpecialEffect := seadd;
       FSummonCastResource.DrawShadow := false;

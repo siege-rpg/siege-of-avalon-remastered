@@ -5215,8 +5215,8 @@ begin
   end;
 
   Effect := TEffect.Create;
-  Effect.Resource := LoadArtResource('engine\WeaponProjectiles\vortex.gif');
- // Effect.Resource:=LoadArtResource('engine\spells\summonreceive.gif');
+  Effect.Resource := LoadArtResource('engine/WeaponProjectiles/vortex.gif');
+ // Effect.Resource:=LoadArtResource('engine/spells/summonreceive.gif');
   Effect.AnimationDuration := 8 * (Effect.Resource.FrameMultiplier + 6);
   Effect.Power := Character.Mysticism * 5;
   Effect.DoAction('Default', Character.FacingString);

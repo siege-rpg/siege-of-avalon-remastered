@@ -1130,7 +1130,7 @@ var
   INI : TINIFile;
   StrTmp : string;
 begin
-  INI := TINIFile.create( DefaultPath + 'maps\symbols.ini' );
+  INI := TINIFile.create( DefaultPath + 'maps/symbols.ini' );
   try
     StrTmp := '#' + Value;
     result := INI.ReadString( Parse( Value, 0, '.' ), Parse( Value, 1, '.' ), StrTmp );
@@ -8895,7 +8895,7 @@ begin
 
     if not assigned( Resource ) then
     begin
-      LayeredImage := PartManager.GetImageFile( PartName, 'HumanMaleLayers\BaseHumanMale.gif' );
+      LayeredImage := PartManager.GetImageFile( PartName, 'HumanMaleLayers/BaseHumanMale.gif' );
       Resource := PartManager.GetLayerResource( LayeredImage );
     end;
 
@@ -8993,7 +8993,7 @@ begin
       end
       else
       begin
-        S := PartManager.GetImageFile( PartName, 'HumanMaleLayers\BaseHumanMale.gif' );
+        S := PartManager.GetImageFile( PartName, 'HumanMaleLayers/BaseHumanMale.gif' );
         NewResource := PartManager.GetLayerResource( S );
       end;
       if assigned( NewResource ) then
@@ -10507,7 +10507,7 @@ begin
           if ( j < length( S ) ) and ( S[ j + 1 ] = '#' ) then
           begin
             if not assigned( INI ) then
-              INI := TINIFile.create( DefaultPath + 'maps\symbols.ini' );
+              INI := TINIFile.create( DefaultPath + 'maps/symbols.ini' );
             S0 := Copy( S, j + 1, Length( S ) - j );
             S1 := Parse( S0, 1, '#' );
             StrTmp := S1;
@@ -14148,7 +14148,7 @@ begin
   inherited;
   if not assigned( BodyRotResource ) then
   begin
-    BodyRotResource := LoadArtResource( 'engine\fx\CorpseRot.gif' );
+    BodyRotResource := LoadArtResource( 'engine/fx/CorpseRot.gif' );
   end;
 end;
 
