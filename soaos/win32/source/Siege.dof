@@ -39,12 +39,12 @@ MaxStackSize=8388608
 ImageBase=8388608
 ExeDescription=
 [Directories]
-OutputDir=../../game
+OutputDir=../../../game
 UnitOutputDir=dcu
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=ai;engine;graphics;interface;sound
-Packages=VCL40;VCLX40;dcani30;vcl;rtl;vclactnband;vclx;VclSmp;DelphiX_for7;SOA
+Packages=VCL40;VCLX40;vcl;rtl;vclactnband;vclx;VclSmp;DelphiX_for7;SOA
 Conditionals=DirectX
 DebugSourceDirs=
 UsePackages=0
@@ -91,6 +91,7 @@ Item2=../engine
 Count=1
 Item0=dcu
 [HistoryLists\hlOutputDirectorry]
-Count=2
-Item0=../../game
-Item1=E:\Games\SOAOS
+Count=3
+Item0=../../../game
+Item1=../../game
+Item2=E:\Games\SOAOS

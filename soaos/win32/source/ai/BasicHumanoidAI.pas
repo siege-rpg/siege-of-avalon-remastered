@@ -2607,7 +2607,7 @@ begin
         for i := 0 to NPCList.count - 1 do
         begin
           TCharacter( NPCList.items[ i ] ).CombatMode := Current.CombatMode;
-          Form1.PaintCharacterOnBorder( TSpriteObject( NPCList.items[ i ] ), i );
+          frmMain.PaintCharacterOnBorder( TSpriteObject( NPCList.items[ i ] ), i );
         end;
       end;
 

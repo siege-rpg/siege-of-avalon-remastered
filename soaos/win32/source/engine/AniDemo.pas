@@ -153,9 +153,7 @@ type
     procedure Draw;
   end;
 
-  TForm1 = class( TForm )
-    AniView1 : TAniView;
-    AniMap1 : TAniMap;
+  TfrmMain = class( TForm )
     Image4 : TImage;
     Image1 : TImage;
     Image2 : TImage;
@@ -347,7 +345,7 @@ type
 
 var
   SetAppExStyleCount : Integer;
-  Form1 : TForm1;
+  frmMain : TfrmMain;
 
 const
   TempGame = '~Temp';
@@ -432,7 +430,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseAllDialogs( Sender : TObject );
+procedure TfrmMain.CloseAllDialogs( Sender : TObject );
 var
   i : Integer;
 const
@@ -557,7 +555,7 @@ begin
   end;
 end;
 
-procedure TForm1.OpenDialog( Dialog : TDisplay; CloseProcedure : TNotifyEvent );
+procedure TfrmMain.OpenDialog( Dialog : TDisplay; CloseProcedure : TNotifyEvent );
 const
   FailName : string = 'Main.OpenDialog';
 begin
@@ -636,7 +634,7 @@ end;
 
 //Create new game
 
-procedure TForm1.CloseCreateDialog( Sender : TObject );
+procedure TfrmMain.CloseCreateDialog( Sender : TObject );
 var
   i, j : Integer;
   INI : TIniFile;
@@ -817,7 +815,7 @@ begin
   end;
 end;
 
-procedure TForm1.CharCreationDraw( Sender : TObject );
+procedure TfrmMain.CharCreationDraw( Sender : TObject );
 var
   ddsd : TDDSurfaceDesc;
   Bits : BITPLANE;
@@ -876,7 +874,7 @@ begin
   end;
 end;
 
-procedure TForm1.SaveOptions;
+procedure TfrmMain.SaveOptions;
 var
   INI : TIniFile;
 const
@@ -916,7 +914,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseOptions( Sender : TObject );
+procedure TfrmMain.CloseOptions( Sender : TObject );
 const
   FailName : string = 'Main.CloseOptions';
 begin
@@ -936,7 +934,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseShow( Sender : TObject );
+procedure TfrmMain.CloseShow( Sender : TObject );
 const
   FailName : string = 'Main.CloseShow';
 begin
@@ -955,7 +953,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormShow( Sender : TObject );
+procedure TfrmMain.FormShow( Sender : TObject );
 var
   INI : TIniFile;
   ShowIntro : Boolean;
@@ -996,7 +994,7 @@ begin
 
     Log.Log( 'Set Bounds' );
     Log.flush;
-    AniView1.SetBounds( 0, 0, 703, 511 );
+    Game.SetBounds( 0, 0, 703, 511 );
 
 {$IFDEF DirectX}
     Log.Log( 'Mode=DX' );
@@ -1335,7 +1333,7 @@ begin
   end;
 end;
 
-procedure TForm1.Timer1Timer( Sender : TObject );
+procedure TfrmMain.Timer1Timer( Sender : TObject );
 var
   i : Integer;
   S : string;
@@ -1475,7 +1473,7 @@ begin
   end;
 end;
 
-procedure TForm1.AniView1MouseDown( Sender : TAniView; Button : TMouseButton;
+procedure TfrmMain.AniView1MouseDown( Sender : TAniView; Button : TMouseButton;
   Shift : TShiftState; X, Y, GridX, GridY : Integer );
 const
   FailName : string = 'Main.AniView1MouseDown';
@@ -1608,7 +1606,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormKeyDown( Sender : TObject; var key : Word;
+procedure TfrmMain.FormKeyDown( Sender : TObject; var key : Word;
   Shift : TShiftState );
 var
   i : Integer;
@@ -1995,7 +1993,7 @@ begin
   end;
 end;
 
-procedure TForm1.AniView1AfterDisplay( Sender : TObject );
+procedure TfrmMain.AniView1AfterDisplay( Sender : TObject );
 var
   i, j : Integer;
   GridX, GridY : Longint;
@@ -2156,7 +2154,7 @@ begin
   end;
 end;
 
-procedure TForm1.DrawHealthBars;
+procedure TfrmMain.DrawHealthBars;
 var
   i : Integer;
   HpDistance, ManaDistance : Double;
@@ -2222,7 +2220,7 @@ begin
   end;
 end;
 
-procedure TForm1.AniView1BeforeDisplay( Sender : TObject );
+procedure TfrmMain.AniView1BeforeDisplay( Sender : TObject );
 var
   i : Integer;
 const
@@ -2279,7 +2277,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormDestroy( Sender : TObject );
+procedure TfrmMain.FormDestroy( Sender : TObject );
 var
   ExStyle : Integer;
 const
@@ -2327,7 +2325,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormCreate( Sender : TObject );
+procedure TfrmMain.FormCreate( Sender : TObject );
 var
   ExStyle : Integer;
 begin
@@ -2343,11 +2341,29 @@ begin
   AdventureLog1 := TAdventureLog.create;
   HistoryLog := TAdventureLog.create;
 
-  Game := AniView1;
-  GameMap := AniMap1;
+  Game := TAniView.Create( frmMain );
+  Game.Parent := frmMain;
+  Game.Height := 511;
+  Game.Left := 0;
+  Game.LMouseButton := False;
+  Game.ShowRepaint := False;
+  Game.Width := 703;
+  Game.OnAfterDisplay := AniView1AfterDisplay;
+  Game.OnBeforeDisplay := AniView1BeforeDisplay;
+  Game.OnMouseDown := AniView1MouseDown;
+  
+
+  GameMap := TAniMap.Create( frmMain );
+  GameMap.AmbientColor := clBlack;
+  GameMap.AmbientIntensity := 0;
+  GameMap.Height := 400;
+  GameMap.TransparentColor := clFuchsia;
+  GameMap.UseAmbientOnly := False;
+  GameMap.UseLighting := True;
+  GameMap.Width := 200;
 end;
 
-procedure TForm1.AppException( Sender : TObject; E : Exception );
+procedure TfrmMain.AppException( Sender : TObject; E : Exception );
 begin
   if Assigned( Log ) then
   begin
@@ -2360,7 +2376,7 @@ begin
   Application.Terminate;
 end;
 
-procedure TForm1.BeginConverse( ObjectRef : TGameObject; Conversation : string );
+procedure TfrmMain.BeginConverse( ObjectRef : TGameObject; Conversation : string );
 const
   FailName : string = 'Main.BeginConverse';
 begin
@@ -2383,7 +2399,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginInventory( Character : TCharacter );
+procedure TfrmMain.BeginInventory( Character : TCharacter );
 var
   List : TList;
   i : Integer;
@@ -2431,7 +2447,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginMerchant( Character : TCharacter );
+procedure TfrmMain.BeginMerchant( Character : TCharacter );
 var
   List : TList;
   i : Integer;
@@ -2480,7 +2496,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginObjInventory( Character : TCharacter; OtherObj : TSpriteObject );
+procedure TfrmMain.BeginObjInventory( Character : TCharacter; OtherObj : TSpriteObject );
 var
   List : TList;
   i : Integer;
@@ -2527,7 +2543,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginLoot( Character : TCharacter; OtherObj : TSpriteObject );
+procedure TfrmMain.BeginLoot( Character : TCharacter; OtherObj : TSpriteObject );
 var
   List : TList;
   i : Integer;
@@ -2581,7 +2597,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginStatistics( Character : TCharacter );
+procedure TfrmMain.BeginStatistics( Character : TCharacter );
 const
   FailName : string = 'Main.BeginStatistics';
 begin
@@ -2603,7 +2619,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginMap( Character : TCharacter );
+procedure TfrmMain.BeginMap( Character : TCharacter );
 const
   FailName : string = 'Main.BeginMap';
 begin
@@ -2628,7 +2644,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginHelp;
+procedure TfrmMain.BeginHelp;
 const
   FailName : string = 'Main.BeginHelp';
 begin
@@ -2650,7 +2666,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginTitles( Character : TCharacter );
+procedure TfrmMain.BeginTitles( Character : TCharacter );
 const
   FailName : string = 'Main.BeginTitles';
 begin
@@ -2672,7 +2688,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginNPC( Character : TCharacter );
+procedure TfrmMain.BeginNPC( Character : TCharacter );
 const
   FailName : string = 'Main.BeginNPC';
 begin
@@ -2698,7 +2714,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginJournal;
+procedure TfrmMain.BeginJournal;
 const
   FailName : string = 'Main.BeginJournal';
 begin
@@ -2720,7 +2736,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginOptions( Character : TCharacter );
+procedure TfrmMain.BeginOptions( Character : TCharacter );
 const
   FailName : string = 'Main.BeginOptions';
 begin
@@ -2746,7 +2762,7 @@ begin
   end;
 end;
 
-procedure TForm1.FreeAll;
+procedure TfrmMain.FreeAll;
 const
   FailName : string = 'Main.FreeAll';
 begin
@@ -2873,7 +2889,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormMouseDown( Sender : TObject; Button : TMouseButton;
+procedure TfrmMain.FormMouseDown( Sender : TObject; Button : TMouseButton;
   Shift : TShiftState; X, Y : Integer );
 var
   i : Integer;
@@ -3137,7 +3153,7 @@ begin
   end;
 end;
 
-procedure TForm1.FormMouseMove( Sender : TObject; Shift : TShiftState; X,
+procedure TfrmMain.FormMouseMove( Sender : TObject; Shift : TShiftState; X,
   Y : Integer );
 var
   S, Info : string;
@@ -3187,7 +3203,7 @@ begin
   end;
 end;
 
-procedure TForm1.ChangeFocus( Figure : TAniFigure );
+procedure TfrmMain.ChangeFocus( Figure : TAniFigure );
 var
   i : Integer;
 const
@@ -3229,7 +3245,7 @@ begin
   end;
 end;
 
-procedure TForm1.AddToParty( Figure : TAniFigure );
+procedure TfrmMain.AddToParty( Figure : TAniFigure );
 var
   i : Integer;
 const
@@ -3278,7 +3294,7 @@ begin
   end;
 end;
 
-procedure TForm1.RemoveFromParty( Figure : TAniFigure );
+procedure TfrmMain.RemoveFromParty( Figure : TAniFigure );
 var
   i, j : Integer;
 const
@@ -3314,7 +3330,7 @@ begin
   end;
 end;
 
-procedure TForm1.PaintCharacterOnBorder( Figure : TSpriteObject; Slot : Integer );
+procedure TfrmMain.PaintCharacterOnBorder( Figure : TSpriteObject; Slot : Integer );
 var
   SrcX, SrcY, DstX, DstY : Integer;
   W, H : Integer;
@@ -3549,7 +3565,7 @@ begin
   end;
 end;
 
-function TForm1.LoadResources : Boolean;
+function TfrmMain.LoadResources : Boolean;
 var
   BM : TBitmap;
 const
@@ -3814,7 +3830,7 @@ end;
 end;
 *)
 
-procedure TForm1.LoadNewMapFile;
+procedure TfrmMain.LoadNewMapFile;
 var
   S : string;
 const
@@ -3872,7 +3888,7 @@ begin
   end;
 end;
 
-function TForm1.LoadMapFile( New, FullLoad : Boolean ) : Boolean;
+function TfrmMain.LoadMapFile( New, FullLoad : Boolean ) : Boolean;
 var
   Loaded : Boolean;
   i : Integer;
@@ -4361,7 +4377,7 @@ begin
   end;
 end;
 
-function TForm1.SaveGame : Boolean;
+function TfrmMain.SaveGame : Boolean;
 var
   EOB : Word;
   Level : string;
@@ -4429,7 +4445,7 @@ var
   function GetMpaKnownData : TMemoryStream;
   begin
     Result := TMemoryStream.Create;
-    AniMap1.SaveMapKnownInfo( Result );
+    GameMap.SaveMapKnownInfo( Result );
   end;
 
   function GetProperties : TMemoryStream;
@@ -4583,7 +4599,7 @@ begin
   end;
 end;
 
-function TForm1.ClearResources( PreserveResourceList : Boolean ) : Boolean;
+function TfrmMain.ClearResources( PreserveResourceList : Boolean ) : Boolean;
 var
   i : Integer;
 const
@@ -4698,7 +4714,7 @@ begin
   end;
 end;
 
-function TForm1.LoadGame( FullLoad, UseCache : Boolean ) : Boolean;
+function TfrmMain.LoadGame( FullLoad, UseCache : Boolean ) : Boolean;
 var
   EOB, BB : Word;
 
@@ -4870,7 +4886,7 @@ var
   begin
     if not Assigned( Stream ) then
       Exit;
-    AniMap1.LoadMapKnownInfo( Stream );
+    GameMap.LoadMapKnownInfo( Stream );
   end;
 
   procedure LoadProperties( Stream : TStream; const Scene : string );
@@ -5139,7 +5155,7 @@ begin
   end;
 end;
 
-procedure TForm1.LoadNewMap( const NewFile, SceneName,
+procedure TfrmMain.LoadNewMap( const NewFile, SceneName,
   StartingPoint, Transition : string );
 const
   FailName : string = 'Main.LoadNewMap';
@@ -5176,7 +5192,7 @@ begin
   end;
 end;
 
-procedure TForm1.Timer2Timer( Sender : TObject );
+procedure TfrmMain.Timer2Timer( Sender : TObject );
 const
   FailName : string = 'Main.Timer2Timer';
 begin
@@ -5240,7 +5256,7 @@ begin
   end;
 end;
 
-procedure TForm1.PlaceNPCList;
+procedure TfrmMain.PlaceNPCList;
 var
   List : TStringList;
   i, j : Integer;
@@ -5290,7 +5306,7 @@ begin
   end;
 end;
 
-procedure TForm1.DrawCurrentSpell;
+procedure TfrmMain.DrawCurrentSpell;
 var
   Point : TPoint;
 const
@@ -5317,7 +5333,7 @@ begin
   end;
 end;
 
-procedure TForm1.DrawSpellGlyphs;
+procedure TfrmMain.DrawSpellGlyphs;
 var
   i : Integer;
   SpellList : TStringList;
@@ -5385,7 +5401,7 @@ begin
   end;
 end;
 
-procedure TForm1.CueTune( const FileList : string; Instant : Boolean );
+procedure TfrmMain.CueTune( const FileList : string; Instant : Boolean );
 var
   SongParser : TStringList;
   i : Integer;
@@ -5470,7 +5486,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseIntroDialog( Sender : TObject );
+procedure TfrmMain.CloseIntroDialog( Sender : TObject );
 const
   FailName : string = 'Main.CloseIntroDialog';
 begin
@@ -5535,7 +5551,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartmainMenu( var Message : TWMNoParams );
+procedure TfrmMain.WMStartmainMenu( var Message : TWMNoParams );
 const
   FailName : string = 'Main.WMStartmainMenu';
 begin
@@ -5570,7 +5586,7 @@ begin
   end;
 end;
 
-procedure TForm1.SetCurrentTheme( const Value : string );
+procedure TfrmMain.SetCurrentTheme( const Value : string );
 var
   S : string;
 const
@@ -5592,7 +5608,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartNew( var Message : TWMNoParams );
+procedure TfrmMain.WMStartNew( var Message : TWMNoParams );
 var
   S, LayeredImage : string;
   i : Integer;
@@ -5913,7 +5929,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartOptions( var Message : TWMNoParams );
+procedure TfrmMain.WMStartOptions( var Message : TWMNoParams );
 const
   FailName : string = 'Main.WMStartOptions';
 begin
@@ -5953,7 +5969,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseLoad( Sender : TObject );
+procedure TfrmMain.CloseLoad( Sender : TObject );
 var
   S1, S2 : string;
 const
@@ -6047,7 +6063,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseSave( Sender : TObject );
+procedure TfrmMain.CloseSave( Sender : TObject );
 {var
   S1,S2: string; }
 const
@@ -6109,7 +6125,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartLoad( var Message : TWMNoParams );
+procedure TfrmMain.WMStartLoad( var Message : TWMNoParams );
 const
   FailName : string = 'Main.WMStartLoad';
 begin
@@ -6139,7 +6155,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartSave( var Message : TWMNoParams );
+procedure TfrmMain.WMStartSave( var Message : TWMNoParams );
 const
   FailName : string = 'Main.WMStartSave';
 begin
@@ -6169,7 +6185,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartIntro( var Message : TWMNoParams );
+procedure TfrmMain.WMStartIntro( var Message : TWMNoParams );
 var
   DlgOpenAnim : TOpenAnim;
   INI : TIniFile;
@@ -6259,7 +6275,7 @@ begin
   end;
 end;
 
-procedure TForm1.ShowMouseMessage( const Msg : string );
+procedure TfrmMain.ShowMouseMessage( const Msg : string );
 const
   tX1 = 394;
   tY1 = 33;
@@ -6332,7 +6348,7 @@ begin
   end;
 end;
 
-procedure TForm1.ShowQuickMessage( const Msg : string; Time : Integer );
+procedure TfrmMain.ShowQuickMessage( const Msg : string; Time : Integer );
 const
   FailName : string = 'Main.ShowQuickMessage';
 begin
@@ -6351,7 +6367,7 @@ begin
   end;
 end;
 
-procedure TForm1.InventoryDraw( Sender : TObject );
+procedure TfrmMain.InventoryDraw( Sender : TObject );
 var
   i : Integer;
   HpDistance, ManaDistance : Double;
@@ -6412,7 +6428,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartCredits( var Message : TWMNoParams );
+procedure TfrmMain.WMStartCredits( var Message : TWMNoParams );
 const
   FailName : string = 'Main.WMStartCredits';
 begin
@@ -6443,7 +6459,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMKillFocus( var Message : TMessage );
+procedure TfrmMain.WMKillFocus( var Message : TMessage );
 begin
   //  Log.Log('Kill Focus');
   {  Game.Active:=false;
@@ -6451,7 +6467,7 @@ begin
   inherited;
 end;
 
-procedure TForm1.WMSetFocus( var Message : TMessage );
+procedure TfrmMain.WMSetFocus( var Message : TMessage );
 begin
   inherited;
   //  Log.Log('Set Focus');
@@ -6463,7 +6479,7 @@ begin
     end;  }
 end;
 
-procedure TForm1.AppActivate( Sender : TObject );
+procedure TfrmMain.AppActivate( Sender : TObject );
 const
   FailName : string = 'Main.AppActivate';
 begin
@@ -6492,7 +6508,7 @@ begin
   end;
 end;
 
-procedure TForm1.AppDeactivate( Sender : TObject );
+procedure TfrmMain.AppDeactivate( Sender : TObject );
 const
   FailName : string = 'Main.AppDeactivate';
 begin
@@ -6530,7 +6546,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginDeath;
+procedure TfrmMain.BeginDeath;
 const
   FailName : string = 'Main.BeginDeath';
 begin
@@ -6564,7 +6580,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseIntroJournal( Sender : TObject );
+procedure TfrmMain.CloseIntroJournal( Sender : TObject );
 const
   FailName : string = 'Main.CloseIntroJournal';
 begin
@@ -6586,7 +6602,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMDone( var Message : TWMNoParams );
+procedure TfrmMain.WMDone( var Message : TWMNoParams );
 begin
   //     bPlayClosingMovie := true;
   MouseCursor.Enabled := False;
@@ -6594,7 +6610,7 @@ begin
   Close;
 end;
 
-function TForm1.ShouldRun( X, Y : Longint ) : Boolean;
+function TfrmMain.ShouldRun( X, Y : Longint ) : Boolean;
 var
   D2 : Double;
 begin
@@ -6611,7 +6627,7 @@ begin
     Result := False;
 end;
 
-procedure TForm1.BeginAdvLog;
+procedure TfrmMain.BeginAdvLog;
 const
   FailName : string = 'Main.BeginAdvLog';
 begin
@@ -6631,7 +6647,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginQuestLog;
+procedure TfrmMain.BeginQuestLog;
 const
   FailName : string = 'Main.BeginQuestLog';
 begin
@@ -6651,7 +6667,7 @@ begin
   end;
 end;
 
-procedure TForm1.BeginRoster( Character : TCharacter );
+procedure TfrmMain.BeginRoster( Character : TCharacter );
 const
   FailName : string = 'Main.BeginRoster';
 begin
@@ -6670,7 +6686,7 @@ begin
   end;
 end;
 
-procedure TForm1.CloseRosterDialog( Sender : TObject );
+procedure TfrmMain.CloseRosterDialog( Sender : TObject );
 var
   i : Integer;
   OldCount : Integer;
@@ -6720,7 +6736,7 @@ begin
   CloseAllDialogs( DlgRoster );
 end;
 
-procedure TForm1.DrawRosterGuy( Character : TCharacter; X, Y : Integer );
+procedure TfrmMain.DrawRosterGuy( Character : TCharacter; X, Y : Integer );
 var
   OldUseLighting : Boolean;
   OldDrawShadow : Boolean;
@@ -6773,7 +6789,7 @@ begin
   Character.Highlighted := OldHighighted;
 end;
 
-procedure TForm1.AssignMarch;
+procedure TfrmMain.AssignMarch;
 var
   i : Integer;
   Prev : TCharacter;
@@ -6810,7 +6826,7 @@ begin
   end;
 end;
 
-function TForm1.IsOnZoneTile( Figure : TAniFigure ) : Boolean;
+function TfrmMain.IsOnZoneTile( Figure : TAniFigure ) : Boolean;
 var
   i : Integer;
 begin
@@ -6831,7 +6847,7 @@ begin
   end;
 end;
 
-procedure TForm1.AddLogEntry( const FileName : string );
+procedure TfrmMain.AddLogEntry( const FileName : string );
 var
   DC : HDC;
 const
@@ -6859,7 +6875,7 @@ begin
   end;
 end;
 
-procedure TForm1.AddAdventure( const Entry : string );
+procedure TfrmMain.AddAdventure( const Entry : string );
 var
   DC : HDC;
   i : Integer;
@@ -6880,7 +6896,7 @@ begin
   FillRectAlpha( OverlayB, Rect( 659, 50, 659 + 68, 50 + 24 ), $80, 96 );
 end;
 
-procedure TForm1.AddQuest( const Entry : string );
+procedure TfrmMain.AddQuest( const Entry : string );
 var
   DC : HDC;
   i : Integer;
@@ -6900,7 +6916,7 @@ begin
   FillRectAlpha( OverlayB, Rect( 659, 26, 659 + 68, 26 + 24 ), $80, 96 );
 end;
 
-procedure TForm1.ClearAdventureGraphic;
+procedure TfrmMain.ClearAdventureGraphic;
 var
   DC : HDC;
 begin
@@ -6917,7 +6933,7 @@ begin
   end;
 end;
 
-procedure TForm1.ClearLogGraphic;
+procedure TfrmMain.ClearLogGraphic;
 var
   DC : HDC;
 begin
@@ -6929,7 +6945,7 @@ begin
   end;
 end;
 
-procedure TForm1.ClearQuestGraphic;
+procedure TfrmMain.ClearQuestGraphic;
 var
   DC : HDC;
 begin
@@ -6946,7 +6962,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartTimer( var Message : TWMNoParams );
+procedure TfrmMain.WMStartTimer( var Message : TWMNoParams );
 begin
   if UseTimer then
   begin
@@ -6967,7 +6983,7 @@ begin
   InTimerLoop := False;
 end;
 
-procedure TForm1.SetActive( const Value : Boolean );
+procedure TfrmMain.SetActive( const Value : Boolean );
 begin
   if Value = FActive then
     Exit;
@@ -6989,7 +7005,7 @@ begin
   end;
 end;
 
-procedure TForm1.ClearOverlayB;
+procedure TfrmMain.ClearOverlayB;
 var
   DC : HDC;
 begin
@@ -7002,7 +7018,7 @@ begin
 
 end;
 
-procedure TForm1.SaveAGame( const Name : string );
+procedure TfrmMain.SaveAGame( const Name : string );
 var
   TempName {,S1,S2} : string;
   DC : HDC;
@@ -7057,7 +7073,7 @@ begin
     Active := True;
 end;
 
-procedure TForm1.BeginTransit( const NewFile, SceneName, StartingPoint,
+procedure TfrmMain.BeginTransit( const NewFile, SceneName, StartingPoint,
   Transition, TargetList : string );
 var
   i : Integer;
@@ -7080,7 +7096,7 @@ begin
   PostMessage( Handle, WM_StartTransit, 0, 0 );
 end;
 
-procedure TForm1.CloseTransit( Sender : TObject );
+procedure TfrmMain.CloseTransit( Sender : TObject );
 var
   i : Integer;
   S, S1 : string;
@@ -7161,7 +7177,7 @@ begin
   end;
 end;
 
-procedure TForm1.WMStartTransit( var Message : TWMNoParams );
+procedure TfrmMain.WMStartTransit( var Message : TWMNoParams );
 var
   Width, Height : Longint;
   FileName : string;
@@ -7622,7 +7638,7 @@ Log.Log('  Avoid transit');
   end;
 end;   }
 
-function TForm1.FindMap( const FileName : string ) : string;
+function TfrmMain.FindMap( const FileName : string ) : string;
 var
   S, S1 : string;
   i : Integer;
@@ -7646,7 +7662,7 @@ begin
   Result := DefaultPath + 'maps\' + FileName + '.lvl';
 end;
 
-procedure TForm1.ClearOnDemandResources;
+procedure TfrmMain.ClearOnDemandResources;
 var
   i : Integer;
 begin
@@ -7665,7 +7681,7 @@ begin
   end;
 end;
 
-procedure TForm1.Timer3Timer( Sender : TObject );
+procedure TfrmMain.Timer3Timer( Sender : TObject );
 const
   FailName : string = 'Main.Timer3Timer';
 begin
@@ -7740,7 +7756,7 @@ begin
 
 end;
 
-procedure TForm1.ShowEnding;
+procedure TfrmMain.ShowEnding;
 var
   INI : TIniFile;
   S : string;
@@ -7789,7 +7805,7 @@ begin
 
 end;
 
-procedure TForm1.CloseEnding( Sender : TObject );
+procedure TfrmMain.CloseEnding( Sender : TObject );
 const
   FailName : string = 'Main.CloseEnding';
 begin
@@ -7884,9 +7900,9 @@ begin
       MsgID := 4 //Adventure
     else if PtInRect( Rect( 663, 560, 722, 578 ), P ) then
       MsgID := 5 //Journal
-    else if PtInRect( Rect( 609, 543, 647, 583 ), P ) and not Form1.SpellBarActive then
+    else if PtInRect( Rect( 609, 543, 647, 583 ), P ) and not frmMain.SpellBarActive then
       MsgID := 6 //Awards
-    else if PtInRect( Rect( 392, 517, 591, 582 ), P ) and not Form1.SpellBarActive then
+    else if PtInRect( Rect( 392, 517, 591, 582 ), P ) and not frmMain.SpellBarActive then
       MsgID := 7 //Message Area
     else if PtInRect( Rect( 715, 10, 778, 104 ), P ) then
       MsgID := 8 //Player Stats
@@ -7894,13 +7910,13 @@ begin
       MsgID := 9 //Mana
     else if PtInRect( Rect( 711, 258, 759, 348 ), P ) then
       MsgID := 10 //Health
-    else if PtInRect( Rect( 337, 547, 371, 582 ), P ) and not Form1.SpellBarActive then
+    else if PtInRect( Rect( 337, 547, 371, 582 ), P ) and not frmMain.SpellBarActive then
       MsgID := 11 //Spell
-    else if PtInRect( Rect( 175, 539, 256, 571 ), P ) and not Form1.SpellBarActive then
+    else if PtInRect( Rect( 175, 539, 256, 571 ), P ) and not frmMain.SpellBarActive then
       MsgID := 12 //Roster
-    else if PtInRect( Rect( 3, 510, 65, 586 ), P ) and not Form1.SpellBarActive then
+    else if PtInRect( Rect( 3, 510, 65, 586 ), P ) and not frmMain.SpellBarActive then
       MsgID := 13 //Party Member 1
-    else if PtInRect( Rect( 80, 510, 151, 586 ), P ) and not Form1.SpellBarActive then
+    else if PtInRect( Rect( 80, 510, 151, 586 ), P ) and not frmMain.SpellBarActive then
       MsgID := 14 //Party Member 2
     else
       MsgID := 0;
@@ -7985,7 +8001,7 @@ begin
 
 end;
 
-procedure TForm1.ShowHistroy;
+procedure TfrmMain.ShowHistroy;
 var
   //HistoryLog: TAdventureLog;
   Ini : TIniFile;
@@ -8042,7 +8058,7 @@ begin
 
 end;
 
-procedure TForm1.CloseHistory( Sender : TObject );
+procedure TfrmMain.CloseHistory( Sender : TObject );
 const
   FailName : string = 'Main.CloseHistory';
 begin

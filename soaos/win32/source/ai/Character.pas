@@ -2755,7 +2755,7 @@ begin
 
     WasPartyMember := ( NPCList.IndexOf( self ) >= 0 );
     if WasPartyMember and ( self <> Player ) then
-      Form1.RemoveFromParty( self );
+      frmMain.RemoveFromParty( self );
 
     if random < 0.125 then
     begin
@@ -3089,7 +3089,7 @@ begin
               if not TCharacter( FTarget ).Dieing and not CombatMode and not InterfaceLocked and
                 not ( FTarget.Frame = 0 ) and not TCharacter( FTarget ).WillBeDisabled then
               begin
-                Form1.BeginLoot( Current, FTarget );
+                frmMain.BeginLoot( Current, FTarget );
               end;
               FTarget := nil;
             end
@@ -3107,7 +3107,7 @@ begin
                 if assigned( TCharacter( NPCList.items[ i ] ).FAI ) and
                   ( TCharacter( NPCList.items[ i ] ).FAI is TPartyAI ) and not CombatMode and not InterfaceLocked then
                 begin
-                  Form1.BeginObjInventory( Current, NPCList.items[ i ] );
+                  frmMain.BeginObjInventory( Current, NPCList.items[ i ] );
                 end;
                 FTarget := nil;
               end
@@ -3165,7 +3165,7 @@ begin
               else
               begin
                 if TContainer( FTarget ).FixMissingItems then
-                  Form1.BeginObjInventory( Current, FTarget );
+                  frmMain.BeginObjInventory( Current, FTarget );
               end;
             end;
             FTarget := nil;
@@ -3459,7 +3459,7 @@ begin
       Dead := True;
       WasPartyMember := ( NPCList.IndexOf( self ) >= 0 );
       if WasPartyMember and ( self <> Player ) then
-        Form1.RemoveFromParty( self );
+        frmMain.RemoveFromParty( self );
       FRecoveryCount := 0;
       if random < 0.125 then
       begin
@@ -8121,7 +8121,7 @@ begin
     begin
 
       if FixMissingItems then
-        Form1.BeginObjInventory( Current, self );
+        frmMain.BeginObjInventory( Current, self );
       ShowObjectInventory := false;
     end;
 
@@ -14062,7 +14062,7 @@ begin
           end;
         end;
         if Game.KeyFigure = self then
-          Form1.ChangeFocus( Master );
+          frmMain.ChangeFocus( Master );
       end;
     end
     else

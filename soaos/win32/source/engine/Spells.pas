@@ -3954,7 +3954,7 @@ begin
         InterfaceLocked := true;
         AddEffect( Effect );
       end;
-      Form1.ChangeFocus( NewCharacter );
+      frmMain.ChangeFocus( NewCharacter );
     end;
 
   except

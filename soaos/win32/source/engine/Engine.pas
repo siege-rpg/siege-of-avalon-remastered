@@ -726,12 +726,12 @@ begin
         end
         else if Token = 'fadetoblack' then
         begin
-          Form1.Active := False;
-          Form1.Timer3.Interval := 200;
-          Form1.Timer3.tag := 5;
+          frmMain.Active := False;
+          frmMain.Timer3.Interval := 200;
+          frmMain.Timer3.tag := 5;
           MouseCursor.Enabled := false;
           BlackScript := Parms;
-          Form1.Timer3.enabled := true;
+          frmMain.Timer3.enabled := true;
         end
         else if ( Token = 'loadmap' ) or ( Token = 'loadmapext' ) then
         begin
@@ -744,22 +744,22 @@ begin
             S4 := Parse( S0, 3, ',' );
             k := Pos( '|', Parms );
             if ( k = 0 ) or NoTransit then
-              Form1.LoadNewMap( S1, S2, S3, S4 )
+              frmMain.LoadNewMap( S1, S2, S3, S4 )
             else
             begin
               S5 := copy( Parms, k, length( Parms ) - k + 1 );
-              Form1.BeginTransit( S1, S2, S3, S4, S5 );
+              frmMain.BeginTransit( S1, S2, S3, S4, S5 );
             end;
           end;
         end
         else if Token = 'enableconsole' then
         begin
-          Form1.DisableConsole := false;
+          frmMain.DisableConsole := false;
         end
         else if Token = 'disableconsole' then
         begin
-          Form1.DisableConsole := true;
-          Form1.OnKeyDown := nil;
+          frmMain.DisableConsole := true;
+          frmMain.OnKeyDown := nil;
           Game.OnMouseDown := nil;
 
           Game.OnMouseUp := nil;
@@ -778,26 +778,26 @@ begin
             TCharacter( ObjectRef ).CalcStats; // just to be sure
             Log.Log( '-- Party.HitPoints is now ' + FloatToStr( TCharacter( ObjectRef ).HitPoints ) + ' and BaseHitPoints is now ' + FloatToStr( TCharacter( ObjectRef ).BaseHitPoints ) );
           end;
-          Form1.AddToParty( ObjectRef );
+          frmMain.AddToParty( ObjectRef );
         end
         else if Token = 'removefromparty' then
         begin
           if NPCList.Count > 1 then
           begin
-            Form1.ChangeFocus( player );
-            Form1.RemoveFromParty( ObjectRef );
+            frmMain.ChangeFocus( player );
+            frmMain.RemoveFromParty( ObjectRef );
           end;
         end
         else if Token = 'removeallpartymembers' then
         begin
           if NPCList.Count > 1 then
           begin
-            Form1.ChangeFocus( player );
+            frmMain.ChangeFocus( player );
             while NPCList.Count > 1 do
               if NPCList.Items[ 1 ] <> player then
               begin
                 TCharacter( NPCList.Items[ 1 ] ).Alliance := '';
-                Form1.RemoveFromParty( NPCList.Items[ 1 ] );
+                frmMain.RemoveFromParty( NPCList.Items[ 1 ] );
               end;
           end;
         end
@@ -805,7 +805,7 @@ begin
         begin
           if NPCList.Count > 1 then
           begin
-            Form1.ChangeFocus( player );
+            frmMain.ChangeFocus( player );
             for iLoop := 0 to NPCList.Count - 1 do
               if NPCList.Items[ iLoop ] <> player then
               begin
@@ -823,7 +823,7 @@ begin
         end
         else if Token = 'savegame' then
         begin
-          Form1.SaveAGame( Parms );
+          frmMain.SaveAGame( Parms );
         end
         else if ( Token = 'setproperty' ) or ( Token = 'setprop' ) then
         begin
@@ -914,7 +914,7 @@ begin
         else if Token = 'merchant' then
         begin
           if ObjectRef is TCharacter then
-            Form1.BeginMerchant( TCharacter( ObjectRef ) );
+            frmMain.BeginMerchant( TCharacter( ObjectRef ) );
         end
         else if Token = 'cleartrack' then
         begin
@@ -923,7 +923,7 @@ begin
         end
         else if Token = 'changetheme' then
         begin
-          Form1.CurrentTheme := Parms;
+          frmMain.CurrentTheme := Parms;
         end
         else if Token = 'playmp3' then
         begin
@@ -931,31 +931,31 @@ begin
           begin
             MusicLib.OpenThisSong( SoundPath + 'theme\' + Parms );
             MusicLib.PlayThisSong;
-            Form1.SoundTimer.Enabled := false;
+            frmMain.SoundTimer.Enabled := false;
           end;
         end
         else if Token = 'endmp3' then
         begin
           if Assigned( MusicLib ) then
           begin
-            Form1.SoundTimer.Enabled := false;
+            frmMain.SoundTimer.Enabled := false;
           end;
         end
 
         else if Token = 'setdeathscreen' then
         begin
-          Form1.DeathScreen := Parms;
+          frmMain.DeathScreen := Parms;
         end
         else if Token = 'showending' then
         begin
-          Form1.ShowEnding;
+          frmMain.ShowEnding;
         end
         else if Token = 'showmessage' then
         begin
           S1 := Parse( Parms, 0, ',' ); //Message
           S2 := Parse( Parms, 1, ',' ); //Time
           try
-            Form1.ShowQuickMessage( S1, StrToInt( S2 ) );
+            frmMain.ShowQuickMessage( S1, StrToInt( S2 ) );
           except
           end;
         end
@@ -1201,11 +1201,11 @@ begin
         end
         else if Token = 'journalentry' then
         begin
-          Form1.AddLogEntry( Parms );
+          frmMain.AddLogEntry( Parms );
         end
         else if Token = 'addquest' then
         begin
-          Form1.AddQuest( Parms );
+          frmMain.AddQuest( Parms );
         end
         else if Token = 'removequest' then
         begin
@@ -1215,7 +1215,7 @@ begin
         end
         else if Token = 'adventure' then
         begin
-          Form1.AddAdventure( Parms );
+          frmMain.AddAdventure( Parms );
         end
         else if Token = 'additem' then
         begin
@@ -1445,7 +1445,7 @@ begin
 {$ENDIF}
   try
 
-    Form1.BeginConverse( TGameObject( ObjectRef ), Conversation );
+    frmMain.BeginConverse( TGameObject( ObjectRef ), Conversation );
 
   except
     on E : Exception do

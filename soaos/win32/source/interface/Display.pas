@@ -200,7 +200,7 @@ begin
     Game.OnMouseDown := MouseDown;
     Game.OnMouseMove := MouseMove;
     Game.OnMouseUp := MouseUp;
-    Form1.OnKeyDown := KeyDown;
+    frmMain.OnKeyDown := KeyDown;
   except
     on E : Exception do
       Log.log( FailName + E.Message );
