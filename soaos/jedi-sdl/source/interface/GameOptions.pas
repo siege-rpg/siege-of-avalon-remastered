@@ -59,6 +59,9 @@ unit GameOptions;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2004/09/30 22:49:20  savage
+  Initial Game Interface units.
+
 
 }
 {******************************************************************************}
@@ -71,12 +74,23 @@ uses
   SiegeInterfaces;
 
 type
+  TMouseOverGameOptions = ( moNone, moContinue, moSound, moMusic, moShadowsOn, moShadowsOff, moEnglish, moSpanish, moGerman, moSpells );
+
+  TLanguageSelected = ( lsEnglish, lsSpanish, lsGerman );
+  
   TGameOptions = class( TSimpleSoAInterface )
   private
     DXContinue, DXYellow, DXVolumeSlider, DXVolumeShadow : PSDL_Surface;
+    DxLangEng, DxLangSpa, DxLangGer : PSDL_Surface;
     DxTextMessage : array[ 0..4 ] of PSDL_Surface;
     SpellList : TStringList;
-    MouseIsOverContinue, MouseIsOverSound, MouseIsOverMusic, MouseIsOverShadows, MouseIsOverSpells : Boolean;
+    MouseOverOptions : TMouseOverGameOptions;
+    ShadowsOn : Boolean;
+    LanguageSelected : TLanguageSelected;
+    EngRect, SpaRect, GerRect : TSDL_Rect;
+    SoundRect, MusicRect, ShadowOnRect, ShadowOffRect, ContinueRect : TSDL_Rect;
+    SpellsRect : TSDL_Rect;
+    SoundPos, MusicPos : integer;
   public
     procedure FreeSurfaces; override;
     procedure LoadSurfaces; override;
@@ -91,7 +105,7 @@ implementation
 uses
   SysUtils,
   globals,
-  GameMainMenu;
+  GameMainMenu, sdlgameinterface;
 
 { TGameOptions }
 
@@ -103,10 +117,15 @@ begin
   SDL_FreeSurface( DXYellow );
   SDL_FreeSurface( DXVolumeSlider );
   SDL_FreeSurface( DXVolumeShadow );
+  SDL_FreeSurface( DxLangEng );
+  SDL_FreeSurface( DxLangSpa );
+  SDL_FreeSurface( DxLangGer );
   for i := Low( DxTextMessage ) to High( DxTextMessage ) do
     SDL_FreeSurface( DxTextMessage[ i ] );
 
   ExText.Close;
+
+  SpellList.Free;
   inherited;
 end;
 
@@ -118,12 +137,14 @@ end;
 
 procedure TGameOptions.LoadSurfaces;
 var
-  Flags : Cardinal;
   i : integer;
+  Flags : Cardinal;
   C : TSDL_Color;
 begin
   inherited;
   Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
+
+  SpellList := TStringList.Create;
 
   ExText.Open( 'Options' );
   C.r := 231;
@@ -138,15 +159,16 @@ begin
     GameFont.FontSize := 13
   else}
   GameFont.FontSize := 18;
-  for i := 0 to 4 do
+
+  for i := Low( DxTextMessage ) to High( DxTextMessage ) do
   begin
-    DxTextMessage[ i ] := GameFont.DrawText( ExText.GetText( 'Message' + inttostr( i ) ) );
+    DxTextMessage[ i ] := GameFont.DrawText( ExText.GetText( 'Message' + IntToStr( i ) ) );
     SDL_SetColorKey( DxTextMessage[ i ], Flags, SDL_MapRGB( DxTextMessage[ i ].format, 0, 0, 0 ) );
   end;
 
   //TODO : { if Character <> nil then SpellList := Character.SpellList; }
 
-  DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opContinue.bmp' ) );
+  DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'opContinue.bmp' ) );
   SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 0, 255, 255 ) );
 
   DXYellow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opYellow.bmp' ) );
@@ -156,10 +178,78 @@ begin
   SDL_SetColorKey( DXVolumeSlider, Flags, SDL_MapRGB( DXVolumeSlider.format, 0, 255, 255 ) );
 
   DXVolumeShadow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opVolumeShadow.bmp' ) );
-  SDL_SetColorKey( DXVolumeShadow, Flags, SDL_MapRGB( DXVolumeShadow.format, 0, 255, 255 ) );
+  SDL_SetColorKey( DXVolumeShadow, Flags, SDL_MapRGB( DXVolumeShadow.format, 0, 0, 0 ) );
 
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'options.bmp' ) );
+  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'options.bmp' ) );
   SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
+
+  DxLangEng := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'english.bmp' ) );
+  SDL_SetColorKey( DxLangEng, Flags, SDL_MapRGB( DxLangEng.format, 0, 255, 255 ) );
+
+  DxLangSpa := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'spanish.bmp' ) );
+  SDL_SetColorKey( DxLangSpa, Flags, SDL_MapRGB( DxLangSpa.format, 0, 255, 255 ) );
+
+  DxLangGer := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'german.bmp' ) );
+  SDL_SetColorKey( DxLangGer, Flags, SDL_MapRGB( DxLangGer.format, 0, 255, 255 ) );
+
+  // Setup Rects
+  if SoASettings.LanguagePath = 'english' then
+    LanguageSelected := lsEnglish;
+  EngRect.x := 363;
+  EngRect.y := 135;
+  EngRect.w := DxLangEng.w shr 1;
+  EngRect.h := DxLangEng.h;
+
+  if SoASettings.LanguagePath = 'spanish' then
+    LanguageSelected := lsSpanish;
+
+  SpaRect.x := 468;
+  SpaRect.y := 135;
+  SpaRect.w := DxLangSpa.w shr 1;
+  SpaRect.h := DxLangSpa.h;
+
+  if SoASettings.LanguagePath = 'german' then
+    LanguageSelected := lsGerman;
+
+  GerRect.x := 573;
+  GerRect.y := 135;
+  GerRect.w := DxLangGer.w shr 1;
+  GerRect.h := DxLangGer.h;
+
+  SoundRect.x := 100;
+  SoundRect.y := 88;
+  SoundRect.w := 230;
+  SoundRect.h := 35;
+
+  MusicRect.x := 100;
+  MusicRect.y := 172;
+  MusicRect.w := 230;
+  MusicRect.h := 35;
+
+  ShadowOnRect.x := 557;
+  ShadowOnRect.y := 71;
+  ShadowOnRect.w := 20;
+  ShadowOnRect.h := 20;
+
+  ShadowOffRect.x := 628;
+  ShadowOffRect.y := 71;
+  ShadowOffRect.w := 20;
+  ShadowOffRect.h := 20;
+
+  ContinueRect.x := 500;
+  ContinueRect.y := 450;
+  ContinueRect.w := 200;
+  ContinueRect.h := 45;
+
+  SpellsRect.x := 500;
+  SpellsRect.y := 450;
+  SpellsRect.w := 200;
+  SpellsRect.h := 45;
+
+  // Load Selections from SoASettings
+  ShadowsOn := SoASettings.ShadowsOn;
+  SoundPos := Round( ( ( SoASettings.SoundVolume * SoundRect.w ) / 255 ) + SoundRect.x );
+  MusicPos := Round( ( ( SoASettings.MusicVolume * MusicRect.w ) / 255 ) + MusicRect.x );
 
   NextGameInterface := TMainMenu; // TODO : Change this to something more appropriate
 end;
@@ -167,8 +257,65 @@ end;
 procedure TGameOptions.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
 begin
   inherited;
-  if PointIsInRect( CurrentPos, 500, 450, 700, 495 ) then
-  begin // clicked continue
+  if PointIsInRect( CurrentPos, SoundRect.x, SoundRect.y, SoundRect.x + SoundRect.w, SoundRect.y + SoundRect.h ) then //Sound Volume
+  begin
+    SoundPos := CurrentPos.x;
+    if SoundPos < 116 then
+      SoundPos := 116;
+    if SoundPos > 316 then
+      SoundPos := 316;
+  end
+  else if PointIsInRect( CurrentPos, MusicRect.x, MusicRect.y, MusicRect.x + MusicRect.w, MusicRect.y + MusicRect.h ) then //Music Volume
+  begin
+    MusicPos := CurrentPos.x;
+    if MusicPos < 116 then
+      MusicPos := 116;
+    if MusicPos > 316 then
+      MusicPos := 316;
+  end;
+
+  if PointIsInRect( CurrentPos, ShadowOnRect.x, ShadowOnRect.y, ShadowOnRect.x + ShadowOnRect.w, ShadowOnRect.y + ShadowOnRect.h ) then
+  begin //yes
+    ShadowsOn := true;
+  end
+  else if PointIsInRect( CurrentPos, ShadowOffRect.x, ShadowOffRect.y, ShadowOffRect.x + ShadowOffRect.w, ShadowOffRect.y + ShadowOffRect.h ) then
+  begin //no
+    ShadowsOn := false;
+  end
+  else if PointIsInRect( CurrentPos, EngRect.x, EngRect.y, EngRect.x + EngRect.w, EngRect.y + EngRect.w ) then
+  begin
+    LanguageSelected := lsEnglish
+  end
+  else if PointIsInRect( CurrentPos, SpaRect.x, SpaRect.y, SpaRect.x + SpaRect.w, SpaRect.y + SpaRect.w ) then
+  begin
+    LanguageSelected := lsSpanish
+  end
+  else if PointIsInRect( CurrentPos, GerRect.x, GerRect.y, GerRect.x + GerRect.w, GerRect.y + GerRect.w ) then
+  begin
+    LanguageSelected := lsGerman
+  end
+  else if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
+  begin // Continue
+    // Save Selections to SoASettings
+    SoASettings.ShadowsOn := ShadowsOn;
+    SoASettings.SoundVolume := Round( ( ( SoundPos - SoundRect.x ) / SoundRect.w ) * 255 );
+    SoASettings.MusicVolume := Round( ( ( MusicPos - MusicRect.x ) / MusicRect.w ) * 255 );
+    case LanguageSelected of
+      lsEnglish :
+      begin
+        SoASettings.LanguagePath := 'english';
+      end;
+
+      lsSpanish :
+      begin
+        SoASettings.LanguagePath := 'spanish';
+      end;
+
+      lsGerman :
+      begin
+        SoASettings.LanguagePath := 'german';
+      end;
+    end;
     MainWindow.Rendering := false;
   end;
 end;
@@ -176,89 +323,203 @@ end;
 procedure TGameOptions.MouseMove( Shift : TSDLMod; CurrentPos, RelativePos : TPoint );
 begin
   inherited;
-  if Dragging then
-  begin
-  end
-  else
-  begin
-    MouseIsOverContinue := false;
-    MouseIsOverSound := false;
-    MouseIsOverMusic := false;
-    MouseIsOverShadows := false;
-    MouseIsOverSpells := false;
-    if PointIsInRect( CurrentPos, 500, 450, 700, 495 ) then
-      MouseIsOverContinue := true
-    else if PointIsInRect( CurrentPos, 100, 61, 332, 126 ) then
-      MouseIsOverSound := true
-    else if PointIsInRect( CurrentPos, 9, 144, 332, 209 ) then
-      MouseIsOverMusic := true
-    else if PointIsInRect( CurrentPos, 350, 61, 695, 98 ) then
-      MouseIsOverShadows := true
-    else if PointIsInRect( CurrentPos, 359, 670, 121, 240 ) then
-      MouseIsOverSpells := true;
-  end;
+
+  MouseOverOptions := moNone;
+  if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
+    MouseOverOptions := moContinue
+  else if PointIsInRect( CurrentPos, SoundRect.x, SoundRect.y, SoundRect.x + SoundRect.w, SoundRect.y + SoundRect.h ) then
+    MouseOverOptions := moSound
+  else if PointIsInRect( CurrentPos, MusicRect.x, MusicRect.y, MusicRect.x + MusicRect.w, MusicRect.y + MusicRect.h ) then
+    MouseOverOptions := moMusic
+  else if PointIsInRect( CurrentPos, ShadowOnRect.x, ShadowOnRect.y, ShadowOnRect.x + ShadowOnRect.w, ShadowOnRect.y + ShadowOnRect.h ) then
+    MouseOverOptions := moShadowsOn
+  else if PointIsInRect( CurrentPos, ShadowOffRect.x, ShadowOffRect.y, ShadowOffRect.x + ShadowOffRect.w, ShadowOffRect.y + ShadowOffRect.h ) then
+    MouseOverOptions := moShadowsOff
+  else if PointIsInRect( CurrentPos, EngRect.x, EngRect.y, EngRect.x + EngRect.w, EngRect.y + EngRect.h ) then
+    MouseOverOptions := moEnglish
+  else if PointIsInRect( CurrentPos, SpaRect.x, SpaRect.y, SpaRect.x + SpaRect.w, SpaRect.y + SpaRect.h ) then
+    MouseOverOptions := moSpanish
+  else if PointIsInRect( CurrentPos, GerRect.x, GerRect.y, GerRect.x + GerRect.w, GerRect.y + GerRect.h ) then
+    MouseOverOptions := moGerman
+  else if PointIsInRect( CurrentPos, SpellsRect.x, SpellsRect.y, SpellsRect.x + SpellsRect.w, SpellsRect.y + SpellsRect.h ) then
+    MouseOverOptions := moSpells;
 end;
 
 procedure TGameOptions.Render;
 var
-  Rect : TSDL_Rect;
+  Rect, SrcRect : TSDL_Rect;
 begin
   inherited;
-  if MouseIsOverContinue then
-  begin
-    Rect.x := 400;
-    Rect.y := 450;
-    Rect.w := 300;
-    Rect.h := 45;
-    SDL_BlitSurface( DXContinue, nil, MainWindow.DisplaySurface, @Rect );
-  end;
-
-  if MouseIsOverSound then
-  begin
-    Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 0 ].w ) shr 1;
-    Rect.y := 516;
-    Rect.w := DxTextMessage[ 0 ].w;
-    Rect.h := DxTextMessage[ 0 ].h;
-    SDL_BlitSurface( DxTextMessage[ 0 ], nil, MainWindow.DisplaySurface, @Rect );
-  end;
-
-  if MouseIsOverMusic then
-  begin
-    Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 1 ].w ) shr 1;
-    Rect.y := 516;
-    Rect.w := DxTextMessage[ 1 ].w;
-    Rect.h := DxTextMessage[ 1 ].h;
-    SDL_BlitSurface( DxTextMessage[ 1 ], nil, MainWindow.DisplaySurface, @Rect );
-  end;
-
-  if MouseIsOverShadows then
-  begin
-    Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 2 ].w ) shr 1;
-    Rect.y := 516;
-    Rect.w := DxTextMessage[ 2 ].w;
-    Rect.h := DxTextMessage[ 2 ].h;
-    SDL_BlitSurface( DxTextMessage[ 2 ], nil, MainWindow.DisplaySurface, @Rect );
-  end;
-
-  if MouseIsOverSpells then
-  begin
-    {if Character = nil then
+  case  MouseOverOptions of
+    moContinue:
     begin
-      Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 3 ].w ) shr 1;
-      Rect.y := 516;
-      Rect.w := DxTextMessage[ 3 ].w;
-      Rect.h := DxTextMessage[ 3 ].h;
-      SDL_BlitSurface( DxTextMessage[ 3 ], nil, MainWindow.DisplaySurface, @Rect )
-    end
-    else}
+      Rect.x := 400;
+      Rect.y := 450;
+      Rect.w := 300;
+      Rect.h := 45;
+      SDL_BlitSurface( DXContinue, nil, MainWindow.DisplaySurface, @Rect );
+    end;
+
+    moSound:
     begin
-      Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 4 ].w ) shr 1;
+      Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 0 ].w ) shr 1;
       Rect.y := 516;
-      Rect.w := DxTextMessage[ 4 ].w;
-      Rect.h := DxTextMessage[ 4 ].h;
-      SDL_BlitSurface( DxTextMessage[ 4 ], nil, MainWindow.DisplaySurface, @Rect )
-    end
+      Rect.w := DxTextMessage[ 0 ].w;
+      Rect.h := DxTextMessage[ 0 ].h;
+      SDL_BlitSurface( DxTextMessage[ 0 ], nil, MainWindow.DisplaySurface, @Rect );
+    end;
+
+    moMusic:
+    begin
+      Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 1 ].w ) shr 1;
+      Rect.y := 516;
+      Rect.w := DxTextMessage[ 1 ].w;
+      Rect.h := DxTextMessage[ 1 ].h;
+      SDL_BlitSurface( DxTextMessage[ 1 ], nil, MainWindow.DisplaySurface, @Rect );
+    end;
+
+    moShadowsOn, moShadowsOff:
+    begin
+      Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 2 ].w ) shr 1;
+      Rect.y := 516;
+      Rect.w := DxTextMessage[ 2 ].w;
+      Rect.h := DxTextMessage[ 2 ].h;
+      SDL_BlitSurface( DxTextMessage[ 2 ], nil, MainWindow.DisplaySurface, @Rect );
+    end;
+
+    moSpells:
+    begin
+      {if Character = nil then
+      begin
+        Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 3 ].w ) shr 1;
+        Rect.y := 516;
+        Rect.w := DxTextMessage[ 3 ].w;
+        Rect.h := DxTextMessage[ 3 ].h;
+        SDL_BlitSurface( DxTextMessage[ 3 ], nil, MainWindow.DisplaySurface, @Rect )
+      end
+      else}
+      begin
+        Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage[ 4 ].w ) shr 1;
+        Rect.y := 516;
+        Rect.w := DxTextMessage[ 4 ].w;
+        Rect.h := DxTextMessage[ 4 ].h;
+        SDL_BlitSurface( DxTextMessage[ 4 ], nil, MainWindow.DisplaySurface, @Rect )
+      end
+    end;
   end;
+
+  if ShadowsOn then
+  begin
+    Rect.x := 561;
+    Rect.y := 75;
+    Rect.w := DXYellow.w;
+    Rect.h := DXYellow.h;
+    SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+  end
+  else
+  begin
+    Rect.x := 633;
+    Rect.y := 75;
+    Rect.w := DXYellow.w;
+    Rect.h := DXYellow.h;
+    SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+  end;
+
+  case LanguageSelected of
+    lsEnglish :
+    begin
+      SrcRect.x := ( DxLangEng.w shr 1 );
+      SrcRect.y := 0;
+      SrcRect.w := DxLangEng.w shr 1;
+      SrcRect.h := DxLangEng.h;
+      SDL_BlitSurface( DxLangEng, @SrcRect, MainWindow.DisplaySurface, @EngRect );
+
+      SrcRect.x := 0;
+      SrcRect.y := 0;
+      SrcRect.w := DxLangSpa.w shr 1;
+      SrcRect.h := DxLangSpa.h;
+      SDL_BlitSurface( DxLangSpa, @SrcRect, MainWindow.DisplaySurface, @SpaRect );
+
+      SrcRect.x := 0;
+      SrcRect.y := 0;
+      SrcRect.w := DxLangGer.w shr 1;
+      SrcRect.h := DxLangGer.h;
+      SDL_BlitSurface( DxLangGer, @SrcRect, MainWindow.DisplaySurface, @GerRect );
+    end;
+
+    lsSpanish :
+    begin
+      SrcRect.x := 0;
+      SrcRect.y := 0;
+      SrcRect.w := DxLangEng.w shr 1;
+      SrcRect.h := DxLangEng.h;
+      SDL_BlitSurface( DxLangEng, @SrcRect, MainWindow.DisplaySurface, @EngRect );
+
+      SrcRect.x := ( DxLangSpa.w shr 1 );
+      SrcRect.y := 0;
+      SrcRect.w := DxLangSpa.w shr 1;
+      SrcRect.h := DxLangSpa.h;
+      SDL_BlitSurface( DxLangSpa, @SrcRect, MainWindow.DisplaySurface, @SpaRect );
+
+      SrcRect.x := 0;
+      SrcRect.y := 0;
+      SrcRect.w := DxLangGer.w shr 1;
+      SrcRect.h := DxLangGer.h;
+      SDL_BlitSurface( DxLangGer, @SrcRect, MainWindow.DisplaySurface, @GerRect );
+    end;
+
+    lsGerman :
+    begin
+      SrcRect.x := 0;
+      SrcRect.y := 0;
+      SrcRect.w := DxLangEng.w shr 1;
+      SrcRect.h := DxLangEng.h;
+      SDL_BlitSurface( DxLangEng, @SrcRect, MainWindow.DisplaySurface, @EngRect );
+
+      SrcRect.x := 0;
+      SrcRect.y := 0;
+      SrcRect.w := DxLangSpa.w shr 1;
+      SrcRect.h := DxLangSpa.h;
+      SDL_BlitSurface( DxLangSpa, @SrcRect, MainWindow.DisplaySurface, @SpaRect );
+
+      SrcRect.x := ( DxLangGer.w shr 1 );
+      SrcRect.y := 0;
+      SrcRect.w := DxLangGer.w shr 1;
+      SrcRect.h := DxLangGer.h;
+      SDL_BlitSurface( DxLangGer, @SrcRect, MainWindow.DisplaySurface, @GerRect );
+    end;
+
+  end;
+
+  //Sound FX
+  Rect.x := 116;
+  Rect.y := 92;
+  Rect.w := SoundPos;
+  Rect.h := 12;
+  SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+
+
+  Rect.x := SoundPos - ( DXVolumeSlider.w shr 1 );
+  Rect.y := 103;
+  Rect.w := DXVolumeSlider.w;
+  Rect.h := DXVolumeSlider.h;
+  SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
+  SDL_BlitSurface( DXVolumeSlider, nil, MainWindow.DisplaySurface, @Rect );
+
+
+  //Music
+  Rect.x := 116;
+  Rect.y := 175;
+  Rect.w := MusicPos;
+  Rect.h := 12;
+  SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+
+  Rect.x := MusicPos - ( DXVolumeSlider.w shr 1 );
+  Rect.y := 184;
+  Rect.w := DXVolumeSlider.w;
+  Rect.h := DXVolumeSlider.h;
+  SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
+  SDL_BlitSurface( DXVolumeSlider, nil, MainWindow.DisplaySurface, @Rect );
 end;
 
 end.
