@@ -153,8 +153,8 @@ begin
   SiegeIni := TIniFile.Create( ExtractFilePath( Application.ExeName ) + 'siege.ini' );
   try
 
-    OpeningMovie := SiegeIni.ReadString( 'Settings', 'MoviePath', ExtractFilePath( Application.ExeName ) + 'Movies' ) + '\' + SiegeIni.ReadString( 'Settings', 'OpeningMovie', 'siegeopening.bik' );
-    ClosingMovie := SiegeIni.ReadString( 'Settings', 'MoviePath', ExtractFilePath( Application.ExeName ) + 'Movies' ) + '\' + SiegeIni.ReadString( 'Settings', 'ClosingMovie', 'siegeclosing.bik' );
+    OpeningMovie := SiegeIni.ReadString( 'Settings', 'MoviePath', ExtractFilePath( Application.ExeName ) + 'Movies' ) + '/' + SiegeIni.ReadString( 'Settings', 'OpeningMovie', 'siegeopening.bik' );
+    ClosingMovie := SiegeIni.ReadString( 'Settings', 'MoviePath', ExtractFilePath( Application.ExeName ) + 'Movies' ) + '/' + SiegeIni.ReadString( 'Settings', 'ClosingMovie', 'siegeclosing.bik' );
     MovieSwitches := UpperCase( SiegeIni.ReadString( 'Settings', 'MovieSwitches', '/R/C/U1/I102/D9/B0' ) );
 
     Screen.Cursor := crNone;
