@@ -71,7 +71,7 @@ uses
   Graphics,
   Controls,
   ExtCtrls,
-  Dialogs, {DsgnIntf,}
+  Dialogs,
   AniDec30,
   AStar,
   MMTimer,

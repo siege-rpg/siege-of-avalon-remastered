@@ -72,17 +72,14 @@ uses
   Controls,
   ExtCtrls,
   Dialogs,
-  DsgnIntf,
   AniDec30,
   AStar,
-  MMTimer
+  MMTimer,
 {$IFDEF DirectX}
-  ,
   DirectX,
   DXUtil,
-  DXEffects
+  DXEffects,
 {$ENDIF}
-  ,
   LogFile;
 
 type
