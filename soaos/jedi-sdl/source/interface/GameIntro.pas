@@ -59,6 +59,9 @@ unit GameIntro;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2004/09/30 22:49:20  savage
+  Initial Game Interface units.
+
 
 }
 {******************************************************************************}
@@ -146,7 +149,7 @@ var
   Rect : TSDL_Rect;
 begin
   inherited;
-  Rect.x := -60;
+  Rect.x := 0;
   Rect.y := 0;
   Rect.w := DxSiege.w;
   Rect.h := DxSiege.h;
