@@ -90,8 +90,8 @@ MaxStackSize=8388608
 ImageBase=8388608
 ExeDescription=
 [Directories]
-OutputDir=..\..\..\game
-UnitOutputDir=dcu
+OutputDir=./../../../game
+UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
 SearchPath=ai;engine;graphics;interface;sound
@@ -134,6 +134,8 @@ OriginalFilename=Siege
 ProductName=Siege of Avalon(tm)
 ProductVersion=1.1.2001.0409
 Comments=Siege of Avalon, an Episodic Computer Game Novel from Digital Tome
+[Excluded Packages]
+E:\Development\Projects\Games\SOAOS\soaos\jedi-sdl\source\components\SOA.bpl=(untitled)
 [HistoryLists\hlConditionals]
 Count=3
 Item0=DirectX
@@ -143,20 +145,28 @@ Item2=DirectX;D4
 Count=1
 Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
 [HistoryLists\hlSearchPath]
-Count=5
+Count=6
 Item0=ai;engine;graphics;interface;sound
-Item1=engine
-Item2=dcu;engine
-Item3=..\dcu;..\engine
-Item4=..\dcu
+Item1=$(DELPHI)\Lib\Debug;ai;engine;graphics;interface;sound
+Item2=engine
+Item3=dcu;engine
+Item4=..\dcu;..\engine
+Item5=..\dcu
 [HistoryLists\hlUnitOutputDirectory]
-Count=3
-Item0=dcu
-Item1=..\dcu
-Item2=$(DELPHI)\dcu
+Count=5
+Item0=$(DELPHI)\dcu
+Item1=dcu
+Item2=../dcu
+Item3=./dcu
+Item4=..\dcu
 [HistoryLists\hlOutputDirectorry]
-Count=4
-Item0=..\..\..\game
-Item1=..\..\game
-Item2=../../game
-Item3=E:\Games\SOAOS
+Count=9
+Item0=./../../../game
+Item1=/../../../game
+Item2=E:/Development/Projects/Games/SOAOS/game
+Item3=E:\Development\Projects\Games\SOAOS\game
+Item4=../../../game
+Item5=..\..\..\game
+Item6=..\..\game
+Item7=../../game
+Item8=E:\Games\SOAOS
