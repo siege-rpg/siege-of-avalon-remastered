@@ -64,6 +64,10 @@ unit Anigrp30;
 interface
 
 uses
+{$ifdef LINUX}
+  SysUtils, Types, Classes, Variants, QTypes, QGraphics, QControls, QForms,
+  QDialogs, QStdCtrls,
+{$else}
   Windows,
   Classes,
   SysUtils,
@@ -72,6 +76,7 @@ uses
   Controls,
   ExtCtrls,
   Dialogs,
+{$endif}
   AniDec30,
   AStar,
   MMTimer,

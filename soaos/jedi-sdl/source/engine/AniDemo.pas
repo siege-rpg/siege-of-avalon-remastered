@@ -65,6 +65,10 @@ interface
 {$INCLUDE Anigrp30cfg.inc}
 
 uses
+{$ifdef LINUX}
+  SysUtils, Types, Classes, Variants, QTypes, QGraphics, QControls, QForms,
+  QDialogs, QStdCtrls,
+{$else}
   Windows,
   Messages,
   SysUtils,
@@ -76,6 +80,7 @@ uses
   ExtCtrls,
   StdCtrls,
   Buttons,
+{$endif}
   IniFiles,
   LogFile,
   Spells,
@@ -118,7 +123,7 @@ uses
   LogScreen,
   Transit,
   AddKickNPC,
-  Security;
+  Security, QTypes, QExtCtrls, QGraphics, QControls;
 
 const
   WM_StartMainMenu = WM_USER + 1;

@@ -62,9 +62,14 @@ unit LogFile;
 interface
 
 uses
+{$ifdef LINUX}
+  SysUtils, Types, Classes, Variants, QTypes, QGraphics, QControls, QForms,
+  QDialogs, QStdCtrls;
+{$else}
   Classes,
   SysUtils,
   Windows;
+{$endif}
 
 type
   TLog = class( TFileStream )
@@ -83,7 +88,9 @@ type
   private
     RealCurrDbgLvl, // Set by Command Line Parser to current Debug Level of Detail
       RealCurrDbgGroup : Word; // Set by Command Line Parser to current Debug Interest Group
+{$ifndef LINUX} {ToDo: find equivilent in LINUX}
     MEMORYSTATUS : TMemoryStatus;
+{$endif}
     procedure OutputLogHeader;
     procedure ParseCommandLine;
   end;
@@ -113,8 +120,11 @@ var
 
 implementation
 
-uses String32,
+uses
+{$ifndef LINUX}
+  String32,
   Forms,
+{$endif}
   Engine,
   IniFiles;
 
@@ -187,7 +197,8 @@ begin
     S := 'Commandline: ' + #13#10 + CmdLine + #13#10 + #13#10;
     Write( S[ 1 ], Length( S ) );
   end;
-
+  {ToDo Find equivilent in Linux }
+{$ifndef LINUX}
   MEMORYSTATUS.dwLength := SizeOf( MEMORYSTATUS );
   GlobalMemoryStatus( MEMORYSTATUS );
   with MEMORYSTATUS do
@@ -220,6 +231,7 @@ begin
     S := S + #13#10 + ' ===== End Of Header =====' + #13#10 + #13#10;
     Write( S[ 1 ], Length( S ) );
   end; { with }
+{$endif}
 end;
 
 procedure TLog.ParseCommandLine;

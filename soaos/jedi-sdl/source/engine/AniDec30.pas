@@ -64,11 +64,16 @@ unit AniDec30;
 interface
 
 uses
+{$ifdef LINUX}
+  SysUtils, Types, Classes, Variants, QTypes, QGraphics, QControls, QForms,
+  QDialogs, QStdCtrls,
+{$else}
   Windows,
   Classes,
   Graphics,
   SysUtils,
   Controls,
+{$endif}
   LogFile;
 
 const

@@ -60,11 +60,20 @@ program Siege;
 {******************************************************************************}
 
 uses
+  {$IFDEF LINUX}
+  QForms,
+  QControls,
+  SysUtils,
+  IniFiles,
+//  SysUtils, Types, Classes, Variants, QTypes, QGraphics,
+//  QDialogs, QStdCtrls;
+  {$else}
   Forms,
   Windows,
   SysUtils,
   IniFiles,
   Controls,
+  {$endif}
   AniDemo in 'engine\AniDemo.pas' {frmMain},
   Loader in 'engine\Loader.pas',
   Resource in 'engine\Resource.pas',
