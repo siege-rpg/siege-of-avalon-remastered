@@ -4663,34 +4663,34 @@ var
 begin
   if ( FMap = nil ) then
     Exit;
-//TZone(FMap.Zones[1]).ExportTiles('f:\zone1tiles.bmp');
-//TZone(FMap.Zones[2]).ExportTiles('f:\zone2tiles.bmp');
-{TZone(FMap.Zones[0]).ExportItems('f:\zone0items.bmp');
-TZone(FMap.Zones[1]).ExportItems('f:\zone1items.bmp');
-TZone(FMap.Zones[2]).ExportItems('f:\zone2items.bmp');
-TZone(FMap.Zones[3]).ExportItems('f:\zone3items.bmp');
-TZone(FMap.Zones[4]).ExportItems('f:\zone4items.bmp');
-TZone(FMap.Zones[5]).ExportItems('f:\zone5items.bmp');
-TZone(FMap.Zones[6]).ExportItems('f:\zone6items.bmp');
-TZone(FMap.Zones[7]).ExportItems('f:\zone7items.bmp');
-TZone(FMap.Zones[8]).ExportItems('f:\zone8items.bmp'); }
-{TZone(FMap.Zones[9]).ExportItems('f:\zone9items.bmp');
-TZone(FMap.Zones[10]).ExportItems('f:\zone10items.bmp');
-TZone(FMap.Zones[11]).ExportItems('f:\zone11items.bmp');
-TZone(FMap.Zones[12]).ExportItems('f:\zone12items.bmp');
-TZone(FMap.Zones[13]).ExportItems('f:\zone13items.bmp');
-TZone(FMap.Zones[14]).ExportItems('f:\zone14items.bmp');
-TZone(FMap.Zones[15]).ExportItems('f:\zone15items.bmp');
-TZone(FMap.Zones[16]).ExportItems('f:\zone16items.bmp');
-TZone(FMap.Zones[17]).ExportItems('f:\zone17items.bmp');
-TZone(FMap.Zones[18]).ExportItems('f:\zone18items.bmp');
-TZone(FMap.Zones[19]).ExportItems('f:\zone19items.bmp'); }
-//TZone(FMap.Zones[1]).ExportTiles('f:\zone1tiles.bmp');
-//TZone(FMap.Zones[2]).ExportTiles('f:\zone2tiles.bmp');
-//TZone(FMap.Zones[3]).ExportTiles('f:\zone3tiles.bmp');
-//TZone(FMap.Zones[1]).ExportItems('f:\zone1items.bmp');
-//TZone(FMap.Zones[2]).ExportItems('f:\zone2items.bmp');
-//TZone(FMap.Zones[3]).ExportItems('f:\zone3items.bmp');
+//TZone(FMap.Zones[1]).ExportTiles('f:/zone1tiles.bmp');
+//TZone(FMap.Zones[2]).ExportTiles('f:/zone2tiles.bmp');
+{TZone(FMap.Zones[0]).ExportItems('f:/zone0items.bmp');
+TZone(FMap.Zones[1]).ExportItems('f:/zone1items.bmp');
+TZone(FMap.Zones[2]).ExportItems('f:/zone2items.bmp');
+TZone(FMap.Zones[3]).ExportItems('f:/zone3items.bmp');
+TZone(FMap.Zones[4]).ExportItems('f:/zone4items.bmp');
+TZone(FMap.Zones[5]).ExportItems('f:/zone5items.bmp');
+TZone(FMap.Zones[6]).ExportItems('f:/zone6items.bmp');
+TZone(FMap.Zones[7]).ExportItems('f:/zone7items.bmp');
+TZone(FMap.Zones[8]).ExportItems('f:/zone8items.bmp'); }
+{TZone(FMap.Zones[9]).ExportItems('f:/zone9items.bmp');
+TZone(FMap.Zones[10]).ExportItems('f:/zone10items.bmp');
+TZone(FMap.Zones[11]).ExportItems('f:/zone11items.bmp');
+TZone(FMap.Zones[12]).ExportItems('f:/zone12items.bmp');
+TZone(FMap.Zones[13]).ExportItems('f:/zone13items.bmp');
+TZone(FMap.Zones[14]).ExportItems('f:/zone14items.bmp');
+TZone(FMap.Zones[15]).ExportItems('f:/zone15items.bmp');
+TZone(FMap.Zones[16]).ExportItems('f:/zone16items.bmp');
+TZone(FMap.Zones[17]).ExportItems('f:/zone17items.bmp');
+TZone(FMap.Zones[18]).ExportItems('f:/zone18items.bmp');
+TZone(FMap.Zones[19]).ExportItems('f:/zone19items.bmp'); }
+//TZone(FMap.Zones[1]).ExportTiles('f:/zone1tiles.bmp');
+//TZone(FMap.Zones[2]).ExportTiles('f:/zone2tiles.bmp');
+//TZone(FMap.Zones[3]).ExportTiles('f:/zone3tiles.bmp');
+//TZone(FMap.Zones[1]).ExportItems('f:/zone1items.bmp');
+//TZone(FMap.Zones[2]).ExportItems('f:/zone2items.bmp');
+//TZone(FMap.Zones[3]).ExportItems('f:/zone3items.bmp');
 
   MapWidth := ( width div FMap.FTileWidth ) + 2;
   MapHeight := ( Height div FMap.FTileHeight ) + 2;

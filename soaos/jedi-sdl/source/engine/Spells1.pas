@@ -313,7 +313,7 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := GreatHandEffect;
-    Resource := LoadArtResource( 'engine\spells\GreatHandReceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/GreatHandReceive.gif', true );
     LoadCastSounds( 'Charge' );
     Resource.DrawShadow := false;
     SoundInCast := true;
@@ -570,7 +570,7 @@ begin
     CastingType := ctSummoning;
     TargetType := ttNone;
     CastEffect := SummonEffect;
-    Resource := LoadArtResource( 'engine\spells\summonreceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/summonreceive.gif', true );
     Resource.DrawShadow := false;
     SoundInCast := false;
     LoadCastSounds( 'Summon' );
@@ -774,7 +774,7 @@ begin
     CastingType := ctHealing;
     TargetType := ttFriend;
     CastEffect := HealEffect;
-    Resource := LoadArtResource( 'engine\spells\Healreceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/Healreceive.gif', true );
     LoadCastSounds( 'Heal' );
  // Resource.DrawShadow:=false;
     SoundInCast := false;

@@ -281,8 +281,8 @@ const
   scrRandom = 3;
   Angles = 8;
 
-  LayerPath = 'engine\layeredimages\';
-  InventoryPath = 'engine\inventoryimages\';
+  LayerPath = 'engine/layeredimages/';
+  InventoryPath = 'engine/inventoryimages/';
 
 var
   ArtPath : string;
@@ -1314,11 +1314,11 @@ begin
     begin
       NakedResource := PartManager.GetLayerResource( NakedName );
     end;
-    if lowercase( NakedName ) = 'humanmalelayers\basehumanmale.gif' then
+    if lowercase( NakedName ) = 'humanmalelayers/basehumanmale.gif' then
       UseDefaultPants := @DefaultPants
-    else if lowercase( NakedName ) = 'humanfemale2layers\basehumanfemale.gif' then
+    else if lowercase( NakedName ) = 'humanfemale2layers/basehumanfemale.gif' then
       UseDefaultPants := @FemDefaultPants
-    else if lowercase( NakedName ) = 'elfmalelayers\baseelf.gif' then
+    else if lowercase( NakedName ) = 'elfmalelayers/baseelf.gif' then
       UseDefaultPants := @ElfDefaultPants
     else
       UseDefaultPants := nil;
@@ -2818,7 +2818,7 @@ begin
     begin
       S1 := ExtractFilePath( LinkPath );
       S1 := copy( S1, 1, length( S1 ) - 1 );
-      S1 := ExtractFileName( S1 ) + '\' + S;
+      S1 := ExtractFileName( S1 ) + '/' + S;
       LinkedResource := PartManager.GetLayerResource( S1 );
     end;
     LinkPath := '';

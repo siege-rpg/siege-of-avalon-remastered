@@ -732,7 +732,7 @@ function MakeCastEffect( var CastEffect : TResource; const ResName : string ) : 
 begin
   result := false;
   Log.Log( 'Loading ' + ResName + ' cast effect...' );
-  CastEffect := LoadArtResource( 'engine\spells\' + ResName + '.gif', true );
+  CastEffect := LoadArtResource( 'engine/spells/' + ResName + '.gif', true );
   if not assigned( CastEffect ) or not CastEffect.Loaded then
   begin
     Log.Log( ResName + ' cast effect could not be loaded' );
@@ -1320,13 +1320,13 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := FireEffect;
-    Resource := LoadArtResource( 'engine\weaponprojectiles\FireBallExplode.gif', true );
-    Resource2 := LoadArtResource( 'engine\weaponprojectiles\FireBall2(LVL3).gif', true );
-    Resource3 := LoadArtResource( 'engine\weaponprojectiles\FireBall3(LVL3).gif', true );
-    Resource4 := LoadArtResource( 'engine\weaponprojectiles\FireBall4(LVL3).gif', true );
-    Resource5 := LoadArtResource( 'engine\weaponprojectiles\FireBall5(LVL3).gif', true );
-    Resource6 := LoadArtResource( 'engine\weaponprojectiles\FireBall4(LVL2).gif', true );
-    Resource7 := LoadArtResource( 'engine\weaponprojectiles\FireBall5(LVL2).gif', true );
+    Resource := LoadArtResource( 'engine/weaponprojectiles/FireBallExplode.gif', true );
+    Resource2 := LoadArtResource( 'engine/weaponprojectiles/FireBall2(LVL3).gif', true );
+    Resource3 := LoadArtResource( 'engine/weaponprojectiles/FireBall3(LVL3).gif', true );
+    Resource4 := LoadArtResource( 'engine/weaponprojectiles/FireBall4(LVL3).gif', true );
+    Resource5 := LoadArtResource( 'engine/weaponprojectiles/FireBall5(LVL3).gif', true );
+    Resource6 := LoadArtResource( 'engine/weaponprojectiles/FireBall4(LVL2).gif', true );
+    Resource7 := LoadArtResource( 'engine/weaponprojectiles/FireBall5(LVL2).gif', true );
     Resource2.SpecialEffect := seAdd;
     Resource3.SpecialEffect := seAdd;
     Resource4.SpecialEffect := seAdd;
@@ -1706,8 +1706,8 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := FrostEffect;
-    Resource := LoadArtResource( 'engine\weaponprojectiles\FrostBall.gif', true );
-    SmallResource := LoadArtResource( 'engine\weaponprojectiles\SmallFrostBall.gif', true );
+    Resource := LoadArtResource( 'engine/weaponprojectiles/FrostBall.gif', true );
+    SmallResource := LoadArtResource( 'engine/weaponprojectiles/SmallFrostBall.gif', true );
     Resource.DrawShadow := false;
     SmallResource.DrawShadow := false;
     SoundInCast := true;
@@ -1950,7 +1950,7 @@ begin
     CastEffect := ProtectionEffect;
     if not assigned( ProtectionResource ) then
     begin
-      ProtectionResource := LoadArtResource( 'engine\spells\protectionreceive.gif', true );
+      ProtectionResource := LoadArtResource( 'engine/spells/protectionreceive.gif', true );
       ProtectionResource.DrawShadow := false;
       ResourceOwner := true;
     end;
@@ -2643,10 +2643,10 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := LightningEffect;
-    Resource1 := LoadArtResource( 'engine\weaponprojectiles\smalllightning.gif', true );
-    Resource2 := LoadArtResource( 'engine\weaponprojectiles\medlightning.gif', true );
-    Resource3 := LoadArtResource( 'engine\weaponprojectiles\lrglightning.gif', true );
-    ReceiveResource := LoadArtResource( 'engine\spells\ShockReceive.gif', true );
+    Resource1 := LoadArtResource( 'engine/weaponprojectiles/smalllightning.gif', true );
+    Resource2 := LoadArtResource( 'engine/weaponprojectiles/medlightning.gif', true );
+    Resource3 := LoadArtResource( 'engine/weaponprojectiles/lrglightning.gif', true );
+    ReceiveResource := LoadArtResource( 'engine/spells/ShockReceive.gif', true );
     LoadCastSounds( 'shock1,shock2' );
     Resource1.DrawShadow := false;
     Resource2.DrawShadow := false;
@@ -3160,7 +3160,7 @@ begin
     CastingType := ctHealing;
     TargetType := ttFriend;
     CastEffect := HealEffect;
-    Resource := LoadArtResource( 'engine\spells\healreceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/healreceive.gif', true );
     LoadCastSounds( 'heal' );
     Resource.DrawShadow := false;
     SoundInCast := false;
@@ -3443,7 +3443,7 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := ChargeEffect;
-    Resource := LoadArtResource( 'engine\spells\charge4receive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/charge4receive.gif', true );
     LoadCastSounds( 'Charge' );
     Resource.DrawShadow := false;
     SoundInCast := true;
@@ -3720,9 +3720,9 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := LightningEffect;
-    Resource1 := TLightning( Lightning ).SmallResource; //LoadArtResource('engine\WeaponProjectiles\smalllightning.gif');
-    Resource2 := TLightning( Lightning ).MediumResource; //LoadArtResource('engine\WeaponProjectiles\medlightning.gif');
-    Resource3 := TLightning( Lightning ).LargeResource; //LoadArtResource('engine\WeaponProjectiles\lrglightning.gif');
+    Resource1 := TLightning( Lightning ).SmallResource; //LoadArtResource('engine/WeaponProjectiles/smalllightning.gif');
+    Resource2 := TLightning( Lightning ).MediumResource; //LoadArtResource('engine/WeaponProjectiles/medlightning.gif');
+    Resource3 := TLightning( Lightning ).LargeResource; //LoadArtResource('engine/WeaponProjectiles/lrglightning.gif');
     LoadCastSounds( 'Charge' );
 //  Resource1.DrawShadow:=false;
 //  Resource2.DrawShadow:=false;
@@ -3980,7 +3980,7 @@ begin
     CastingType := ctSummoning;
     TargetType := ttNone;
     CastEffect := SummonEffect;
-    Resource := LoadArtResource( 'engine\spells\summonreceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/summonreceive.gif', true );
     Resource.DrawShadow := false;
     SoundInCast := false;
     LoadCastSounds( 'Summon' );
@@ -4219,7 +4219,7 @@ begin
     CastingType := ctSummoning;
     TargetType := ttNone;
     CastEffect := SummonEffect;
-    Resource := LoadArtResource( 'engine\spells\summonreceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/summonreceive.gif', true );
     Resource.DrawShadow := false;
     SoundInCast := false;
     LoadCastSounds( 'Summon' );
@@ -4649,7 +4649,7 @@ begin
     CastEffect := ProtectionEffect;
     if not assigned( ProtectionResource ) then
     begin
-      ProtectionResource := LoadArtResource( 'engine\spells\protectionreceive.gif', true );
+      ProtectionResource := LoadArtResource( 'engine/spells/protectionreceive.gif', true );
       ProtectionResource.DrawShadow := false;
       ResourceOwner := true;
     end;
@@ -4871,7 +4871,7 @@ begin
     CastingType := ctTranslocation;
     TargetType := ttEnemy;
     CastEffect := HoldEffect;
-    Resource := LoadArtResource( 'engine\spells\holdreceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/holdreceive.gif', true );
     Resource.DrawShadow := false;
 
     SoundInCast := true;
@@ -5108,7 +5108,7 @@ begin
     CastingType := ctHealing;
     TargetType := ttFriend;
     CastEffect := LichEffect;
-    Resource := LoadArtResource( 'engine\WeaponProjectiles\vortex.gif', true );
+    Resource := LoadArtResource( 'engine/WeaponProjectiles/vortex.gif', true );
     LoadCastSounds( 'deathvortex' );
     if assigned( Resource ) then
       Resource.DrawShadow := false;
@@ -5484,7 +5484,7 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := ShrapnelEffect;
-    Resource := LoadArtResource( 'engine\weaponprojectiles\Shrapnelball.gif', true );
+    Resource := LoadArtResource( 'engine/weaponprojectiles/Shrapnelball.gif', true );
     LoadCastSounds( 'ShrapCast' );
     Resource.SpecialEffect := seAdd;
     Resource.DrawShadow := false;
@@ -6216,7 +6216,7 @@ begin
     CastingType := ctDivination;
     TargetType := ttFriend;
     CastEffect := ManaThiefEffect;
-    Resource := LoadArtResource( 'engine\spells\ManaThiefReceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/ManaThiefReceive.gif', true );
     if assigned( Resource ) then
     begin
       Resource.DrawShadow := false;
@@ -6481,7 +6481,7 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := GreatHandEffect;
-    Resource := LoadArtResource( 'engine\spells\GreatHandReceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/GreatHandReceive.gif', true );
     if assigned( Resource ) then
     begin
       Resource.DrawShadow := false;
@@ -6648,11 +6648,11 @@ begin
 
     inherited;
 
-    Resource := LoadArtResource( 'engine\spells\AuraIronReceive(LVL2).gif', true );
+    Resource := LoadArtResource( 'engine/spells/AuraIronReceive(LVL2).gif', true );
     Resource.DrawShadow := false;
     Resource.SpecialEffect := seAdd;
 
-    HitResource := LoadArtResource( 'engine\spells\AuraIronHit(LVL2).gif', true );
+    HitResource := LoadArtResource( 'engine/spells/AuraIronHit(LVL2).gif', true );
     HitResource.DrawShadow := false;
     HitResource.SpecialEffect := seAdd;
 
@@ -6703,11 +6703,11 @@ begin
 
     inherited;
 
-    Resource := LoadArtResource( 'engine\spells\AuraSteelReceive(LVL2).gif', true );
+    Resource := LoadArtResource( 'engine/spells/AuraSteelReceive(LVL2).gif', true );
     Resource.DrawShadow := false;
     Resource.SpecialEffect := seAdd;
 
-    HitResource := LoadArtResource( 'engine\spells\AuraSteelHit(LVL2).gif', true );
+    HitResource := LoadArtResource( 'engine/spells/AuraSteelHit(LVL2).gif', true );
     HitResource.DrawShadow := false;
     HitResource.SpecialEffect := seAdd;
 
@@ -7031,7 +7031,7 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := GreatWolfEffect;
-    Resource := LoadArtResource( 'engine\spells\GreatWolfReceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/GreatWolfReceive.gif', true );
     if assigned( Resource ) then
     begin
       Resource.DrawShadow := false;
@@ -7552,7 +7552,7 @@ begin
     CastingType := ctCombat;
     TargetType := ttEnemy;
     CastEffect := FrostEffect;
-    Resource := LoadArtResource( 'engine\weaponprojectiles\NewLightningball.gif', true );
+    Resource := LoadArtResource( 'engine/weaponprojectiles/NewLightningball.gif', true );
     Resource.DrawShadow := false;
     SoundInCast := true;
     LoadCastSounds( 'freezespell1,freezespell2' );
@@ -7765,14 +7765,14 @@ begin
     TargetType := ttFriend;
     CastEffect := ReflectEffect;
 
-    Resource := LoadArtResource( 'engine\spells\ReflectReceive.gif', true );
+    Resource := LoadArtResource( 'engine/spells/ReflectReceive.gif', true );
     if assigned( Resource ) then
     begin
       Resource.DrawShadow := false;
       Resource.SpecialEffect := seAdd;
     end;
 
-    HitResource := LoadArtResource( 'engine\spells\ReflectHit.gif', true );
+    HitResource := LoadArtResource( 'engine/spells/ReflectHit.gif', true );
     if assigned( HitResource ) then
     begin
       HitResource.DrawShadow := false;

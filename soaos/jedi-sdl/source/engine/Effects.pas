@@ -370,8 +370,8 @@ constructor TBurningRam.Create;
 begin
   inherited;
   AnimationDuration := 5000;
-  LowRes := LoadArtResource( 'engine\fx\lowfire.pox' );
-  HighRes := LoadArtResource( 'engine\fx\hifire.pox' );
+  LowRes := LoadArtResource( 'engine/fx/lowfire.pox' );
+  HighRes := LoadArtResource( 'engine/fx/hifire.pox' );
 end;
 
 destructor TBurningRam.Destroy;

@@ -372,7 +372,7 @@ begin
     S := Parse( result, 1, '#' );
     j := Length( S );
     if not assigned( INI ) then
-      INI := TINIFile.create( DefaultPath + 'maps\symbols.ini' );
+      INI := TINIFile.create( DefaultPath + 'maps/symbols.ini' );
     S1 := Parse( S, 0, '.' );
     S2 := Parse( S, 1, '.' );
     S0 := INI.ReadString( S1, S2, '' );
@@ -933,7 +933,7 @@ begin
         begin
           if Assigned( MusicLib ) then
           begin
-            MusicLib.OpenThisSong( SoundPath + 'theme\' + Parms );
+            MusicLib.OpenThisSong( SoundPath + 'theme/' + Parms );
             MusicLib.PlayThisSong;
             frmMain.SoundTimer.Enabled := false;
           end;
@@ -1463,7 +1463,7 @@ var
   SearchRec : TSearchRec;
   sDir, sExt : string;
 begin
-  if cDir[ length( cDir ) ] = '\' then
+  if cDir[ length( cDir ) ] = '/' then
     sDir := copy( cDir, 1, length( cDir ) - 1 )
   else
     sDir := cDir;
@@ -1472,7 +1472,7 @@ begin
     sExt := '.' + sExt;
 
   result := TStringList.create;
-  found := FindFirst( sDir + '\*' + sExt, 0, SearchRec );
+  found := FindFirst( sDir + '/*' + sExt, 0, SearchRec );
   while found = 0 do
   begin
     result.add( SearchRec.Name );
@@ -1495,7 +1495,7 @@ var
   CacheItem : TCacheInfo;
   Count : integer;
 begin
-  Dir := DefaultPath + 'cache\';
+  Dir := DefaultPath + 'cache/';
   FileList := GetFileList( Dir, '.zit' );
   try
     Count := FileList.count;

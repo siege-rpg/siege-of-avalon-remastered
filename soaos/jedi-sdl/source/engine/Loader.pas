@@ -456,7 +456,7 @@ var
           zone := Map.AddLight( Color, Intensity, Radius, FlickerType, X, Y, Z );
     //    Log.Log('Light Zone: '+inttostr(zone));
 
-          S := DefaultPath + 'Maps\' + ChangeFileExt( ExtractFilename( LVLFile ), '.zit' );
+          S := DefaultPath + 'Maps/' + ChangeFileExt( ExtractFilename( LVLFile ), '.zit' );
           if FileExists( S ) then
           try
             ZoneStream := TFileStream.Create( S, fmOpenRead or fmShareDenyWrite );
@@ -1159,7 +1159,7 @@ var
       end
       else
       begin
-        S := DefaultPath + 'Maps\' + ChangeFileExt( ExtractFilename( LVLFile ), '.zit' );
+        S := DefaultPath + 'Maps/' + ChangeFileExt( ExtractFilename( LVLFile ), '.zit' );
         try
           if FileExists( S ) then
             ZoneStream := TFileStream.Create( S, fmOpenRead or fmShareDenyWrite )
@@ -1245,7 +1245,7 @@ begin
       end
       else
       begin
-        S := DefaultPath + 'Maps\' + ChangeFileExt( ExtractFilename( LVLFile ), '.zit' );
+        S := DefaultPath + 'Maps/' + ChangeFileExt( ExtractFilename( LVLFile ), '.zit' );
         try
           if FileExists( S ) then
             Stream := TFileStream.Create( S, fmOpenRead or fmShareDenyWrite )
@@ -1416,7 +1416,7 @@ begin
                 begin
 
                   S := lowercase( ONames.Strings[ i ] );
-                  if copy( S, 1, 7 ) = 'editor\' then
+                  if copy( S, 1, 7 ) = 'editor/' then
                   begin
 //                  Log.Log('  Skipping '+S);
                     OIndex[ i ] := 0;
@@ -1424,7 +1424,7 @@ begin
                   else
                   begin
 //                  Log.Log('  '+S);
-                    StaticObject := ( copy( S, 1, 13 ) = 'staticobject\' );
+                    StaticObject := ( copy( S, 1, 13 ) = 'staticobject/' );
                     if UseCache and StaticObject then
                     begin //Prevent loading of static if cache loaded
 //                    Log.Log('  Skipping '+S+' because of cache');

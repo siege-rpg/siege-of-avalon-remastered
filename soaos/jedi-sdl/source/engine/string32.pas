@@ -386,8 +386,9 @@ var
   oDum : TFileStream;
 begin
   //file must exist or it fails! (stupid)
-  if RightStr( d, 1 ) <> '\' then
-    d := d + '\';
+  if ( RightStr( d, 1 ) <> '\'  )
+  or ( RightStr( d, 1 ) <> '/'  ) then
+    d := d + '/';
   d := d + 'x.x';
   oDum := TFileStream.Create( d, fmCreate );
   oDum.WriteBuffer( 'xxx', 3 );
@@ -456,8 +457,9 @@ end;
 function AddRightSlash( cDir : string ) : string;
 begin
   Result := cDir;
-  if RightStr( Result, 1 ) <> '\' then
-    Result := Result + '\';
+  if ( RightStr( Result, 1 ) <> '\' )
+  or ( RightStr( Result, 1 ) <> '/' ) then
+    Result := Result + '/';
 end;
 
 end.

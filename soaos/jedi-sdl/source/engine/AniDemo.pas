@@ -65,14 +65,20 @@ interface
 {$INCLUDE Anigrp30cfg.inc}
 
 uses
+  SysUtils,
+  Classes,
 {$ifdef LINUX}
-  SysUtils, Types, Classes, Variants, QTypes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls,
+  Types,
+  Variants,
+  QTypes,
+  QGraphics,
+  QControls,
+  QForms,
+  QDialogs,
+  QStdCtrls,
 {$else}
   Windows,
   Messages,
-  SysUtils,
-  Classes,
   Graphics,
   Controls,
   Forms,
@@ -123,7 +129,7 @@ uses
   LogScreen,
   Transit,
   AddKickNPC,
-  Security, QTypes, QExtCtrls, QGraphics, QControls;
+  Security;
 
 const
   WM_StartMainMenu = WM_USER + 1;
@@ -375,7 +381,8 @@ uses
   MP3,
   Engine,
   MousePtr,
-  SaveFile;
+  SaveFile,
+  String32;
 
 {$R *.DFM}
 
@@ -693,20 +700,20 @@ begin
       Exit;
     end;
 
-    ForceNotReadOnly( DefaultPath + 'games\' + TempGame + '.sav' );
-    ForceNotReadOnly( DefaultPath + 'games\' + TempGame + '.idx' );
-    ForceNotReadOnly( DefaultPath + 'games\' + TempGame + '.map' );
+    ForceNotReadOnly( DefaultPath + 'games/' + TempGame + '.sav' );
+    ForceNotReadOnly( DefaultPath + 'games/' + TempGame + '.idx' );
+    ForceNotReadOnly( DefaultPath + 'games/' + TempGame + '.map' );
 
     try
-      DeleteFile( PChar( DefaultPath + 'games\' + TempGame + '.sav' ) );
+      DeleteFile( PChar( DefaultPath + 'games/' + TempGame + '.sav' ) );
     except
     end;
     try
-      DeleteFile( PChar( DefaultPath + 'games\' + TempGame + '.idx' ) );
+      DeleteFile( PChar( DefaultPath + 'games/' + TempGame + '.idx' ) );
     except
     end;
     try
-      DeleteFile( PChar( DefaultPath + 'games\' + TempGame + '.map' ) );
+      DeleteFile( PChar( DefaultPath + 'games/' + TempGame + '.map' ) );
     except
     end;
 
@@ -1037,40 +1044,35 @@ begin
     UseDirectSound := False;
 
     ArtPath := INI.ReadString( 'Settings', 'ArtPath', DefaultPath );
-    if ArtPath[ Length( ArtPath ) ] <> '\' then
-      ArtPath := ArtPath + '\';
+
+    ArtPath := AddRightSlash( ArtPath );
     Log.Log( 'ArtPath=' + ArtPath );
     Log.flush;
 
     TilePath := INI.ReadString( 'Settings', 'TilePath', DefaultPath );
-    if TilePath[ Length( TilePath ) ] <> '\' then
-      TilePath := TilePath + '\';
+    TilePath := AddRightSlash( TilePath );
     Log.Log( 'TilePath=' + TilePath );
     Log.flush;
 
     SoundPath := INI.ReadString( 'Settings', 'SoundPath', DefaultPath );
-    if SoundPath[ Length( SoundPath ) ] <> '\' then
-      SoundPath := SoundPath + '\';
+    SoundPath := AddRightSlash( SoundPath );
     Log.Log( 'SoundPath=' + SoundPath );
     Log.flush;
 
     InterfacePath := INI.ReadString( 'Settings', 'Interface', DefaultPath );
-    if InterfacePath[ Length( InterfacePath ) ] <> '\' then
-      InterfacePath := InterfacePath + '\';
+    InterfacePath := AddRightSlash( InterfacePath );
     Log.Log( 'InterfacePath=' + InterfacePath );
     Log.flush;
 
-    CachePath := INI.ReadString( 'Settings', 'CachePath', DefaultPath + 'cache\' );
-    if CachePath[ Length( CachePath ) ] <> '\' then
-      CachePath := CachePath + '\';
+    CachePath := INI.ReadString( 'Settings', 'CachePath', DefaultPath + 'cache/' );
+    CachePath := AddRightSlash( CachePath );
     Log.Log( 'CachePath=' + CachePath );
     Log.flush;
 
     MapPath := INI.ReadString( 'Settings', 'MapPath', '' );
     if MapPath <> '' then
     begin
-      if MapPath[ Length( MapPath ) ] <> '\' then
-        MapPath := MapPath + '\';
+      MapPath := AddRightSlash( MapPath );
       Log.Log( 'MapPath=' + MapPath );
       Log.flush;
     end;
@@ -1146,7 +1148,7 @@ begin
       Log.Log( 'Music disabled' );
       Log.flush;
     end;
-    //MusicLib.OpenThisSong(SoundPath+'theme\canyon'+'.mp3');
+    //MusicLib.OpenThisSong(SoundPath+'theme/canyon'+'.mp3');
     //MusicLib.PlayThisSong;
 
     if DaSoundCardAvailable then
@@ -1242,9 +1244,9 @@ begin
     Log.flush;
 
     if ( INI.ReadInteger( 'Settings', 'JournalFont', 0 ) = 1 ) and DirectoryExists( ArtPath + 'journalalt' ) then
-      AdventureLog1.LogDirectory := ArtPath + 'journalalt\'
+      AdventureLog1.LogDirectory := ArtPath + 'journalalt/'
     else
-      AdventureLog1.LogDirectory := ArtPath + 'journal\';
+      AdventureLog1.LogDirectory := ArtPath + 'journal/';
 
     //cue intro music
     Log.Log( 'Start event timer' );
@@ -1901,8 +1903,8 @@ begin
         TempName := GameName;
         try
           GameName := QuickSave;
-          {        S1:=DefaultPath+'games\'+TempGame+'.sav';
-                  S2:=DefaultPath+'games\'+GameName+'.sav';
+          {        S1:=DefaultPath+'games/'+TempGame+'.sav';
+                  S2:=DefaultPath+'games/'+GameName+'.sav';
                   if FileExists(S1) then begin
                     try
                       if FileExists(S2) then DeleteFile(PChar(S2));
@@ -1925,8 +1927,8 @@ begin
             try
               if Assigned( ScreenShot ) then
               begin
-                Log.Log( 'Saving screenshot: ' + DefaultPath + 'games\' + GameName + '.bmp' );
-                ScreenShot.SaveToFile( DefaultPath + 'games\' + GameName + '.bmp' );
+                Log.Log( 'Saving screenshot: ' + DefaultPath + 'games/' + GameName + '.bmp' );
+                ScreenShot.SaveToFile( DefaultPath + 'games/' + GameName + '.bmp' );
               end;
             except
             end;
@@ -2301,15 +2303,15 @@ begin
 
     Log.Log( 'Shutting down application' );
     try
-      DeleteFile( PChar( DefaultPath + 'games\' + TempGame + '.sav' ) );
+      DeleteFile( PChar( DefaultPath + 'games/' + TempGame + '.sav' ) );
     except
     end;
     try
-      DeleteFile( PChar( DefaultPath + 'games\' + TempGame + '.idx' ) );
+      DeleteFile( PChar( DefaultPath + 'games/' + TempGame + '.idx' ) );
     except
     end;
     try
-      DeleteFile( PChar( DefaultPath + 'games\' + TempGame + '.map' ) );
+      DeleteFile( PChar( DefaultPath + 'games/' + TempGame + '.map' ) );
     except
     end;
 
@@ -3858,19 +3860,19 @@ begin
       Log.Log( 'SaveGame' );
       SaveGame;
       Log.Log( 'Copy files' );
-      ForceNotReadOnly( DefaultPath + 'games\~End of Level.sav' );
-      ForceNotReadOnly( DefaultPath + 'games\~End of Level.idx' );
-      ForceNotReadOnly( DefaultPath + 'games\~End of Level.map' );
+      ForceNotReadOnly( DefaultPath + 'games/~End of Level.sav' );
+      ForceNotReadOnly( DefaultPath + 'games/~End of Level.idx' );
+      ForceNotReadOnly( DefaultPath + 'games/~End of Level.map' );
       try
-        CopyFile( PChar( DefaultPath + 'games\' + GameName + '.sav' ), PChar( DefaultPath + 'games\~End of Level.sav' ), False );
+        CopyFile( PChar( DefaultPath + 'games/' + GameName + '.sav' ), PChar( DefaultPath + 'games/~End of Level.sav' ), False );
       except
       end;
       try
-        CopyFile( PChar( DefaultPath + 'games\' + GameName + '.idx' ), PChar( DefaultPath + 'games\~End of Level.idx' ), False );
+        CopyFile( PChar( DefaultPath + 'games/' + GameName + '.idx' ), PChar( DefaultPath + 'games/~End of Level.idx' ), False );
       except
       end;
       try
-        CopyFile( PChar( DefaultPath + 'games\' + GameName + '.map' ), PChar( DefaultPath + 'games\~End of Level.map' ), False );
+        CopyFile( PChar( DefaultPath + 'games/' + GameName + '.map' ), PChar( DefaultPath + 'games/~End of Level.map' ), False );
       except
       end;
       Log.Log( 'ClearOnDemandResources' );
@@ -3935,7 +3937,7 @@ begin
       S := DefaultTransition
     else
     begin
-      S := ArtPath + 'Transition\' + TransitionScreen + '.bmp';
+      S := ArtPath + 'Transition/' + TransitionScreen + '.bmp';
       if not FileExists( S ) then
         S := DefaultTransition;
     end;
@@ -3970,7 +3972,7 @@ begin
       try
         if ReadCache or WriteCache then
         begin
-          LVLDate := GetFileDate( LVLFile );
+          LVLDate := Resource.GetFileDate( LVLFile );
           if not DirectoryExists( S ) then
             CreateDirectory( PChar( S ), nil );
           CacheExists := FileExists( CacheFileA ) and FileExists( CacheFileB );
@@ -4137,14 +4139,14 @@ begin
       try
         Randomize;
 
-        DefaultPants := PartManager.GetLayerResource( 'HumanMaleLayers\BrownPants' );
-//        FemDefaultPants := PartManager.GetLayerResource('HumanFemale2Layers\BrownTights');
+        DefaultPants := PartManager.GetLayerResource( 'HumanMaleLayers/BrownPants' );
+//        FemDefaultPants := PartManager.GetLayerResource('HumanFemale2Layers/BrownTights');
         FemDefaultPants := nil;
-        ElfDefaultPants := PartManager.GetLayerResource( 'ElfMaleLayers\ElfTightsBrown' );
+        ElfDefaultPants := PartManager.GetLayerResource( 'ElfMaleLayers/ElfTightsBrown' );
 
         //Stuff for summoning spells
-        RatResource := TCharacterResource( PartManager.GetOnDemandResource( 'SpriteObject\Character\Animals\Rat' ) );
-        WolfResource := TCharacterResource( PartManager.GetOnDemandResource( 'SpriteObject\Character\Animals\Wolf1' ) );
+        RatResource := TCharacterResource( PartManager.GetOnDemandResource( 'SpriteObject/Character/Animals/Rat' ) );
+        WolfResource := TCharacterResource( PartManager.GetOnDemandResource( 'SpriteObject/Character/Animals/Wolf1' ) );
 
         for i := 0 to NPCList.Count - 1 do
         begin
@@ -4233,7 +4235,7 @@ begin
           GameMap.RenderMap;
           DlgProgress.SetBar( Round( DlgProgress.MaxValue * 0.98 ) );
 
-          S := DefaultPath + 'Maps\' + ChangeFileExt( ExtractFileName( LVLFile ), '.zit' );
+          S := DefaultPath + 'Maps/' + ChangeFileExt( ExtractFileName( LVLFile ), '.zit' );
           if FileExists( S ) then
           begin
             ForceNotReadOnly( S );
@@ -4334,7 +4336,7 @@ begin
       S := '';
     end;
     {if Game.FrameCount=0 then begin
-      S:='theme\canyon';
+      S:='theme/canyon';
       Log.Log('Canyon');
     end;    }
     CueTune( S, False );
@@ -4570,14 +4572,14 @@ begin
     if not DirectoryExists( DefaultPath + 'games' ) then
       ForceDirectories( DefaultPath + 'games' );
 
-    FileName := DefaultPath + 'games\' + GameName + '.sav';
+    FileName := DefaultPath + 'games/' + GameName + '.sav';
     ForceNotReadOnly( FileName );
     ForceNotReadOnly( ChangeFileExt( FileName, '.idx' ) );
     ForceNotReadOnly( ChangeFileExt( FileName, '.map' ) );
 
     SavFile := TSavFile.Create;
     try
-      SavFile.Open( DefaultPath + 'games\' + TempGame + '.sav' );
+      SavFile.Open( DefaultPath + 'games/' + TempGame + '.sav' );
       SavFile.MapName := Level;
       SavFile.SceneName := CurrentScene;
       SavFile.CurrentMap := Level;
@@ -4763,10 +4765,10 @@ var
                 Stream.Read( S[ 1 ], L );
                 List.Text := S;
                 S := LowerCase( List.Values[ 'Resource' ] );
-                i := Pos( 'players\player', S );
+                i := Pos( 'players/player', S );
                 if i > 0 then
                 begin
-                  j := i + length( 'players\player' );
+                  j := i + length( 'players/player' );
                   while j <= length( S ) do
                   begin
                     if S[ j ] = '.' then
@@ -5120,7 +5122,7 @@ begin
 
     EOB := EOBMarker;
 
-    FileName := DefaultPath + 'games\' + GameName + '.sav';
+    FileName := DefaultPath + 'games/' + GameName + '.sav';
     ForceNotReadOnly( FileName );
     ForceNotReadOnly( ChangeFileExt( FileName, '.idx' ) );
     ForceNotReadOnly( ChangeFileExt( FileName, '.map' ) );
@@ -5656,7 +5658,7 @@ begin
 
     INI := TIniFile.Create( DefaultPath + 'siege.ini' );
     try
-      PlayerResource := 'players\' + INI.ReadString( 'Character', 'Resource', 'player' ) + '.pox';
+      PlayerResource := 'players/' + INI.ReadString( 'Character', 'Resource', 'player' ) + '.pox';
       if not FileExists( ArtPath + PlayerResource ) then
       begin
         //Message could not create character
@@ -6008,8 +6010,8 @@ begin
       begin
         Log.Log( 'Loading saved game: ' + DlgLoad.LoadThisFile );
 
-        S1 := DefaultPath + 'games\' + TempGame + '.sav';
-        S2 := DefaultPath + 'games\' + DlgLoad.LoadThisFile + '.sav';
+        S1 := DefaultPath + 'games/' + TempGame + '.sav';
+        S2 := DefaultPath + 'games/' + DlgLoad.LoadThisFile + '.sav';
         ForceNotReadOnly( S1 );
         ForceNotReadOnly( ChangeFileExt( S1, '.idx' ) );
         ForceNotReadOnly( ChangeFileExt( S1, '.map' ) );
@@ -6103,8 +6105,8 @@ begin
         Log.Log( 'Saving game: ' + DlgLoad.LoadThisFile );
         GameName := LoadThisFile;
         try
-          {        S1:=DefaultPath+'games\'+TempGame+'.sav';
-                  S2:=DefaultPath+'games\'+DlgLoad.LoadThisFile+'.sav';
+          {        S1:=DefaultPath+'games/'+TempGame+'.sav';
+                  S2:=DefaultPath+'games/'+DlgLoad.LoadThisFile+'.sav';
                   if FileExists(S1) then begin
                     try
                       if FileExists(S2) then DeleteFile(PChar(S2));
@@ -6117,9 +6119,9 @@ begin
           LastFileSaved := GameName;
           if Assigned( ScreenShot ) then
           begin
-            Log.Log( 'Saving screenshot: ' + DefaultPath + 'games\' + DlgLoad.LoadThisFile + '.bmp' );
-            ForceNotReadOnly( DefaultPath + 'games\' + DlgLoad.LoadThisFile + '.bmp' );
-            ScreenShot.SaveToFile( DefaultPath + 'games\' + DlgLoad.LoadThisFile + '.bmp' );
+            Log.Log( 'Saving screenshot: ' + DefaultPath + 'games/' + DlgLoad.LoadThisFile + '.bmp' );
+            ForceNotReadOnly( DefaultPath + 'games/' + DlgLoad.LoadThisFile + '.bmp' );
+            ScreenShot.SaveToFile( DefaultPath + 'games/' + DlgLoad.LoadThisFile + '.bmp' );
           end;
         except
           //Could not save file
@@ -7041,8 +7043,8 @@ begin
   TempName := GameName;
   try
     GameName := Name;
-    {    S1:=DefaultPath+'games\'+TempGame+'.sav';
-        S2:=DefaultPath+'games\'+GameName+'.sav';
+    {    S1:=DefaultPath+'games/'+TempGame+'.sav';
+        S2:=DefaultPath+'games/'+GameName+'.sav';
         if FileExists(S1) then begin
           try
             if FileExists(S2) then DeleteFile(PChar(S2));
@@ -7067,9 +7069,9 @@ begin
         try
           if Assigned( ScreenShot ) then
           begin
-            Log.Log( 'Saving screenshot: ' + DefaultPath + 'games\' + GameName + '.bmp' );
-            ForceNotReadOnly( DefaultPath + 'games\' + GameName + '.bmp' );
-            ScreenShot.SaveToFile( DefaultPath + 'games\' + GameName + '.bmp' );
+            Log.Log( 'Saving screenshot: ' + DefaultPath + 'games/' + GameName + '.bmp' );
+            ForceNotReadOnly( DefaultPath + 'games/' + GameName + '.bmp' );
+            ScreenShot.SaveToFile( DefaultPath + 'games/' + GameName + '.bmp' );
           end;
         except
         end;
@@ -7310,9 +7312,9 @@ begin
   PathCornerList := TStringList.Create;
   SavFile := TSavFile.Create;
   try
-    S := DefaultPath + 'games\' + TempGame + '.sav';
+    S := DefaultPath + 'games/' + TempGame + '.sav';
     if not FileExists( S ) then
-      S := DefaultPath + 'games\' + GameName + '.sav';
+      S := DefaultPath + 'games/' + GameName + '.sav';
     if FileExists( S ) then
     try
       SavFile.Open( S );
@@ -7432,9 +7434,9 @@ Log.Log('  Starting Point: '+trStartingPoint);
   try
     MapKnownList:=TStringList.create;
     MapKnownList.sorted:=true;
-    S:=DefaultPath+'games\'+TempGame+'.sav';
+    S:=DefaultPath+'games/'+TempGame+'.sav';
     if not FileExists(S) then
-      S:=DefaultPath+'games\'+GameName+'.sav';
+      S:=DefaultPath+'games/'+GameName+'.sav';
 //Log.Log('Look for map known and path corner blocks in save file');
 //Log.Log('Scanning: '+S);
     if FileExists(S) then try
@@ -7657,8 +7659,8 @@ begin
   S := Parse( MapPath, i, ';' );
   while S <> '' do
   begin
-    if S[ Length( S ) ] <> '\' then
-      S := S + '\';
+    if S[ Length( S ) ] <> '/' then
+      S := S + '/';
     S1 := S + FileName + '.lvl';
     if FileExists( S1 ) then
     begin
@@ -7669,7 +7671,7 @@ begin
     S := Parse( MapPath, i, ';' );
   end;
 
-  Result := DefaultPath + 'maps\' + FileName + '.lvl';
+  Result := DefaultPath + 'maps/' + FileName + '.lvl';
 end;
 
 procedure TfrmMain.ClearOnDemandResources;
@@ -8022,9 +8024,9 @@ begin
   INI := TIniFile.Create( DefaultPath + 'siege.ini' );
 
   if ( INI.ReadInteger( 'Settings', 'JournalFont', 0 ) = 1 ) and DirectoryExists( ArtPath + 'journalalt' ) then
-    HistoryLog.LogDirectory := ArtPath + 'journalalt\'
+    HistoryLog.LogDirectory := ArtPath + 'journalalt/'
   else
-    HistoryLog.LogDirectory := ArtPath + 'journal\';
+    HistoryLog.LogDirectory := ArtPath + 'journal/';
 
   try
     S := INI.ReadString( 'Settings', 'History', '' );

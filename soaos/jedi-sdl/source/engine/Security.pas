@@ -111,7 +111,7 @@ const
 
 procedure SFPCallBack1;
 begin
-  SFPCallBack1Val := Integer( GetDriveType( 'c:\' ) );
+  SFPCallBack1Val := Integer( GetDriveType( 'c:/' ) );
 end;
 
 procedure SFPCallBack2;
@@ -123,7 +123,7 @@ end;
 
 function SFPLoopBack1 : Boolean;
 begin
-  Result := SFPCallBack1Val = Integer( GetDriveType( 'c:\' ) );
+  Result := SFPCallBack1Val = Integer( GetDriveType( 'c:/' ) );
 end;
 
 function SFPLoopBack2 : Boolean;
