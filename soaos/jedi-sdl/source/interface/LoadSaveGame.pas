@@ -59,6 +59,9 @@ unit LoadSaveGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2004/10/06 22:48:46  savage
+  Changes required to make use of YesNoDialog
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -157,9 +160,9 @@ implementation
 
 uses
   SysUtils,
+  sdlgameinterface,
   globals,
   GameMainMenu,
-  sdlgameinterface,
   YesNoDialog,
   SaveFile;
 
@@ -334,10 +337,10 @@ begin
   LoadSaveUpperRect.w := 357;
   LoadSaveUpperRect.h := 64;
 
-  SelectionRect.x := 371;
-  SelectionRect.y := 62;
+  SelectionRect.x := 385;
+  SelectionRect.y := 60;
   SelectionRect.w := 296;
-  SelectionRect.h := 30;
+  SelectionRect.h := 27;
 
   MapRect.x := 123;
   MapRect.y := 70;
