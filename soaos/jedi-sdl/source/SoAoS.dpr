@@ -19,7 +19,15 @@ uses
   GameJournal in 'interface\GameJournal.pas',
   GameCredits in 'interface\GameCredits.pas',
   YesNoDialog in 'interface\YesNoDialog.pas',
-  SaveFile in 'engine\SaveFile.pas';
+  SaveFile in 'engine\SaveFile.pas',
+  AStar in 'ai\AStar.pas',
+  DFX in 'graphics\DFX.pas',
+  digifx in 'graphics\digifx.pas',
+  DXEffects in 'graphics\DXEffects.pas',
+  DXRender in 'graphics\DXRender.pas',
+  SiegeTypes in 'engine\SiegeTypes.pas',
+  CustomAniFigure in 'engine\CustomAniFigure.pas',
+  ListBoxDialog in 'interface\ListBoxDialog.pas';
 
 {$R *.res}
 

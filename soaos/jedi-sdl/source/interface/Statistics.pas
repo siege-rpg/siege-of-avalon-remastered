@@ -234,7 +234,7 @@ begin
     DXRightArrow := DDGetImage( lpDD, BMBack, InvisColor, False );
     BMBack.LoadFromFile( InterfacePath + 'staLeftArrow.bmp' );
     DXLeftArrow := DDGetImage( lpDD, BMBack, InvisColor, False );
-    BMBack.LoadFromFile( InterfacePath + 'staBackToGame.bmp' );
+    BMBack.LoadFromFile( InterfacePath + LanguagePath + 'staBackToGame.bmp' );
     DXBackToGame := DDGetImage( lpDD, BMBack, InvisColor, False );
 
     BMBack.LoadFromFile( InterfacePath + 'Statistics.bmp' );

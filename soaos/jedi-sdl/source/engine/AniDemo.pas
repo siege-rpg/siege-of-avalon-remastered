@@ -147,6 +147,7 @@ const
 var
   DlgProgress : TLoaderBox;
   InterfacePath : string;
+  LanguagePath : string;
   MapPath : string;
   MaxPartyMembers : Integer;
   bPlayClosingMovie : Boolean;
@@ -1062,6 +1063,11 @@ begin
     InterfacePath := INI.ReadString( 'Settings', 'Interface', DefaultPath );
     InterfacePath := AddRightSlash( InterfacePath );
     Log.Log( 'InterfacePath=' + InterfacePath );
+    Log.flush;
+
+    LanguagePath := INI.ReadString( 'Settings', 'LanguagePath', 'english' );
+    LanguagePath := AddRightSlash( LanguagePath );
+    Log.Log( 'LanguagePath=' + LanguagePath );
     Log.flush;
 
     CachePath := INI.ReadString( 'Settings', 'CachePath', DefaultPath + 'cache/' );
@@ -3601,10 +3607,10 @@ begin
         BM.Free;
       end;
       Image6.Picture.BITMAP.LoadFromFile( InterfacePath + 'combat.bmp' );
-      Image4.Picture.BITMAP.LoadFromFile( InterfacePath + 'bottombar.bmp' );
+      Image4.Picture.BITMAP.LoadFromFile( InterfacePath + LanguagePath + 'bottombar.bmp' );
       OverlayB := DDGetImage( lpDD, Image4.Picture.BITMAP,
         ColorToRGB( clFuchsia ), True );
-      Image2.Picture.BITMAP.LoadFromFile( InterfacePath + 'sidebar.bmp' );
+      Image2.Picture.BITMAP.LoadFromFile( InterfacePath + LanguagePath + 'sidebar.bmp' );
       OverlayR := DDGetImage( lpDD, Image2.Picture.BITMAP,
         ColorToRGB( clFuchsia ), True );
       imgMana.Picture.BITMAP.LoadFromFile( InterfacePath + 'mana.bmp' );
@@ -3613,7 +3619,7 @@ begin
       imgLife.Picture.BITMAP.LoadFromFile( InterfacePath + 'health.bmp' );
 
       LifeEmpty := DDGetImage( lpDD, imgLife.Picture.BITMAP, ColorToRGB( clBlack ), True );
-      imgSpellBar.Picture.BITMAP.LoadFromFile( InterfacePath + 'spellbar.bmp' );
+      imgSpellBar.Picture.BITMAP.LoadFromFile( InterfacePath + LanguagePath + 'spellbar.bmp' );
       SpellBar := DDGetImage( lpDD, imgSpellBar.Picture.BITMAP,
         ColorToRGB( clFuchsia ), True );
       ShadowImage := DDGetImage( lpDD, Image3.Picture.BITMAP,
@@ -3742,7 +3748,7 @@ try
       BM.free;
     end;
     Image6.picture.bitmap.LoadFromFile(InterfacePath+'combat.bmp');
-    Image4.picture.bitmap.LoadFromFile(InterfacePath+'bottombar.bmp');
+    Image4.picture.bitmap.LoadFromFile(InterfacePath+ LanguagePath + 'bottombar.bmp');
     OverlayB := DDGetImage(lpDD, Image4.Picture.BITMAP, ColorToRGB(clFuchsia), True);
     Image2.picture.bitmap.LoadFromFile(InterfacePath+'sidebar.bmp');
     OverlayR := DDGetImage(lpDD, Image2.Picture.BITMAP, ColorToRGB(clFuchsia), True);
@@ -3750,7 +3756,7 @@ try
     ManaEmpty:=DDGetImage(lpDD,imgMana.picture.bitmap,ColorToRGB(clBlack),true);
     imgLife.picture.bitmap.LoadFromFile(InterfacePath+'health.bmp');
     LifeEmpty:=DDGetImage(lpDD,imgLife.picture.bitmap,ColorToRGB(clBlack),true);
-    imgSpellBar.picture.bitmap.LoadFromFile(InterfacePath+'spellbar.bmp');
+    imgSpellBar.picture.bitmap.LoadFromFile(InterfacePath+LanguagePath + 'spellbar.bmp');
     SpellBar := DDGetImage(lpDD, imgSpellBar.Picture.BITMAP, ColorToRGB(clFuchsia), True);
     ShadowImage:=DDGetImage(lpDD, Image3.Picture.BITMAP, ColorToRGB(clBlack), false);
     NoSpellIcon:=DDGetSurface(lpDD, 32, 32, clBlack, false);
@@ -6458,7 +6464,7 @@ begin
     DlgShow.pText := DlgText;
     DlgShow.OnClose := CloseShow;
     DlgShow.frmMain := Self;
-    DlgShow.FileName := 'CreditsScreen.bmp';
+    DlgShow.FileName := LanguagePath + 'CreditsScreen.bmp';
     DlgShow.pMusic := MusicLib;
     DlgShow.MusicFileName := 'exCarlibur.mp3';
     MouseCursor.SetFrame( 37 );

@@ -59,8 +59,6 @@ unit DFX;
 {                                                                              }
 {******************************************************************************}
 
-{$INCLUDE Anigrp30cfg.inc}
-
 interface
 
 uses
@@ -74,17 +72,13 @@ uses
   Dialogs,
   digifx,
 {$IFDEF DirectX}
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
   DirectDraw,
-{$ENDIF}
   DXUtil,
   Anigrp30,
 {$ENDIF}
   StdCtrls,
   ExtCtrls,
-  LogFile;
+  logger;
 
 const
   pixelformats : array[ 0..2 ] of DWORD = ( PIXFMT_555, PIXFMT_565, PIXFMT_888 );
@@ -259,11 +253,11 @@ begin
   until ( dfx_hnd <> 0 ) or ( pf_index = High( pixelformats ) );
 
   if dfx_pixelformat = PIXFMT_555 then
-    Log.Log( 'Using 555 Driver' )
+    Log.LogStatus( 'Using 555 Driver', 'DFXInit' )
   else if dfx_pixelformat = PIXFMT_565 then
-    Log.Log( 'Using 565 Driver' )
+    Log.LogStatus( 'Using 565 Driver', 'DFXInit' )
   else if dfx_pixelformat = PIXFMT_888 then
-    Log.Log( 'Using 888 Driver' );
+    Log.LogStatus( 'Using 888 Driver', 'DFXInit' );
 
   Result := ( dfx_hnd <> 0 );
 end;
@@ -463,7 +457,7 @@ begin
   try
     digifxDrawRLE( dfx_hnd, Image[ Index ], X, Y, @dfx_blitfx, Bits );
   except
-    Log.Log( '*** Error drawing resource' );
+    Log.LogError( '*** Error drawing resource', 'TRLESprite.Draw' );
   end;
 end;
 

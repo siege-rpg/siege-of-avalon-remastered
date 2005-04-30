@@ -500,7 +500,7 @@ constructor TQuestLog.Create;
 begin
   inherited;
   TitleName := 'Message3';
-  FileName := ArtPath + 'conversations/Quests.lst';
+  FileName := ArtPath + 'conversations/' + LanguagePath + 'Quests.lst';
 end;
 
 { TAdvLog }
@@ -509,7 +509,7 @@ constructor TAdvLog.Create;
 begin
   inherited;
   TitleName := 'Message2';
-  FileName := ArtPath + 'conversations/Adventures.lst';
+  FileName := ArtPath + 'conversations/' + LanguagePath + 'Adventures.lst';
 end;
 
 end.

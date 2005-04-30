@@ -59,15 +59,11 @@ unit Parts;
 {                                                                              }
 {******************************************************************************}
 
-{$INCLUDE Anigrp30cfg.inc}
-
 interface
 
 uses
   Classes,
-  Windows,
   SysUtils,
-  Graphics,
   Anigrp30,
   AniDec30,
   IniFiles,
@@ -76,8 +72,7 @@ uses
   Resource,
   Character,
   ItemDatabase,
-  Engine,
-  LogFile;
+  Engine;
 
 type
   TPartManager = class( TObject )
@@ -201,56 +196,30 @@ var
 
 implementation
 
+uses
+  SiegeTypes; 
+
 { TPartManager }
 
 constructor TPartManager.Create( const ItemDBPath, XRefDBPath : string );
-const
-  FailName : string = 'Parts.Create';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
-    InvDB := TStringDatabase.Create( ItemDBPath );
-    XRefDB := TStringDatabase.Create( XRefDBPath );
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
+  InvDB := TStringDatabase.Create( ItemDBPath );
+  XRefDB := TStringDatabase.Create( XRefDBPath );
 end;
 
 destructor TPartManager.Destroy;
-const
-  FailName : string = 'Parts.Destroy';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
-    InvDB.Free;
-    XRefDB.Free;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
+  InvDB.Free;
+  XRefDB.Free;
 end;
 
 function TPartManager.GetResource( const PartFile : string ) : TResource;
 var
   i : integer;
   S, S1 : string;
-const
-  FailName : string = 'Parts.GetResource';
 begin
   Result := nil;
 
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
     S := PartFile;
     S1 := ChangeFileExt( S, '' );
     i := Figures.IndexOf( S1 );
@@ -268,26 +237,14 @@ begin
         Figures.Objects[ i ] := result;
       end;
     end;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 function TPartManager.GetOnDemandResource( const PartFile : string ) : TResource;
 var
   i : integer;
   S, S1 : string;
-const
-  FailName : string = 'Parts.GetResource';
 begin
   Result := nil;
-
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
     S := PartFile;
     S1 := ChangeFileExt( S, '' );
     i := Figures.IndexOf( S1 );
@@ -305,27 +262,16 @@ begin
         Figures.Objects[ i ] := result;
       end;
     end;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 function TPartManager.GetLayerResource( const PartFile : string ) : TLayerResource;
 var
   i : integer;
   S, S1 : string;
-const
-  FailName : string = 'Parts.GetLayerResource';
 begin
   Result := nil;
 
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
-    S := LayerPath + PartFile;
+   S := LayerPath + PartFile;
     S1 := ChangeFileExt( S, '' );
     i := Figures.IndexOf( S1 );
     if i >= 0 then
@@ -342,10 +288,6 @@ begin
         Figures.Objects[ i ] := result;
       end;
     end;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 function TPartManager.LoadItem( const ItemName, NakedName : string ) : TItem;
@@ -355,51 +297,21 @@ var
   S : string;
 
   function ParseDB( FieldPos : integer ) : string;
-  const
-    FailName : string = 'Parts.LoadItem.ParseDB';
   begin
-{$IFDEF DODEBUG}
-    if ( CurrDbgLvl >= DbgLvlSevere ) then
-      Log.LogEntry( FailName );
-{$ENDIF}
-    try
       Result := InvDB.Fields[ FieldPos ];
 
       if Result = '' then
         Result := '0'
-    except
-      on E : Exception do
-        Log.log( FailName, E.Message, [ ] );
-    end;
   end;
 
   function sParseDB( FieldPos : integer ) : string;
-  const
-    FailName : string = 'Parts.LoadItem.sParseDB';
   begin
-{$IFDEF DODEBUG}
-    if ( CurrDbgLvl >= DbgLvlSevere ) then
-      Log.LogEntry( FailName );
-{$ENDIF}
-    try
       Result := InvDB.Fields[ FieldPos ];
-    except
-      on E : Exception do
-        Log.log( FailName, E.Message, [ ] );
-    end;
   end;
 
 
-const
-  FailName : string = 'Parts.LoadItem';
 begin
   Result := nil;
-
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
 
     if not InvDB.FindRecord( ItemName ) then
       exit;
@@ -566,11 +478,12 @@ begin
     end
     else if ItemType = 'quiver' then
     begin
+      { TODO
       TQuiver( result ).FletchingColor := StrToInt( ParseDB( qFletchingColor ) );
       TQuiver( result ).TrackingDegree := StrToInt( ParseDB( qTracking ) );
       TQuiver( result ).StrikeLeatherSound := ParseDB( qSndOther );
       TQuiver( result ).StrikeMetalSound := ParseDB( qSndMetal );
-      TQuiver( result ).StrikeStoneSound := ParseDB( qSndStone );
+      TQuiver( result ).StrikeStoneSound := ParseDB( qSndStone );}
     end
     else
     begin
@@ -580,11 +493,6 @@ begin
       else
         result.Material := maOther;
     end;
-
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 function TPartManager.GetImageFile( const PartName,
@@ -592,14 +500,7 @@ function TPartManager.GetImageFile( const PartName,
 var
   S, S1 : string;
   XRefIndex : integer;
-const
-  FailName : string = 'Parts.GetImageFile';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
     result := '';
     NotFound := false;
 
@@ -627,42 +528,20 @@ begin
         end;
       end;
     end;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 procedure TPartManager.ReleaseItemDB;
-const
-  FailName : string = 'Parts.ReleaseItemDB';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
     InvDB.free;
     InvDB := nil;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 function TPartManager.MemSize : longint;
 var
   i : integer;
-const
-  FailName : string = 'Parts.MemSize';
 begin
   result := 0;
 
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
     for i := 0 to Figures.Count - 1 do
     begin
       if assigned( Figures.Objects[ i ] ) then
@@ -670,10 +549,6 @@ begin
         inc( Result, TResource( Figures.Objects[ i ] ).MemSize );
       end;
     end;
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 procedure TPartManager.ClearUnusedParts;

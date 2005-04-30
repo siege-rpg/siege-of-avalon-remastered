@@ -64,16 +64,9 @@ unit AdventureLog;
 interface
 
 uses
-  Windows,
-  Messages,
-  SysUtils,
   Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs, {DsgnIntf,}
-  comctrls,
-  LogFile;
+  SysUtils,
+  logger;
 
 type
   {TAboutAdventureLogProperty = class(TPropertyEditor)
@@ -138,7 +131,7 @@ begin
     FLogDateList := TStringList.Create;
   except
     on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -170,7 +163,7 @@ begin
 
   except
     on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -202,7 +195,7 @@ begin
 
   except
     on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -244,7 +237,7 @@ begin
 
   except
     on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -262,7 +255,7 @@ begin
 
   except
     on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -280,7 +273,7 @@ begin
 
   except
     on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 

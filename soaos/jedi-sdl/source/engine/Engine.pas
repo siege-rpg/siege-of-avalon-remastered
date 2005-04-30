@@ -59,31 +59,22 @@ unit Engine;
 {                                                                              }
 {******************************************************************************}
 
-{$INCLUDE Anigrp30cfg.inc}
-
 interface
 
 uses
   Classes,
+  sdl,
   Anigrp30,
   AniDec30,
-  ExtCtrls,
-  Windows,
   Math,
   SysUtils,
   INIFiles,
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
-  DirectDraw,
-{$ENDIF}
-  LogFile,
-  MMSystem,
-  Graphics,
+  logger,
   Resource,
   Titles,
   DFX,
-  MousePtr;
+  AniMap,
+  AniView;
 
 procedure CreateGlobals;
 procedure FreeGlobals;
@@ -107,7 +98,7 @@ var
   Sounds : TList;
   ActiveTriggers : TList;
   SayList : TList;
-  ShadowImage : IDirectDrawSurface;
+  ShadowImage : PSDL_Surface;
   GlowImage : TRLESprite;
   BaseLightType : longint;
   DefaultPath : string;
@@ -130,7 +121,7 @@ var
   Bikini : boolean;
   Quests : TStringList;
   Adventures : TStringList;
-  MouseCursor : TMousePtr;
+  //MouseCursor : TMousePtr;
   ReadCache : boolean;
   WriteCache : boolean;
   GlobalBrightness : longint;
@@ -153,7 +144,6 @@ var
 implementation
 
 uses
-  AniDemo,
   Character,
   Parts,
   Effects,

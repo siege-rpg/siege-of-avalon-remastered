@@ -61,16 +61,14 @@ unit AI1;
 
 interface
 
-{$INCLUDE Anigrp30cfg.inc}
-
 uses
   Classes,
   SysUtils,
   Character,
   Resource,
   Engine,
-  Anigrp30,
-  LogFile;
+  CustomAniFigure,
+  Anigrp30;
 
 type
   TMeander = class( TAI )
@@ -83,8 +81,8 @@ type
   protected
     procedure OnStop; override;
     procedure OnNoPath; override;
-    procedure WasAttacked( Source : TAniFigure; Damage : Single ); override;
-    function OnCollideFigure( Target : TAniFigure ) : Boolean; override;
+    procedure WasAttacked( Source : TCustomAniFigure; Damage : Single ); override;
+    function OnCollideFigure( Target : TCustomAniFigure ) : Boolean; override;
   public
     procedure Init; override;
     procedure Execute; override;
@@ -103,8 +101,8 @@ type
   protected
     procedure OnStop; override;
     procedure OnNoPath; override;
-    procedure WasAttacked( Source : TAniFigure; Damage : Single ); override;
-    function OnCollideFigure( Target : TAniFigure ) : Boolean; override;
+    procedure WasAttacked( Source : TCustomAniFigure; Damage : Single ); override;
+    function OnCollideFigure( Target : TCustomAniFigure ) : Boolean; override;
   public
     procedure Init; override;
     procedure Execute; override;
@@ -134,16 +132,8 @@ const
 function AssignAI1( AIName : string ) : TAI;
 var
   S : string;
-const
-  FailName : string = 'AssignAI1';
 begin
   Result := nil;
-
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
 
     S := LowerCase( AIName );
     if S = 'meander' then
@@ -153,10 +143,6 @@ begin
     else if ( S = 'followpath' ) then
       Result := TFollowPath.Create;
 
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 { TMeander }
@@ -166,15 +152,7 @@ var
   r : Integer;
   T : Single;
   X, Y : Integer;
-const
-  FailName : string = 'TMeander.Execute';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
-
     if not Walking then
     begin
       if Delay <= 0 then
@@ -191,11 +169,6 @@ begin
         Dec( Delay );
       end;
     end;
-
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 procedure TMeander.Init;

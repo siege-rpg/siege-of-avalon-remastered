@@ -65,12 +65,8 @@ interface
 
 uses
   Windows,
-{$IFDEF DX5}
-  DirectX;
-{$ELSE}
   DirectDraw,
   Direct3D;
-{$ENDIF}
 
 const
   DXR_MAXTEXTURE = 4;

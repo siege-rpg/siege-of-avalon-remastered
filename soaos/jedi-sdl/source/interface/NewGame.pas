@@ -59,6 +59,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2004/10/17 18:38:06  savage
+  Initial changes to stop it crashing on exit.
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -70,7 +73,9 @@ interface
 
 uses
   sdl,
-  SiegeInterfaces;
+  SiegeInterfaces,
+  SiegeTypes{,
+  Character};
 
 type
   TMouseOverNewOptions = (
@@ -83,7 +88,7 @@ type
     moHairStyle,
     moBeard,
     moName,
-    moTraingStyle,
+    moTrainingStyle,
     moStrength,
     moCoordination,
     moConstitution,
@@ -104,6 +109,30 @@ type
     FText : PSDL_Surface;
   end;
 
+  TCharacter = class
+  public
+    BaseStrength : Integer;
+    BaseCoordination : Integer;
+    BaseConstitution : Integer;
+    BaseMysticism : Integer;
+    BaseCombat : Integer;
+    BaseStealth : Integer;
+    BaseMovement : Single;
+    BasePerception : Integer;
+    BaseCharm : Integer;
+    BaseHealingRate : Integer;
+    BaseRechargeRate : Integer;
+    BaseHitPoints : Single;
+    BaseMana : Single;
+    BaseAttackRecovery : Integer;
+    BaseAttackBonus : Single;
+    BaseDefense : Single;
+    BaseHitRecovery : integer;
+    Damage : TDamageProfile;
+    Resistance : TDamageResistanceProfile;
+    TrainingPoints : Integer;
+  end;
+
   TNewGame = class( TSimpleSoAInterface )
   private
     DXCircle : PSDL_Surface; //circle used for outline
@@ -119,10 +148,31 @@ type
     StatAdjustments : array[ 0..7 ] of integer; //used to see if we've added points to a stat or not
     StatName : array[ 0..1, 0..11 ] of string;
     SelectRect : array[ 0..20 ] of TSelectableRect; //collision rects for selectable text
+    //base stuff - saved in case we do a cancel
+    Damage : TDamageProfile;
+    Resistance : TDamageResistanceProfile;
+    BaseStrength : integer;
+    BaseCoordination : integer;
+    BaseConstitution : integer;
+    BasePerception : integer;
+    BaseCharm : integer;
+    BaseMysticism : integer;
+    BaseCombat : integer;
+    BaseStealth : integer;
+    TrainingPoints : integer;
+    ixSelectedShirt : integer; //current selected shirt color
+    ixSelectedPants : integer; //current selected pants color
+    ixSelectedHair : integer; //current selected Hair color
+    ixSelectedHairStyle : integer; //current selected Hairstyle
+    ixSelectedBeard : integer;
+    ixSelectedTraining : integer;
+    
+    procedure LoadBaseValues; //saves the base stats of the character
     procedure LoadNames;
     procedure CreateCollisionRects; //create the rects for the collision detection
+    function ShowListBox( aX, aY : integer; aMoOptions : TMouseOverNewOptions ): integer;
   public
-    //Character : TCharacter;
+    Character : TCharacter;
     procedure FreeSurfaces; override;
     procedure LoadSurfaces; override;
     procedure Render; override;
@@ -136,7 +186,8 @@ implementation
 uses
   SysUtils,
   globals,
-  GameMainMenu;
+  GameMainMenu,
+  ListBoxDialog;
 
 { TNewGame }
 
@@ -417,7 +468,8 @@ begin
   SelectRect[ i ].FRect.h := 223 - InfoRect[ i ].FRect.y;
   SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 66 ], 188, 268 );
   SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 82 ] );
-   //Training
+
+  //Training
   inc( i );
   SelectRect[ i ].FRect.x := 40;
   SelectRect[ i ].FRect.y := 270;
@@ -490,6 +542,29 @@ begin
   MainWindow.Rendering := false;
 end;
 
+procedure TNewGame.LoadBaseValues;
+var
+  i : integer;
+begin
+  //we store thse values so that we can keep the player from lowering his score beyon its start
+  Damage := Character.Damage;
+  Resistance := Character.Resistance;
+  BaseStrength := Character.BaseStrength;
+  BaseCoordination := Character.BaseCoordination;
+  BaseConstitution := Character.BaseConstitution;
+  BasePerception := Character.BasePerception;
+  BaseCharm := Character.BaseCharm;
+  BaseMysticism := Character.BaseMysticism;
+  BaseCombat := Character.BaseCombat;
+  BaseStealth := Character.BaseStealth;
+  TrainingPoints := Character.TrainingPoints;
+
+  for i := 0 to 7 do
+  begin //initialize adjustments to zero
+    StatAdjustments[ i ] := 0;
+  end;
+end;
+
 procedure TNewGame.LoadNames;
 begin
   StatName[ 0 ][ 1 ] := TextMessage[ 86 ]; //'Strength';
@@ -556,13 +631,26 @@ begin
   CancelRect.y := 449;
   CancelRect.w := DXCancel.w;
   CancelRect.h := DXCancel.h;
+
+  LoadNames;
+  CreateCollisionRects;
 end;
 
 procedure TNewGame.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
 begin
   inherited;
-  NextGameInterface := TMainMenu;
-  MainWindow.Rendering := false;
+  if PointIsInRect( CurrentPos, 452, 133, 467, 159 ) then
+    ixSelectedTraining := ShowListBox( 313, 175, moTrainingStyle )
+  else if PointIsInRect( CurrentPos, 265, 239, 279, 264  ) then
+    ixSelectedShirt := ShowListBox( 280, 239, moShirtColour )
+  else if PointIsInRect( CurrentPos, 265, 280, 279, 295 ) then
+    ixSelectedPants := ShowListBox( 280, 281, moPantsColour )
+  else if PointIsInRect( CurrentPos, 265, 322, 279, 337 ) then
+    ixSelectedHair := ShowListBox( 280, 323, moHairColour )
+  else if PointIsInRect( CurrentPos, 265, 364, 279, 379 ) then
+    ixSelectedHairStyle := ShowListBox( 280, 365, moHairStyle )
+  else if PointIsInRect( CurrentPos, 265, 408, 279, 423 ) then
+    ixSelectedBeard := ShowListBox( 280, 409, moBeard );
 end;
 
 procedure TNewGame.MouseMove( Shift : TSDLMod; CurrentPos,
@@ -592,6 +680,71 @@ begin
   end;
 
 
+end;
+
+function TNewGame.ShowListBox( aX, aY : integer; aMoOptions : TMouseOverNewOptions ) : integer;
+var
+  ListBoxDialog : TListBoxDialog;
+  i, x, iLow, iHigh : integer;
+begin
+  iLow := 0;
+  iHigh := 3;
+  ListBoxDialog := TListBoxDialog.Create( SoAoSGame, aX, aY );
+  try
+    case aMoOptions of
+      moShirtColour :
+      begin
+        iLow := 0;
+        iHigh := 3;
+      end;
+
+      moPantsColour :
+      begin
+        iLow := 4;
+        iHigh := 7;
+      end;
+
+      moHairColour :
+      begin
+        iLow := 8;
+        iHigh := 11;
+      end;
+
+      moHairStyle :
+      begin
+        iLow := 12;
+        iHigh := 15;
+      end;
+
+      moBeard :
+      begin
+        iLow := 16;
+        iHigh := 17;
+      end;
+
+      moTrainingStyle :
+      begin
+        iLow := 18;
+        iHigh := 20;
+      end;
+    end;
+
+    x := 0;
+    SetLength( ListBoxDialog.ListItems, iHigh - iLow );
+    for i := iLow to iHigh do
+    begin
+      ListBoxDialog.ListItems[ x ].FInfo := SelectRect[ i ].FInfo;
+      ListBoxDialog.ListItems[ X ].FText := SelectRect[ i ].FText;
+      inc( x );
+    end;
+    
+    ListBoxDialog.LoadSurfaces;
+    SoAoSGame.Show;
+    Result := ListBoxDialog.SelectedIndex;
+  finally
+    ListBoxDialog.Free;
+  end;
+  ResetInputManager;
 end;
 
 end.

@@ -69,7 +69,8 @@ uses
   digifx,
   Character,
   ItemDatabase,
-  LogFile;
+  logger,
+  SiegeTypes;
 
 type
   TTitlesDB = class( TStringDatabase )
@@ -125,7 +126,7 @@ function TTitlesDB.GetStatModifier( const Title : string ) : PStatModifier;
       end;
     except
       on E : Exception do
-        Log.log( FailName + E.Message );
+        Log.LogError( E.Message, FailName );
     end;
 
   end;
@@ -167,7 +168,7 @@ begin
       result := nil;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 
 end;

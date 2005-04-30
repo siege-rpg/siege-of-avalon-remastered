@@ -62,10 +62,7 @@ unit SaveFile;
 interface
 
 uses
-  Windows,
-  SysUtils,
-  Classes,
-  LogFile;
+  Classes;
 
 type
   TSavBlocks = ( sbMap, sbMapKnown, sbCharacter, sbItem, sbTravel, sbJournal, scAbstract, scSoundPlayer, scPathCorner, scTrigger, scSpriteObject,
@@ -157,6 +154,9 @@ const
   EOBMarker = $4242;
 
 implementation
+
+uses
+  SysUtils;
 
 { TSavFile }
 
@@ -764,7 +764,7 @@ end;
 
 procedure TSavFile.Save;
 var
-  Stream : TFileStream;
+  Stream, OlderFile, NewerFile : TFileStream;
   Mem : TmemoryStream;
   S : string;
   MapFilename : string;
@@ -800,7 +800,20 @@ begin
         //if we're saveing as a new file, but haven't changed anything
         try
           if FileExists( FFilename ) then
-            CopyFile( PChar( FFilename ), PChar( NewFilename ), false )
+          begin
+            OlderFile := TFileStream.Create(FFilename, fmOpenRead or fmShareDenyWrite);
+            try
+              NewerFile := TFileStream.Create(NewFileName, fmCreate or fmShareDenyRead);
+              try
+                NewerFile.CopyFrom(OlderFile, OlderFile.Size);
+              finally
+                NewerFile.Free;
+              end;
+            finally
+              OlderFile.Free;
+            end;
+            //CopyFile( PChar( FFilename ), PChar( NewFilename ), false )
+          end
           else
             DeleteFile( NewFilename );
         except
@@ -969,7 +982,20 @@ begin
         try
           S := ChangeFileExt( FFilename, '.map' );
           if FileExists( S ) then
-            CopyFile( PChar( S ), PChar( MapFilename ), false );
+          begin
+            OlderFile := TFileStream.Create(S, fmOpenRead or fmShareDenyWrite);
+            try
+              NewerFile := TFileStream.Create(MapFilename, fmCreate or fmShareDenyRead);
+              try
+                NewerFile.CopyFrom(OlderFile, OlderFile.Size);
+              finally
+                NewerFile.Free;
+              end;
+            finally
+              OlderFile.Free;
+            end;
+            //CopyFile( PChar( S ), PChar( MapFilename ), false );
+          end;
         except
         end;
       end;

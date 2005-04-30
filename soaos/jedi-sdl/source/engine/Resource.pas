@@ -61,46 +61,18 @@ unit Resource;
 
 interface
 
-{$INCLUDE Anigrp30cfg.inc}
-
 uses
   Classes,
-  Windows,
   SysUtils,
-  Graphics,
-  Anigrp30,
-  AniDec30,
   IniFiles,
-{$IFDEF DirectX}
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
-  DirectDraw,
-{$ENDIF}
-  DXUtil,
-  DXEffects,
-{$ENDIF}
-  DFX,
-  digifx,
-  LogFile;
+  sdl,
+  SiegeTypes,
+  Anigrp30,
+  AniMap,
+  CustomAniFigure,
+  DFX;
 
 type
-  TDynamicWordArray = array of Word;
-  TDynamicSmallIntArray = array of SmallInt;
-
-  TFacing = ( fNW, fNN, fNE, fEE, fSE, fSS, fSW, fWW );
-
-  TSlot = ( slLeg1, slBoot, slLeg2, slChest1, slChest2, slArm, slBelt, slChest3,
-    slGauntlet, slOuter, slHelmet, slWeapon, slShield, slMisc1, slMisc2, slMisc3 );
-
-  TSlotAllowed = set of TSlot;
-
-  TLightSource = record
-    X, Y, Z : longint;
-    Intensity : double;
-    Radius : integer;
-  end;
-
   TStringIniFile = class( TCustomIniFile )
   private
     FSections : TStringList;
@@ -128,7 +100,7 @@ type
   TResource = class( TAniResource )
   private
     FScriptMax : Integer;
-    Picture : TBitPlane;
+    Picture : PSDL_Surface;
     Lights : array[ 1..8 ] of TLightSource;
     LightCount : integer;
     FReload : boolean;
@@ -142,7 +114,7 @@ type
     FrameHeight : Integer;
     FrameMultiplier : Integer;
     SpecialEffect : TAniSpecialEffect;
-    TransparentColor : TColor;
+    TransparentColor : TSDL_Color;
     Radius : Integer;
     CenterX : Integer;
     CenterY : Integer;
@@ -155,16 +127,16 @@ type
     Highlightable : Boolean;
     DrawShadow : boolean;
     ComplexShadow : boolean;
-    ShadowColor : TColor;
+    ShadowColor : TSDL_Color;
     RLE : TRLESprite;
     OnDemand : boolean;
     Filename : string;
-    procedure EnumLightSource( Figure : TAniFigure; Index, X, Y, Z : longint; Intensity : double; Radius : integer ); override;
+    procedure EnumLightSource( Figure : TCustomAniFigure; Index, X, Y, Z : longint; Intensity : double; Radius : integer ); override;
     procedure LoadData( INI : TStringINIFile ); virtual;
-    procedure Draw( Canvas : TCanvas; X, Y : Integer; Frame : Word ); override;
+    procedure Draw( Canvas : PSDL_Surface; X, Y : Integer; Frame : Word ); override;
     procedure FreeResources; override;
-    procedure Render( Figure : TAniFigure ); override;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); virtual;
+    procedure Render( Figure : TCustomAniFigure ); override;
+    //procedure RenderLocked( Figure : TCustomAniFigure; Bits : PBITPLANE ); virtual;
     function MemSize : longint; virtual;
     procedure LoadGraphic;
     property ScriptMax : Integer read FScriptMax;
@@ -180,20 +152,20 @@ type
     ItemFrame : integer;
     LinkedResource : TResource;
     BackLayer : array[ 0..383 ] of boolean;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    //procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
     procedure LoadData( INI : TStringINIFile ); override;
   end;
 
   TInventoryResource = class( TResource )
   public
     procedure LoadData( INI : TStringINIFile ); override;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
-    procedure RenderShadowLocked( Figure : TAniFigure; Bits : PBITPLANE );
+    //procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    //procedure RenderShadowLocked( Figure : TAniFigure; Bits : PBITPLANE );
   end;
 
   TCastResource = class( TResource )
   public
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    //procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
   end;
 
   TCharacterResource = class( TResource )
@@ -216,8 +188,8 @@ type
     Equipment : array[ slLeg1..slMisc3 ] of string;
     constructor Create;
     destructor Destroy; override;
-    procedure Render( Figure : TAniFigure ); override;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    procedure Render( Figure : TCustomAniFigure ); override;
+    //procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
     procedure LoadData( INI : TStringINIFile ); override;
     procedure FreeResources; override;
     property ContactFrame : Integer read FContactFrame;
@@ -237,22 +209,12 @@ type
   TStaticResource = class( TResource )
   private
     Data : string;
-{$IFDEF DirectX}
-    function GetImage( ImageIndex : Integer ) : IDirectDrawSurface;
-    procedure GetImage1( ImageIndex : Integer; Surface : IDirectDrawSurface; W : integer );
-{$ENDIF}
-{$IFNDEF DirectX}
-    function GetImage( ImageIndex : Integer ) : TBitmap;
-{$ENDIF}
+    function GetImage( ImageIndex : Integer ) : PSDL_Surface;
+    procedure GetImage1( ImageIndex : Integer; Surface : PSDL_Surface; W : integer );
   public
     procedure LoadData( INI : TStringINIFile ); override;
     function Define( Map : TAniMap; Zone : byte; Index : word ) : integer; virtual;
-{$IFDEF DirectX}
-    property Image[ ImageIndex : Integer ] : IDirectDrawSurface read GetImage;
-{$ENDIF}
-{$IFNDEF DirectX}
-    property Image[ ImageIndex : Integer ] : TBitmap read GetImage;
-{$ENDIF}
+    property Image[ ImageIndex : Integer ] : PSDL_Surface read GetImage;
   end;
 
   TDoorResource = class( TStaticResource )
@@ -263,7 +225,7 @@ type
     CacheLoaded : boolean;
     procedure LoadData( INI : TStringINIFile ); override;
     function Define( Map : TAniMap; Zone : byte; Index : Word ) : integer; override;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    //procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
   end;
 
   TTileResource = class( TStaticResource )
@@ -294,7 +256,7 @@ var
 
 
 function Parse( const S : string; Index : integer; ParseChar : Char ) : string;
-function GetFile( const FileName : string; var BM : TBitmap; var INI : TStringIniFile; var FrameCount : Integer ) : Boolean;
+function GetFile( const FileName : string; var BM : PSDL_Surface; var INI : TStringIniFile; var FrameCount : Integer ) : Boolean;
 function LoadResource( const Filename : string ) : TResource; overload;
 function LoadResource( const Filename : string; OnDemand : boolean ) : TResource; overload;
 function LoadArtResource( const ResourceFile : string ) : TResource; overload;
@@ -1071,7 +1033,7 @@ begin
   end;
 end;
 
-procedure TResource.RenderLocked( Figure : TAniFigure; Bits : PBITPLANE );
+procedure TResource.RenderLocked( Figure : TCustomAniFigure; Bits : PBITPLANE );
 var
   SrcBlend, DstBlend : integer;
   i, j, A : integer;
@@ -2248,7 +2210,7 @@ var
   INI : TStringINIFile;
   ImageIndex : integer;
 {$IFDEF DirectX}
-  BM : IDirectDrawSurface;
+  BM : PSDL_Surface;
   ddck : TDDCOLORKEY;
   BltFx : TDDBLTFX;
 {$ENDIF}
@@ -2379,7 +2341,7 @@ var
   AutoTransparent : Boolean;
   ImageIndex : integer;
 {$IFDEF DirectX}
-  BM : IDirectDrawSurface;
+  BM : PSDL_Surface;
   ddck : TDDCOLORKEY;
   BltFx : TDDBLTFX;
 {$ENDIF}
@@ -2498,7 +2460,7 @@ begin
   end;
 end;
 
-procedure TStaticResource.GetImage1( ImageIndex : Integer; Surface : IDirectDrawSurface; W : integer );
+procedure TStaticResource.GetImage1( ImageIndex : Integer; Surface : PSDL_Surface; W : integer );
 var
   Bits : BITPLANE;
   ddsd : TDDSurfaceDesc;
@@ -2534,7 +2496,7 @@ end;
 
 {$IFDEF DirectX}
 
-function TStaticResource.GetImage( ImageIndex : Integer ) : IDirectDrawSurface;
+function TStaticResource.GetImage( ImageIndex : Integer ) : PSDL_Surface;
 var
   Bits : BITPLANE;
   W : integer;
@@ -2662,7 +2624,7 @@ end;
 function TTileResource.Define( Map : TAniMap; Zone : byte; Index : word ) : integer;
 var
 {$IFDEF DirectX}
-  TileBM : IDirectDrawSurface;
+  TileBM : PSDL_Surface;
   ddck : TDDCOLORKEY;
   BltFx : TDDBLTFX;
 {$ENDIF}

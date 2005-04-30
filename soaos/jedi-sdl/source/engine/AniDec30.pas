@@ -59,143 +59,19 @@ unit AniDec30;
 {                                                                              }
 {******************************************************************************}
 
-{$INCLUDE Anigrp30cfg.inc}
-
 interface
 
 uses
-{$ifdef LINUX}
-  SysUtils, Types, Classes, Variants, QTypes, QGraphics, QControls, QForms,
-  QDialogs, QStdCtrls,
-{$else}
-  Windows,
   Classes,
-  Graphics,
   SysUtils,
-  Controls,
-{$endif}
-  LogFile;
+  sdl,
+  SiegeTypes;
 
-const
-  MaxItems = 2047;
-  MaxTiles = 2047;
-  ItemListSize = 32767;
-  MaxScripts = 128;
-  MaxScriptFrames = 64;
-  MaxZones = 255;
-  MaxLightStates = 4;
-  WorkWidth = 384;
-  WorkHeight = 160;
-  MaxSubMaps = 127;
-  MaxZoneHeight = 2048;
-
-type
-  PGridInfo = ^GridInfo;
-  GridInfo = packed record
-    Figure : Pointer; //For collision detection
-    FilterID : Smallint;
-    TriggerID : Smallint;
-    CollisionMask : Word;
-    LineOfSightMask : Word;
-    FilterMask : Word;
-    TriggerMask : Word;
-    Tile : array[ 0..4 ] of Word;
-    Zone : array[ 0..4 ] of Byte;
-    BitField : Byte; //Bit 7 denotes a diamond tile, Bit 6 is automap.
-  end;
-
-  PTileInfo = ^TileInfo;
-  TileInfo = packed record
-    ImageIndex : Word;
-    Rows : Word;
-    Columns : Word;
-    Zone : Word;
-    Element : Byte;
-    Reserved : Byte;
-  end;
-
-  MapColumnHeaderInfo = packed record
-    BaseLine : Longint;
-    Top : Longint;
-    Active : Boolean;
-    Reserved : Byte;
-  end;
-
-  RowUpdateInfo = packed record
-    Figure : Pointer; //The first figure on the row
-    OverlapRow : Longint; //The last row that contains an item which could overlap this row
-    DescendRow : Longint; //The first row which has an item that descends below its position to this row
-    MaxHeight : Longint; //The tallest item on this row
-    ItemIndex : Word; //The first item on the row
-  end;
-
-  PItemInfo = ^ItemInfo;
-  ItemInfo = packed record
-    Top : Longint;
-    Left : Longint;
-    Slope : Single;
-    StripHeights : HGLOBAL;
-    CollisionMasks : HGLOBAL;
-    LineOfSightMasks : HGLOBAL;
-    LightPoints : HGLOBAL;
-    Width : Word;
-    Height : Word;
-    Strips : Word; //=roundup(Width/TileWidth)  Strips*Height=next Items top
-    StripCount : Word;
-    Used : Boolean;
-    Visible : Boolean;
-    AutoTransparent : Boolean;
-    Vertical : Boolean;
-  end;
-
-  PItemInstanceInfo = ^ItemInstanceInfo;
-  ItemInstanceInfo = packed record
-    X : Longint;
-    Y : Longint;
-    ImageY : Word;
-    Slope0 : Single;
-    Slope1 : Single;
-    Slope2 : Single;
-    RefItem : word;
-    FilterID : Smallint;
-    XRayID : Smallint;
-    ImageX : Word;
-    Width : Word;
-    Height : Word;
-    VHeight : Word; //Height of region that may obscure objects behind it
-    Next : Word;
-    Zone : Word;
-    AutoTransparent : Boolean;
-    Visible : Boolean;
-    Last : Boolean;
-    Vertical : Boolean;
-  end;
-
-  ScriptInfo = packed record
-    Frames : Word;
-    FrameID : array[ 1..MaxScriptFrames ] of Word;
-    Name : string[ 32 ];
-    Multiplier : Word;
-    Tag : Longint;
-  end;
-
-  BITMAP = record
-    bmType : Longint;
-    bmWidth : Longint;
-    bmHeight : Longint;
-    bmWidthBytes : Longint;
-    bmPlanes : Integer;
-    bmBitsPixel : Integer;
-    bmBits : Pointer;
-  end;
-
-  TPixelFormat = ( pf555, pf565, pf888 );
-
-procedure CreateMask( var Picture, Mask : HBITMAP; BITMAP : TBitmap; Color : TColor );
+{procedure CreateMask( var Picture, Mask : HBITMAP; BITMAP : TBitmap; Color : TColor );
 procedure CreateHighlightMask( Mask : HBITMAP; var HLMask : HBITMAP; W, H : Word );
 procedure CreateHighlight( HLMask : HBITMAP; var HLPicture : HBITMAP; HLColor : TColor );
 procedure GetStripHeights( var StripHeights : HGLOBAL; Mask : HBITMAP; W, H, StripWidth : Word );
-function CreateShadowBrush : HBRUSH;
+function CreateShadowBrush : HBRUSH; }
 function Min( A, B : Single ) : Single;
 function ATan( X, Y : Single ) : Single;
 procedure Clip( ClipX1, ClipX2 : Integer; var DestX1, DestX2, SrcX1, SrcX2 : Integer );
@@ -204,7 +80,7 @@ procedure Clip2( ClipX1, ClipX2 : Integer; var DestX1, SrcX1, W : Integer );
 
 implementation
 
-procedure CreateMask( var Picture, Mask : HBITMAP; BITMAP : TBitmap; Color : TColor );
+{procedure CreateMask( var Picture, Mask : HBITMAP; BITMAP : TBitmap; Color : TColor );
 var
   TempBitmap : TBitmap;
   DC, MaskDC : HDC;
@@ -273,7 +149,7 @@ begin
   MaskBMP.Free;
   HLPicture := BITMAP.ReleaseHandle;
   BITMAP.Free;
-end;
+end;}
 
 function Min( A, B : Single ) : Single;
 begin
@@ -283,7 +159,7 @@ begin
     Result := B;
 end;
 
-function CreateShadowBrush : HBRUSH;
+{function CreateShadowBrush : HBRUSH;
 var
   DC, TempDC : HDC;
   NewBitmap, OldBitmap : HBITMAP;
@@ -332,10 +208,6 @@ var
 const
   FailName : string = 'AniDec30.GetStripHeights';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    DbgLog.LogEntry( FailName );
-{$ENDIF}
   try
 
     RowSize := W div 8;
@@ -583,7 +455,7 @@ begin
   GlobalUnlock( ghBitmapInfo );
   GlobalFree( ghBitmapInfo );
 
-end;
+end;}
 
 function ATan( X, Y : Single ) : Single;
 begin

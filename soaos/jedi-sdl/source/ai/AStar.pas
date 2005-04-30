@@ -63,9 +63,8 @@ interface
 
 uses
   Classes,
-  Windows,
   SysUtils,
-  LogFile;
+  sdl;
 
 const
   MinSearch = -128;
@@ -102,7 +101,7 @@ type
     ClosestD : word;
     ClosestX : Smallint;
     ClosestY : Smallint;
-    AGrid : array[ MinSearch - 1..MaxSearch + 1, MinSearch - 1..MaxSearch + 1 ] of TAgrid;
+    AGrid : array[ - 1 + MinSearch ..MaxSearch + 1, - 1 + MinSearch ..MaxSearch + 1 ] of TAgrid;
     InitD : array[ 1..HeapSize ] of TInitD;
     procedure OpenCell( CurrentX, CurrentY, X, Y : Smallint );
   public
@@ -219,6 +218,7 @@ var
   //  a2,h2: double; //Creates a tighter path which is not appropriate for 8 direction walk
   FavorDiagonal : boolean;
 begin
+  p := nil;
   inc( Iteration );
   FSrcX := SrcX;
   FSrcY := SrcY;
@@ -393,8 +393,8 @@ begin
               inc( result );
             until ( X = SrcX ) and ( Y = SrcY );
 
-            Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
-            p := GlobalLock( Handle );
+            // TODO : Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
+            // TODO : p := GlobalLock( Handle );
             inc( p, result );
             X := ClosestX;
             Y := ClosestY;
@@ -407,7 +407,7 @@ begin
               X := X1;
               Y := Y1;
             until ( X = SrcX ) and ( Y = SrcY );
-            GlobalUnlock( Handle );
+            // TODO : GlobalUnlock( Handle );
 
             exit;
           end;
@@ -431,8 +431,8 @@ begin
     inc( result );
   until ( X = SrcX ) and ( Y = SrcY );
 
-  Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
-  p := GlobalLock( Handle );
+  // TODO : Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
+  // TODO : p := GlobalLock( Handle );
   inc( p, result );
   X := DestX;
   Y := DestY;
@@ -445,7 +445,7 @@ begin
     X := X1;
     Y := Y1;
   until ( X = SrcX ) and ( Y = SrcY );
-  GlobalUnlock( Handle );
+  // TODO : GlobalUnlock( Handle );
 
 end;
 
@@ -465,6 +465,7 @@ var
   a1, a3 : double;
   a2, h2 : double; //Creates a tighter path which is not appropriate for 8 direction walk
 begin
+  p := nil;
   inc( Iteration );
   FSrcX := SrcX;
   FSrcY := SrcY;
@@ -609,8 +610,8 @@ begin
               inc( result );
             until ( X = SrcX ) and ( Y = SrcY );
 
-            Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
-            p := GlobalLock( Handle );
+            // TODO : Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
+            // TODO : p := GlobalLock( Handle );
             inc( p, result );
             X := ClosestX;
             Y := ClosestY;
@@ -623,7 +624,7 @@ begin
               X := X1;
               Y := Y1;
             until ( X = SrcX ) and ( Y = SrcY );
-            GlobalUnlock( Handle );
+            // TODO : GlobalUnlock( Handle );
 
             exit;
           end;
@@ -646,8 +647,8 @@ begin
     inc( result );
   until ( X = SrcX ) and ( Y = SrcY );
 
-  Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
-  p := GlobalLock( Handle );
+  // TODO : Handle := GlobalAlloc( GMEM_MOVEABLE, result * sizeof( TPoint ) );
+  // TODO : p := GlobalLock( Handle );
   inc( p, result );
   X := DestX;
   Y := DestY;
@@ -660,7 +661,7 @@ begin
     X := X1;
     Y := Y1;
   until ( X = SrcX ) and ( Y = SrcY );
-  GlobalUnlock( Handle );
+  // TODO : GlobalUnlock( Handle );
 
 end;
 

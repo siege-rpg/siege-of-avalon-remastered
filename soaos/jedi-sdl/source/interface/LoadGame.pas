@@ -57,6 +57,10 @@ unit LoadGame;
 { ----------------                                                             }
 {   July    13 2003 - DL : Initial Upload to CVS                               }
 {                                                                              }
+{
+  $Log$
+
+}
 {******************************************************************************}
 
 {$INCLUDE Anigrp30cfg.inc}
@@ -89,6 +93,7 @@ uses
   Anigrp30,
   Engine,
   Logfile;
+  
 type
   pItem = ^SelectableRect;
   SelectableRect = record
@@ -651,7 +656,7 @@ begin
 
          //Character.Name:=SavedFileName;
       pText.PlotText( SavedFileName, X1, Y1, 240 );
-         //plot the Carat
+         //plot the Caret
       pText.PlotText( '|', CaratPosition + X1, Y1, 240 );
       lpDDSFront.Flip( nil, DDFLIP_WAIT );
       WrapperBltFast( lpDDSBack, 0, 0, lpDDSFront, Rect( 0, 0, 800, 600 ), DDBLTFAST_WAIT );
@@ -1092,7 +1097,7 @@ begin
   //transparent color
     InvisColor := $00FFFF00;
 
-    BM.LoadFromFile( InterfacePath + 'ldChooseBox.bmp' );
+    BM.LoadFromFile( InterfacePath + LanguagePath + 'ldChooseBox.bmp' );
     DXBorders := DDGetImage( lpDD, BM, InvisColor, False );
   //WrapperBltFast( lpDDSBack, 369, 431, DXBorders, Rect(0, 0, BM.width, BM.Height), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT);
     nRect := pItem( SelectRect.Items[ CurrentSelectedListItem ] ).Rect;
@@ -1138,7 +1143,7 @@ begin
   //transparent color
     InvisColor := $00FFFF00;
 
-    BM.LoadFromFile( InterfacePath + 'ldChooseBox.bmp' );
+    BM.LoadFromFile( InterfacePath + LanguagePath + 'ldChooseBox.bmp' );
     DXBorders := DDGetImage( lpDD, BM, InvisColor, False );
   //WrapperBltFast( lpDDSBack, 369, 431, DXBorders, Rect(0, 0, BM.width, BM.Height), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT);
     nRect := pItem( SelectRect.Items[ CurrentSelectedListItem ] ).Rect;
@@ -1175,7 +1180,7 @@ begin
   //transparent color
   InvisColor := $00FFFF00;
 
-  BM.LoadFromFile( InterfacePath + 'ldChooseBox.bmp' );
+  BM.LoadFromFile( InterfacePath + LanguagePath + 'ldChooseBox.bmp' );
   DXBorders := DDGetImage( lpDD, BM, InvisColor, False );
 
   nRect := pItem( SelectRect.Items[ CurrentSelectedListItem ] ).Rect;
@@ -1474,7 +1479,7 @@ begin
                   SetLength( S, L );
                   Stream.Read( S[ 1 ], L );
                   List.Text := S;
-                  CharacterCount := CharacterCount + 1;
+                  inc( CharacterCount );
                   CharacterName[ CharacterCount ] := List.Values[ 'CharacterName' ];
                   CharacterGif := List.Values[ 'Resource' ];
                   FoundCharacters := true;

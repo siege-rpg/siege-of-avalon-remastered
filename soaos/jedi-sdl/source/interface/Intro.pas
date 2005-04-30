@@ -138,6 +138,7 @@ const
   H = 52;
 var
   DC : HDC;
+  //DXTemp : IDirectDrawSurface;
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
@@ -145,7 +146,7 @@ begin
 {$ENDIF}
   try
     Caption.Rect := Rect( X, Y, X + W, Y + H );
-    Caption.Image := DDGetSurface( lpDD, W, H, $FF00FF, true );
+    Caption.Image := DDGetSurface( lpDD, W, H, $FF04FF, false );
     Caption.Image.GetDC( DC );
     try
       BitBlt( DC, 0, 0, W, H, BM.canvas.handle, X - XFrame, Y - YFrame, SRCCOPY );
@@ -220,7 +221,7 @@ begin
       BM.LoadFromFile( InterfacePath + 'gMainMenuBlank.bmp' );
       DXBack := DDGetImage( lpDD, BM, $00FFFF00, true );
 
-      BM.LoadFromFile( InterfacePath + 'gMainMenuText.bmp' );
+      BM.LoadFromFile( InterfacePath + LanguagePath + 'gMainMenuText.bmp' );
       DXBack.GetDC( DC );
       try
         BitBlt( DC, 106, 41, 582, 416, BM.canvas.handle, 0, 0, SRCCOPY );
@@ -230,7 +231,7 @@ begin
 
       WrapperBltFast( lpDDSBack, 0, 0, DXBack, Rect( 0, 0, 800, 600 ), DDBLTFAST_NOCOLORKEY or DDBLTFAST_WAIT );
 
-      BM.LoadFromFile( InterfacePath + 'gMainMenuTextBttns.bmp' );
+      BM.LoadFromFile( InterfacePath + LanguagePath + 'gMainMenuTextBttns.bmp' );
       Y1 := YFrame;
       MakeRect( Captions[ 1 ], XFrame, Y1, BM );
 
@@ -399,7 +400,7 @@ begin
   //transparent color
     InvisColor := $00FFFF00;
 
-    BM.LoadFromFile( InterfacePath + 'ldChooseBox.bmp' );
+    BM.LoadFromFile( InterfacePath + LanguagePath + 'ldChooseBox.bmp' );
     DXBorders := DDGetImage( lpDD, BM, InvisColor, False );
     nRect := Captions[ 7 ].Rect; //Exit
 

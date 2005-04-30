@@ -63,24 +63,17 @@ interface
 
 uses
   Classes,
-  Windows,
   SysUtils,
+  sdl,
   Anigrp30,
-{$IFDEF DirectX}
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
-  DirectDraw,
-{$ENDIF}
-  DXUtil,
-  DXEffects,
-{$ENDIF}
   digifx,
   DFX,
   Engine,
   Character,
   Resource,
-  LogFile;
+  SiegeTypes,
+  CustomAniFigure,
+  AniFigure;
 
 var
   AllSpellList : TStringList;
@@ -583,7 +576,7 @@ type
     destructor Destroy; override;
     procedure Refresh( NewEffect : TEffect ); override;
     procedure Adjust( Character : TCharacter ); override;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    procedure RenderLocked( Figure : TCustomAniFigure; Bits : PSDL_PixelFormat ); override;
     function DoFrame : boolean; override;
   end;
 
@@ -593,7 +586,7 @@ type
     FCharacter : TCharacter;
   public
     procedure Adjust( Character : TCharacter ); override;
-    function Hit( Source : TAniFigure; Damage : PDamageProfile ) : boolean; override;
+    function Hit( Source : TCustomAniFigure; Damage : PDamageProfile ) : boolean; override;
   end;
 
   TReflectEffect = class( TEffect )
@@ -603,7 +596,7 @@ type
     Reflect : boolean;
   public
     procedure Adjust( Character : TCharacter ); override;
-    function Hit( Source : TAniFigure; Damage : PDamageProfile ) : boolean; override;
+    function Hit( Source : TCustomAniFigure; Damage : PDamageProfile ) : boolean; override;
   end;
 
   TThiefEffect = class( TEffect )
@@ -663,7 +656,7 @@ type
     function FindEnemies : TList;
   protected
     procedure DoFrame; override;
-    procedure CollideFigure( Source, Target : TAniFigure; var Stop : Boolean ); override;
+    procedure CollideFigure( Source, Target : TCustomAniFigure; var Stop : Boolean ); override;
   public
     ScanRange : integer;
     procedure Launch( Source : TCharacter; Target : TSpriteObject; X, Y : Longint ); override;
@@ -673,9 +666,9 @@ type
   TInfernoCoreProjectile = class( TProjectile )
   protected
     procedure Render; override;
-    procedure CollideFigure( Source, Target : TAniFigure; var Stop : Boolean ); override;
-    procedure CollideItem( Source : TAniFigure; var Stop : Boolean ); override;
-    procedure CollideBoundary( Source : TAniFigure ); override;
+    procedure CollideFigure( Source, Target : TCustomAniFigure; var Stop : Boolean ); override;
+    procedure CollideItem( Source : TCustomAniFigure; var Stop : Boolean ); override;
+    procedure CollideBoundary( Source : TCustomAniFigure ); override;
   public
     Proj1, Proj2 : TInfernoProjectile;
   end;

@@ -67,7 +67,7 @@ uses
   classes,
   forms,
   Resource,
-  LogFile;
+  logger;
 
 type
   TStringDatabase = class( TObject )
@@ -156,7 +156,7 @@ begin
     Result := Parse( DataString, FieldPos, '|' );
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 
 end;
@@ -185,7 +185,7 @@ begin
     end;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 
 end;

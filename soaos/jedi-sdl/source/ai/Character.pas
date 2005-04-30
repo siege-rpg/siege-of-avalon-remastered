@@ -59,120 +59,27 @@ unit Character;
 {                                                                              }
 {******************************************************************************}
 
-{$INCLUDE Anigrp30cfg.inc}
-
 interface
 
 uses
   Classes,
-  Windows,
   SysUtils,
-  Anigrp30,
-  AniDec30,
-  Graphics,
-{$IFDEF DirectX}
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
-  DirectDraw,
-{$ENDIF}
-  DXUtil,
-  DXEffects,
-{$ENDIF}
-  digifx,
-  DFX,
+  sdl,
+  SiegeTypes,
   Resource,
-  LogFile;
-
-const
-  MaxCompanions = 5;
-//  ThresholdOfPain = 5;
+  Anigrp30,
+  CustomAniFigure{,
+  AniDec30,
+  DFX};
 
 procedure PlaySound( const Sounds : TDynamicSmallIntArray; X, Y : longint );
 procedure PlaySingleSound( Sound : SmallInt; X, Y : longint );
 
 type
-  TCastingType = ( ctCombat, ctHealing, ctDivination, ctSummoning, ctTranslocation, ctProtection, ctIllusion );
-
-  TTargetType = ( ttNone, ttFriend, ttEnemy );
-
-  TAIMode = ( aiNone, aiIdle, aiCombat, aiParty );
-
-  TAIPriority = ( prNone, prAttack, prGuard, prFlee, prHide, prCast, prFollowClose, prFollowFar );
-
-  TAIParameter = ( paNone, paAnyEnemy, paAnyAlly, paAnyPartyMember, paClosestEnemy, paStrongestEnemy,
-    paWeakestEnemy, paMostMagicalEnemy, paAttacker, paSelf, paSpecificPartyMember, paPlayerTarget );
-
-  TMaterial = ( maOther, maMetal );
-
-  TNextAction = ( naNone, naWalk, naRun, naAttack, naCast );
-
   TCharacter = class;
   TCompanionCharacter = class;
   TGlow = class;
   TSpell = class;
-
-  TDamageRange = record
-    Min : Single;
-    Max : Single;
-  end;
-
-  TDamageResistance = record
-    Invulnerability : Single;
-    Resistance : Single;
-  end;
-
-  PDamageProfile = ^TDamageProfile;
-  TDamageProfile = record
-    Piercing : TDamageRange;
-    Crushing : TDamageRange;
-    Cutting : TDamageRange;
-    Heat : TDamageRange;
-    Cold : TDamageRange;
-    Electric : TDamageRange;
-    Poison : TDamageRange;
-    Magic : TDamageRange;
-    Mental : TDamageRange;
-    Stun : TDamageRange;
-    Special : TDamageRange;
-  end;
-
-  PDamageResistanceProfile = ^TDamageResistanceProfile;
-  TDamageResistanceProfile = record
-    Piercing : TDamageResistance;
-    Crushing : TDamageResistance;
-    Cutting : TDamageResistance;
-    Heat : TDamageResistance;
-    Cold : TDamageResistance;
-    Electric : TDamageResistance;
-    Poison : TDamageResistance;
-    Magic : TDamageResistance;
-    Mental : TDamageResistance;
-    Stun : TDamageResistance;
-  end;
-
-  PStatModifier = ^TStatModifier;
-  TStatModifier = record
-    Strength : Integer;
-    Coordination : Integer;
-    Constitution : Integer;
-    Mysticism : Integer;
-    Combat : Integer;
-    Stealth : Integer;
-    Restriction : Integer;
-    AttackRecovery : Integer;
-    HitRecovery : Integer;
-    Perception : Integer;
-    Charm : Integer;
-    HealingRate : Integer;
-    RechargeRate : Integer;
-    HitPoints : Integer;
-    Mana : Integer;
-    Attack : Integer;
-    Defense : Integer;
-    Visible : boolean;
-    DisplayName : string;
-  end;
 
   TEffect = class( TObject )
   private
@@ -202,20 +109,20 @@ type
     DisableWhenDone : boolean;
     procedure Refresh( NewEffect : TEffect ); virtual;
     procedure Adjust( Character : TCharacter ); virtual;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); virtual;
+    procedure RenderLocked( Figure : TCustomAniFigure; Bits : PSDL_PixelFormat ); virtual;
     procedure DoAction( const Action, FacingString : string );
     function DoFrame : boolean; virtual;
-    function Hit( Source : TAniFigure; Damage : PDamageProfile ) : boolean; virtual;
+    function Hit( Source : TCustomAniFigure; Damage : PDamageProfile ) : boolean; virtual;
     property Resource : TResource read FResource write SetResource;
   end;
 
   TAI = class( TObject )
   protected
     FrameCount : LongWord;
-    function OnCollideFigure( Target : TAniFigure ) : Boolean; virtual;
-    function OnCollideObject( Target : TAniFigure ) : Boolean; virtual;
-    procedure WasAttacked( Source : TAniFigure; Damage : Single ); virtual;
-    procedure WasKilled( Source : TAniFigure ); virtual;
+    function OnCollideFigure( Target : TCustomAniFigure ) : Boolean; virtual;
+    function OnCollideObject( Target : TCustomAniFigure ) : Boolean; virtual;
+    procedure WasAttacked( Source : TCustomAniFigure; Damage : Single ); virtual;
+    procedure WasKilled( Source : TCustomAniFigure ); virtual;
     procedure TrackChanged; virtual;
     procedure OnCollideItem; virtual;
     procedure OnStop; virtual;
@@ -224,10 +131,10 @@ type
     Character : TCharacter;
     procedure Init; virtual;
     procedure Execute; virtual;
-    procedure CallToArms( Source, Target : TAniFigure ); virtual;
-    procedure Regroup( Source : TAniFigure; NewX, NewY : Integer ); virtual;
-    procedure NotifyOfDeath( Source : TAniFigure ); virtual;
-    procedure Follow( Source, Target : TAniFigure ); virtual;
+    procedure CallToArms( Source, Target : TCustomAniFigure ); virtual;
+    procedure Regroup( Source : TCustomAniFigure; NewX, NewY : Integer ); virtual;
+    procedure NotifyOfDeath( Source : TCustomAniFigure ); virtual;
+    procedure Follow( Source, Target : TCustomAniFigure ); virtual;
     procedure Clicked; virtual;
   end;
 
@@ -246,7 +153,7 @@ type
     property Leader : TCharacter read FLeader write SetLeader;
   end;
 
-  TGameObject = class( TAniFigure )
+  TGameObject = class( TCustomAniFigure )
   private
     FProperties : TStringList;
     Loading : boolean;
@@ -366,20 +273,14 @@ type
     ActivateCount : Integer;
     CollideCount : Integer;
     MsgDuration : Integer;
-{$IFDEF DirectX}
-    MsgImage : IDirectDrawSurface;
-{$ENDIF}
-{$IFNDEF DirectX}
-    MsgImage : HBITMAP;
-    MsgMask : HBITMAP;
-{$ENDIF}
+    MsgImage : PSDL_Surface;
     MsgWidth : Integer;
     MsgHeight : Integer;
     function GetFacingString : string;
     procedure SetFacing( const Value : TFacing );
   protected
     FFacing : TFacing;
-    procedure SetResource( const Value : TAniResource ); override;
+    procedure SetResource( const Value : TCustomAniResource ); override; 
     function GetProperty( const Name : string ) : string; override;
     procedure SetProperty( const Name : string; const Value : string ); override;
     function GetName : string; virtual;
@@ -396,7 +297,7 @@ type
     function ActionExists( const Action : string ) : Boolean;
     function DoAction( const Action : string ) : Boolean; virtual;
     procedure Activate; virtual;
-    procedure Say( const Msg : string; Color : TColor );
+    procedure Say( const Msg : string; Color : TSDL_Color );
     procedure UpdateSay;
     procedure Init; override;
     procedure SaveProperties( List : TStringList ); override;
@@ -411,16 +312,16 @@ type
     PickUpCount : Integer;
     DropCount : Integer;
   protected
-    procedure SetResource( const Value : TAniResource ); override;
+    procedure SetResource( const Value : TCustomAniResource ); override;
     function GetProperty( const Name : string ) : string; override;
     procedure SetProperty( const Name : string; const Value : string ); override;
     function GetName : string; override;
     function GetInfo : string; virtual;
   public
-    SlotsAllowed : TSlotAllowed;
-    Modifier : TStatModifier;
     Resistance : TDamageResistanceProfile;
     Damage : TDamageProfile; //Applies ony to unarmed combat (unless item is TWeapon)
+    SlotsAllowed : TSlotAllowed;
+    Modifier : TStatModifier;
     Value : Integer;
     Weight : Integer;
     Magic : Integer; //Is item magical?  If so, how much?
@@ -448,9 +349,9 @@ type
     function MeetsRequirements( Character : TCharacter ) : Boolean; virtual;
     procedure PickUp; virtual;
     procedure Drop; virtual;
-    function GetInventoryImage : IDirectDrawSurface;
-    function GetInventoryShadow : IDirectDrawSurface;
-    function GetIconicImage : IDirectDrawSurface;
+    function GetInventoryImage : PSDL_Surface;
+    function GetInventoryShadow : PSDL_Surface;
+    function GetIconicImage : PSDL_Surface;
     procedure SaveProperties( List : TStringList ); override;
     procedure Init; override;
     function ShouldSave : boolean; override;
@@ -498,9 +399,9 @@ type
     DamageFactor : single;
     Critical : boolean;
     procedure DoDamage( Target : TSpriteObject ); virtual;
-    procedure CollideFigure( Source, Target : TAniFigure; var Stop : Boolean ); virtual;
-    procedure CollideItem( Source : TAniFigure; var Stop : Boolean ); virtual;
-    procedure CollideBoundary( Source : TAniFigure ); virtual;
+    procedure CollideFigure( Source, Target : TCustomAniFigure; var Stop : Boolean ); virtual;
+    procedure CollideItem( Source : TCustomAniFigure; var Stop : Boolean ); virtual;
+    procedure CollideBoundary( Source : TCustomAniFigure ); virtual;
     procedure DoFrame; override;
     procedure ExplodeEnd( Sender : TObject ); virtual;
     procedure Disable; virtual;
@@ -530,9 +431,9 @@ type
   protected
     procedure Render; override;
     procedure DoDamage( Target : TSpriteObject ); override;
-    procedure CollideFigure( Source, Target : TAniFigure; var Stop : Boolean ); override;
-    procedure CollideItem( Source : TAniFigure; var Stop : Boolean ); override;
-    procedure CollideBoundary( Source : TAniFigure ); override;
+    procedure CollideFigure( Source, Target : TCustomAniFigure; var Stop : Boolean ); override;
+    procedure CollideItem( Source : TCustomAniFigure; var Stop : Boolean ); override;
+    procedure CollideBoundary( Source : TCustomAniFigure ); override;
     procedure DoFrame; override;
     procedure ExplodeEnd( Sender : TObject ); override;
     procedure Disable; override;
@@ -546,11 +447,11 @@ type
 
   TArrow = class( TProjectile )
   private
-    RLE : TRLESprite;
-    BM : TBitmap;
+    // TODO : RLE : TRLESprite;
+    BM : PSDL_Surface;
     PrevSlopeX : Double;
     PrevSlopeY : Double;
-    FletchingColor : TColor;
+    FletchingColor : TSDL_Color;
   protected
     procedure Render; override;
     procedure Disable; override;
@@ -575,7 +476,7 @@ type
     function GetProperty( const Name : string ) : string; override;
     procedure SetProperty( const Name : string; const Value : string ); override;
   public
-    FletchingColor : TColor;
+    FletchingColor : TSDL_Color;
     TrackingDegree : Single;
     destructor Destroy; override;
     procedure Clone( var NewObject : TObject; NewGUID : string ); override;
@@ -669,7 +570,7 @@ type
     function GetProperty( const Name : string ) : string; override;
     procedure SetProperty( const Name : string; const Value : string ); override;
     procedure DoFrame; override;
-    procedure SetResource( const Value : TAniResource ); override;
+    procedure SetResource( const Value : TCustomAniResource ); override;
     function GetName : string; override;
   public
     PrevFrame : Integer;
@@ -744,7 +645,7 @@ type
   public
     constructor Create;
     procedure Adjust( Character : TCharacter ); override;
-    procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
+    //procedure RenderLocked( Figure : TAniFigure; Bits : PBITPLANE ); override;
     function DoFrame : boolean; override;
   end;
 
@@ -870,17 +771,17 @@ type
     function GetProperty( const Name : string ) : string; override;
     procedure SetProperty( const Name : string; const Value : string ); override;
     procedure ScriptEnd( Sender : TObject ); virtual;
-    procedure PathStep( Sender : TAniFigure; X, Y : Longint ); virtual;
+    procedure PathStep( Sender : TCustomAniFigure; X, Y : Longint ); virtual;
     procedure ApplyModifier( Modifier : PStatModifier );
     procedure ApplyResistance( Profile : PDamageResistanceProfile );
-    procedure CollideFigure( Source, Target : TAniFigure; var Stop : Boolean );
-    procedure CollideItem( Source : TAniFigure; var Stop : Boolean );
+    procedure CollideFigure( Source, Target : TCustomAniFigure; var Stop : Boolean );
+    procedure CollideItem( Source : TCustomAniFigure; var Stop : Boolean );
     procedure Stop( Sender : TObject );
     procedure NoPath( Sender : TObject );
-    procedure Filter( Source : TAniFigure; ID, PrevID : SmallInt );
-    procedure Trigger( Source : TAniFigure; ID, PrevID : SmallInt );
+    procedure Filter( Source : TCustomAniFigure; ID, PrevID : SmallInt );
+    procedure Trigger( Source : TCustomAniFigure; ID, PrevID : SmallInt );
     procedure DoFrame; override;
-    procedure SetResource( const Value : TAniResource ); override;
+    procedure SetResource( const Value : TCustomAniResource ); override;
     function GetName : string; override;
   public
     BaseResistance : TDamageResistanceProfile;
@@ -965,7 +866,7 @@ type
     procedure ApproachRun( ATarget : TSpriteObject ); virtual;
     procedure ShiftApproach( ATarget : TSpriteObject ); virtual;
     procedure ShiftApproachRun( ATarget : TSpriteObject ); virtual;
-    function InRange( Target : TAniFigure ) : Boolean;
+    function InRange( Target : TCustomAniFigure ) : Boolean;
     function RangeTo( X, Y : longint ) : double;
     function IsAlly( Target : TCharacter ) : boolean;
     function IsNeutral( Target : TCharacter ) : boolean;
@@ -989,7 +890,7 @@ type
     procedure Clone( var NewObject : TObject; NewGUID : string ); virtual;
     function HasItem( const ItemName : string ) : boolean;
     procedure RemoveItem( const ItemName : string );
-    function AffectDamage( Source : TaniFigure; Damage : PDamageProfile ) : boolean;
+    function AffectDamage( Source : TCustomAniFigure; Damage : PDamageProfile ) : boolean;
     procedure ClearEquipment;
     function ValidateSpells : boolean;
     //Primary Stats
@@ -1054,7 +955,7 @@ type
     Fade : integer;
   protected
     procedure DoFrame; override;
-    procedure SetResource( const Value : TAniResource ); override;
+    procedure SetResource( const Value : TCustomAniResource ); override;
   public
     Duration : integer;
     Master : TCharacter;
@@ -1092,7 +993,7 @@ function TransferItem( Source, Dest : TGameObject; ItemName : string; DropIfNoRo
 function IsAnybodyInTheWay( Source, Dest : TGameObject; Radius : integer ) : boolean;
 function CalcTotalDamage( Damage : TDamageProfile; Resistance : TDamageResistanceProfile; F : Single; Critical : boolean ) : Single;
 function CalcDamage( Range : TDamageRange ) : Single;
-procedure ComputeTrajectory( Source : TAniFigure; var TargetX, TargetY : Integer; ErrDegree : single );
+procedure ComputeTrajectory( Source : TCustomAniFigure; var TargetX, TargetY : Integer; ErrDegree : single );
 function GetFacing( SrcX, SrcY, GridX, GridY : Longint ) : TFacing;
 
 const
@@ -5796,23 +5697,10 @@ begin
 end;
 
 procedure TCharacter.SetTrainingPoints( const Value : Integer );
-const
-  FailName : string = 'TCharacter.SetTrainingPoints';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
-
     Inc( FTrainingPoints, Value );
     if FTrainingPoints < 0 then
       FTrainingPoints := 0;
-
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 procedure TCharacter.SetMoney( const Value : Integer );
@@ -8761,7 +8649,7 @@ begin
   end;
 end;
 
-procedure TDoor.SetResource( const Value : TAniResource );
+procedure TDoor.SetResource( const Value : TCustomAniResource );
 const
   FailName : string = 'TDoor.SetResource';
 begin
@@ -8964,7 +8852,7 @@ begin
   end;
 end;
 
-function TItem.GetIconicImage : IDirectDrawSurface;
+function TItem.GetIconicImage : PSDL_Surface;
 var
   ColorMatch : integer;
   W, H : integer;
@@ -9044,7 +8932,7 @@ begin
   end;
 end;
 
-function TItem.GetInventoryImage : IDirectDrawSurface;
+function TItem.GetInventoryImage : PSDL_Surface;
 var
   ColorMatch : integer;
   ddsd : TDDSurfaceDesc;
@@ -9104,7 +8992,7 @@ begin
   end;
 end;
 
-function TItem.GetInventoryShadow : IDirectDrawSurface;
+function TItem.GetInventoryShadow : PSDL_Surface;
 var
   ColorMatch : integer;
   W, H : integer;
@@ -9699,7 +9587,7 @@ begin
   end;
 end;
 
-procedure TItem.SetResource( const Value : TAniResource );
+procedure TItem.SetResource( const Value : TCustomAniResource );
 const
   FailName : string = 'TItem.SetResource';
 begin
@@ -11025,7 +10913,7 @@ begin
   end;
 end;
 
-procedure TSpriteObject.SetResource( const Value : TAniResource );
+procedure TSpriteObject.SetResource( const Value : TCustomAniResource );
 const
   FailName : string = 'TSpriteObject.SetResource';
 begin
@@ -13588,18 +13476,10 @@ begin
 
 end;
 
-procedure TEffect.RenderLocked( Figure : TAniFigure; Bits : PBITPLANE );
+procedure TEffect.RenderLocked( Figure : TCustomAniFigure; Bits : PSDL_PixelFormat );
 var
   SrcBlend, DstBlend : integer;
-const
-  FailName : string = 'TEffect.RenderLocked';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
-  try
-
     if assigned( Resource ) and ( AnimationDuration > 0 ) then
     begin
       if Keyed then
@@ -13653,11 +13533,6 @@ begin
         end;
       end;
     end;
-
-  except
-    on E : Exception do
-      Log.log( FailName, E.Message, [ ] );
-  end;
 end;
 
 procedure TEffect.SetResource( const Value : TResource );

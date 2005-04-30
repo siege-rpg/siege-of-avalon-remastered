@@ -62,89 +62,67 @@ unit DXEffects;
 interface
 
 uses
-  Windows,
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
-  DirectDraw,
-{$ENDIF}
-  DXRender,
-  Graphics;
+  sdl,
+  DXRender;
 
-procedure DrawAdd( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawAdd( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 
-procedure DrawAlpha( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawAlpha( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 
-procedure DrawMult( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawMult( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 
-procedure DrawSub( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawSub( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 
-procedure DrawInvSub( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawInvSub( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 
-procedure FillRectAdd( Dest : IDirectDrawSurface; const DestRect : TRect; RGBCol : TColor );
+procedure FillRectAdd( Dest : PSDL_Surface; const DestRect : TRect; RGBCol : TSDL_Color );
 
-procedure FillRectAlpha( Dest : IDirectDrawSurface; const DestRect : TRect; RGBCol : TColor;
+procedure FillRectAlpha( Dest : PSDL_Surface; const DestRect : TRect; RGBCol : TSDL_Color;
   Alpha : Integer );
 
-procedure FillRectSub( Dest : IDirectDrawSurface; const DestRect : TRect; RGBCol : TColor );
+procedure FillRectSub( Dest : PSDL_Surface; const DestRect : TRect; RGBCol : TSDL_Color );
 
 implementation
 
-procedure DrawAdd( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+uses
+  sdlutils;
+
+procedure DrawAdd( Dest : PSDL_Surface; const DestRect, SrcRect : TRect;  Source: PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 const
   FailName : string = 'DXEffects.DrawAdd';
 var
-  Src_ddsd : TDDSURFACEDESC;
-  DestSurface, SrcSurface : TDXR_Surface;
-  Blend : TDXR_Blend;
+  SDLSrcRect, SDLDestRect : TSDL_Rect;
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
-  begin
-    try
-      if dxrDDSurfaceLock2( Source, Src_ddsd, SrcSurface ) then
-      begin
-        try
-          if DestSurface.ColorType = DXR_COLORTYPE_INDEXED then
-          begin
-            Blend := DXR_BLEND_ONE1;
-          end
-          else if Alpha >= 255 then
-          begin
-            Blend := DXR_BLEND_ONE1_ADD_ONE2;
-          end
-          else
-          begin
-            Blend := DXR_BLEND_SRCALPHA1_ADD_ONE2;
-          end;
+  SDLSrcRect.x := SrcRect.Left;
+  SDLSrcRect.y := SrcRect.Top;
+  SDLSrcRect.w := SrcRect.Right - SrcRect.Left ;
+  SDLSrcRect.h := SrcRect.Bottom - SrcRect.Top;
 
-          dxrCopyRectBlend( DestSurface, SrcSurface,
-            DestRect, SrcRect, Blend, Alpha, TRANSPARENT, Src_ddsd.ddckCKSrcBlt.dwColorSpaceLowValue );
-        finally
-          dxrDDSurfaceUnLock( Source, SrcSurface )
-        end;
-      end;
-    finally
-      dxrDDSurfaceUnLock( Dest, DestSurface )
-    end;
-  end;
+  SDLDestRect.x := DestRect.Left;
+  SDLDestRect.y := DestRect.Top;
+  SDLDestRect.w := DestRect.Right - DestRect.Left;
+  SDLDestRect.h := DestRect.Bottom - DestRect.Top;
+
+  SDL_AddSurface( Source, @SDLSrcRect, Dest, @SDLDestRect );
 end;
 
-procedure DrawAlpha( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawAlpha( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 const
   FailName : string = 'DXEffects.DrawAlpha';
-var
+{var
   Src_ddsd : TDDSURFACEDESC;
   DestSurface, SrcSurface : TDXR_Surface;
-  Blend : TDXR_Blend;
+  Blend : TDXR_Blend; }
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
+  SDL_SetAlpha( Source, 0, Alpha );
+  {if dxrDDSurfaceLock( Dest, DestSurface ) then
   begin
     try
       if dxrDDSurfaceLock2( Source, Src_ddsd, SrcSurface ) then
@@ -172,19 +150,19 @@ begin
     finally
       dxrDDSurfaceUnLock( Dest, DestSurface )
     end;
-  end;
+  end;}
 end;
 
-procedure DrawMult( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawMult( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 const
   FailName : string = 'DXEffects.DrawMult';
-var
+{var
   Src_ddsd : TDDSURFACEDESC;
   DestSurface, SrcSurface : TDXR_Surface;
-  Blend : TDXR_Blend;
+  Blend : TDXR_Blend; }
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
+  {if dxrDDSurfaceLock( Dest, DestSurface ) then
   begin
     try
       if dxrDDSurfaceLock2( Source, Src_ddsd, SrcSurface ) then
@@ -212,59 +190,39 @@ begin
     finally
       dxrDDSurfaceUnLock( Dest, DestSurface )
     end;
-  end;
+  end; }
 end;
 
-procedure DrawSub( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawSub( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 const
   FailName : string = 'DXEffects.DrawSub';
 var
-  Src_ddsd : TDDSURFACEDESC;
-  DestSurface, SrcSurface : TDXR_Surface;
-  Blend : TDXR_Blend;
+  SDLSrcRect, SDLDestRect : TSDL_Rect;
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
-  begin
-    try
-      if dxrDDSurfaceLock2( Source, Src_ddsd, SrcSurface ) then
-      begin
-        try
-          if DestSurface.ColorType = DXR_COLORTYPE_INDEXED then
-          begin
-            Blend := DXR_BLEND_ONE1;
-          end
-          else if Alpha >= 255 then
-          begin
-            Blend := DXR_BLEND_ONE2_SUB_ONE1;
-          end
-          else
-          begin
-            Blend := DXR_BLEND_ONE2_SUB_SRCALPHA1;
-          end;
+  SDLSrcRect.x := SrcRect.Left;
+  SDLSrcRect.y := SrcRect.Top;
+  SDLSrcRect.w := SrcRect.Right - SrcRect.Left ;
+  SDLSrcRect.h := SrcRect.Bottom - SrcRect.Top;
 
-          dxrCopyRectBlend( DestSurface, SrcSurface,
-            DestRect, SrcRect, Blend, Alpha, TRANSPARENT, Src_ddsd.ddckCKSrcBlt.dwColorSpaceLowValue );
-        finally
-          dxrDDSurfaceUnLock( Source, SrcSurface )
-        end;
-      end;
-    finally
-      dxrDDSurfaceUnLock( Dest, DestSurface )
-    end;
-  end;
+  SDLDestRect.x := DestRect.Left;
+  SDLDestRect.y := DestRect.Top;
+  SDLDestRect.w := DestRect.Right - DestRect.Left;
+  SDLDestRect.h := DestRect.Bottom - DestRect.Top;
+
+  SDL_SubSurface( Source, @SDLSrcRect, Dest, @SDLDestRect );
 end;
 
-procedure DrawInvSub( Dest : IDirectDrawSurface; const DestRect, SrcRect : TRect; Source : IDirectDrawSurface;
+procedure DrawInvSub( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );
 const
   FailName : string = 'DXEffects.DrawInvSub';
-var
+{var
   Src_ddsd : TDDSURFACEDESC;
   DestSurface, SrcSurface : TDXR_Surface;
-  Blend : TDXR_Blend;
+  Blend : TDXR_Blend;}
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
+  {if dxrDDSurfaceLock( Dest, DestSurface ) then
   begin
     try
       if dxrDDSurfaceLock2( Source, Src_ddsd, SrcSurface ) then
@@ -292,56 +250,56 @@ begin
     finally
       dxrDDSurfaceUnLock( Dest, DestSurface )
     end;
-  end;
+  end; }
 end;
 
-procedure FillRectAdd( Dest : IDirectDrawSurface; const DestRect : TRect; RGBCol : TColor );
+procedure FillRectAdd( Dest : PSDL_Surface; const DestRect : TRect; RGBCol : TSDL_Color );
 const
   FailName : string = 'DXEffects.FillRectAdd';
-var
-  DestSurface : TDXR_Surface;
+{var
+  DestSurface : TDXR_Surface; }
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
+ { if dxrDDSurfaceLock( Dest, DestSurface ) then
   begin
     try
-      dxrFillRectColorBlend( DestSurface, DestRect, DXR_BLEND_ONE1_ADD_ONE2, ColorToRGB( RGBCol ) );
+      dxrFillRecTSDL_ColorBlend( DestSurface, DestRect, DXR_BLEND_ONE1_ADD_ONE2, ColorToRGB( RGBCol ) );
     finally
       dxrDDSurfaceUnLock( Dest, DestSurface )
     end;
-  end;
+  end;}
 end;
 
-procedure FillRectAlpha( Dest : IDirectDrawSurface; const DestRect : TRect; RGBCol : TColor;
+procedure FillRectAlpha( Dest : PSDL_Surface; const DestRect : TRect; RGBCol : TSDL_Color;
   Alpha : Integer );
 const
   FailName : string = 'DXEffects.FillRectAlpha';
-var
-  DestSurface : TDXR_Surface;
+{var
+  DestSurface : TDXR_Surface; }
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
+  {if dxrDDSurfaceLock( Dest, DestSurface ) then
   begin
     try
-      dxrFillRectColorBlend( DestSurface, DestRect, DXR_BLEND_SRCALPHA1_ADD_INVSRCALPHA2, ColorToRGB( RGBCol ) or ( Byte( Alpha ) shl 24 ) );
+      dxrFillRecTSDL_ColorBlend( DestSurface, DestRect, DXR_BLEND_SRCALPHA1_ADD_INVSRCALPHA2, ColorToRGB( RGBCol ) or ( Byte( Alpha ) shl 24 ) );
     finally
       dxrDDSurfaceUnLock( Dest, DestSurface )
     end;
-  end;
+  end;}
 end;
 
-procedure FillRectSub( Dest : IDirectDrawSurface; const DestRect : TRect; RGBCol : TColor );
+procedure FillRectSub( Dest : PSDL_Surface; const DestRect : TRect; RGBCol : TSDL_Color );
 const
   FailName : string = 'DXEffects.FillRectSub';
-var
-  DestSurface : TDXR_Surface;
+{var
+  DestSurface : TDXR_Surface; }
 begin
-  if dxrDDSurfaceLock( Dest, DestSurface ) then
+  {if dxrDDSurfaceLock( Dest, DestSurface ) then
   begin
     try
-      dxrFillRectColorBlend( DestSurface, DestRect, DXR_BLEND_ONE2_SUB_ONE1, ColorToRGB( RGBCol ) );
+      dxrFillRectBlend( DestSurface, DestRect, DXR_BLEND_ONE2_SUB_ONE1, ColorToRGB( RGBCol ) );
     finally
       dxrDDSurfaceUnLock( Dest, DestSurface )
     end;
-  end;
+  end; }
 end;
 
 end.

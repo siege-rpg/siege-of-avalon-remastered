@@ -85,14 +85,15 @@ uses
   Character,
   StdCtrls,
   Anigrp30,
-  LogFile;
+  logger,
+  sdl;
 
 type
   TMousePtr = class( TObject )
   private
     BMBack : TBitmap;
-    DXMousePtr : IDirectDrawSurface;
-    DXDirty : IDirectDrawSurface;
+    DXMousePtr : PSDL_Surface;
+    DXDirty : PSDL_Surface;
     MouseTimer : TTimer;
     Mpt : TPoint;
     MouseCounter : integer;
@@ -112,7 +113,7 @@ type
     procedure SetEnabled( const Value : boolean );
   protected
   public
-    DxSurface : IDirectDrawSurface; //surface to draw pointer to
+    DxSurface : PSDL_Surface; //surface to draw pointer to
     constructor Create;
     destructor Destroy; override;
     procedure SetAnim( Frame, Frames, Speed : integer );
@@ -126,7 +127,8 @@ type
 implementation
 
 uses
-  AniDemo;
+  //AniDemo;}
+  globals;
 
 const
   PtrWidth = 32;
@@ -150,20 +152,19 @@ begin
   //transparent color
     InvisColor := rgb( 255, 0, 255 );
 
-    BMBack.LoadFromFile( InterfacePath + 'siegecursorsheet.bmp' );
-    DXMousePtr := DDGetImage( lpDD, BMBack, InvisColor, False );
+    DXMousePtr := SDL_LoadBMP( PChar( SoASettings.InterfacePath  + '/siegecursorsheet.bmp' ) );
   //lpDDSBack.BltFast(0, 0, DXMousePtr, Rect(0, 0, PtrWidth, PtrHeight), DDBLTFAST_WAIT);
 
     BMBack.Free;
 
-    DXDirty := DDGetSurface( lpDD, PtrWidth, PtrHeight, InvisColor, true );
+    //DXDirty := DDGetSurface( lpDD, PtrWidth, PtrHeight, InvisColor, true );
   //pre-load Dirty
 
     FPlotDirty := false;
-    DXSurface := lpDDSFront;
+    //DXSurface := lpDDSFront;
 
-    GetCursorPos( mPt );
-    WrapperBltFast( DXDirty, 0, 0, DXSurface, Rect( mPt.x, mPt.y, mPt.x + PtrWidth, mPt.y + PtrHeight ), DDBLTFAST_WAIT );
+    {GetCursorPos( mPt );
+    WrapperBltFast( DXDirty, 0, 0, DXSurface, Rect( mPt.x, mPt.y, mPt.x + PtrWidth, mPt.y + PtrHeight ), DDBLTFAST_WAIT );}
 
 
 
@@ -176,7 +177,7 @@ begin
     MouseTimer.enabled := false;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 
 end; //Create
@@ -198,7 +199,7 @@ begin
     inherited;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 
 end; //Destroy

@@ -73,6 +73,7 @@ uses
   DXUtil,
   DXEffects,
 {$ENDIF}
+  sdl,
   Windows,
   Forms,
   Classes,
@@ -148,7 +149,9 @@ type
   end;
 
 implementation
+
 uses
+  globals,
   AniDemo;
 { TGameText }
 
@@ -158,7 +161,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -167,7 +170,7 @@ begin
     LoadDarkFontGraphic( 'Inventory' );
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
@@ -177,7 +180,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
     if assigned( DXSurface ) then
@@ -195,74 +198,68 @@ begin
     inherited;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
 procedure TGameText.LoadFontGraphic( ScreenName : string );
-var
-  BM : TBitmap;
 const
   FailName : string = 'TGameText.LoadOfntGraphic';
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
     if assigned( DXSurface ) then
       DXSurface := nil;
-    BM := TBitmap.create;
-    if Lowercase( Screenname ) = 'inventory' then
-      BM.LoadFromFile( InterfacePath + 'fntInvFont.bmp' )
-    else if Lowercase( Screenname ) = 'statistics' then
-      BM.LoadFromFile( InterfacePath + 'fntStatFont.bmp' )
-    else if Lowercase( Screenname ) = 'createchar' then
-      BM.LoadFromFile( InterfacePath + 'fntGoldFont.bmp' );
 
-    DXSurface := DDGetImage( lpDD, BM, $00FFFF00, false );
-    BM.free;
+    if Lowercase( Screenname ) = 'inventory' then
+      DXSurface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fntInvFont.bmp' ) )
+    else if Lowercase( Screenname ) = 'statistics' then
+      DXSurface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fntStatFont.bmp' ) )
+    else if Lowercase( Screenname ) = 'createchar' then
+      DXSurface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fntGoldFont.bmp' ) );
+
+    SDL_SetColorKey( DXSurface, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( DXSurface.format, 0, 255, 255 ) );
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.LoadFontGraphic
 
 procedure TGameText.LoadDarkFontGraphic( ScreenName : string );
-var
-  BM : TBitmap;
 const
   FailName : string = 'TGameText.LoadDarkFontGraphic';
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
     if assigned( DXDarkSurface ) then
       exit;
-    BM := TBitmap.create;
-    BM.LoadFromFile( InterfacePath + 'fntBoldFont.bmp' );
-    DXDarkSurface := DDGetImage( lpDD, BM, $00FFFF00, false );
-    BM.free;
+
+    DXDarkSurface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fntBoldFont.bmp' ) );
+
+    SDL_SetColorKey( DXDarkSurface, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( DXDarkSurface.format, 0, 255, 255 ) );
+
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.LoadDarkFontGraphic
 
 procedure TGameText.LoadTinyFontGraphic( );
-var
-  BM : TBitmap;
 begin
   if assigned( DXTinySurface ) then
     exit;
-  BM := TBitmap.create;
-  BM.LoadFromFile( InterfacePath + 'fntTinyFont.bmp' );
-  DXTinySurface := DDGetImage( lpDD, BM, $00FFFF00, false );
-  BM.free;
+
+  DXTinySurface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fntTinyFont.bmp' ) );
+
+  SDL_SetColorKey( DXTinySurface, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( DXTinySurface.format, 0, 255, 255 ) );
 
 end; //TGameText.LoadTinyFontGraphic
 
@@ -274,15 +271,12 @@ begin;
 end; //TGameText.UnloadTinyFontGraphic
 
 procedure TGameText.Load13Graphic( );
-var
-  BM : TBitmap;
 begin
   if assigned( DX13Surface ) then
     exit;
-  BM := TBitmap.create;
-  BM.LoadFromFile( InterfacePath + 'fnt13.bmp' );
-  DX13Surface := DDGetImage( lpDD, BM, $00FFFF00, false );
-  BM.free;
+
+  DX13Surface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fnt13.bmp' ) );
+  SDL_SetColorKey( DX13Surface, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( DX13Surface.format, 0, 255, 255 ) );
 
 end; //TGameText.Load13Graphic
 
@@ -294,15 +288,13 @@ begin;
 end; //TGameText.Unload13Graphic
 
 procedure TGameText.LoadMegaTinyFontGraphic( );
-var
-  BM : TBitmap;
 begin
   if assigned( DXMegaTinySurface ) then
     exit;
-  BM := TBitmap.create;
-  BM.LoadFromFile( InterfacePath + 'fntMegaTinyFont.bmp' );
-  DXMegaTinySurface := DDGetImage( lpDD, BM, $00FFFF00, false );
-  BM.free;
+
+  DXMegaTinySurface := SDL_LoadBMP( PChar( SoASettings.InterfacePath + 'fntMegaTinyFont.bmp' ) );
+
+  SDL_SetColorKey( DXMegaTinySurface, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( DXMegaTinySurface.format, 0, 255, 255 ) );
 
 end; //TGameText.LoadMegaTinyFontGraphic
 
@@ -323,14 +315,14 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
 
-    if FileExists( InterfacePath + 'fntAlphaCoords.dat' ) then
+    if FileExists( SoASettings.InterfacePath + 'fntAlphaCoords.dat' ) then
     begin
-      AssignFile( F, InterfacePath + 'fntAlphaCoords.dat' );
+      AssignFile( F, SoASettings.InterfacePath + 'fntAlphaCoords.dat' );
       Reset( F );
       i := 32;
       while not Eof( F ) do
@@ -344,15 +336,15 @@ begin
     end
     else
     begin
-      AssignFile( F, InterfacePath + 'fnterror.txt' );
+      AssignFile( F, SoASettings.InterfacePath + 'fnterror.txt' );
       Rewrite( F );
       write( F, 'Didnt find file AlphaCoords.dat' );
       CloseFile( F );
     end;
   //And Now the Dark Font
-    if FileExists( InterfacePath + 'fntDarkAlphaCoords.dat' ) then
+    if FileExists( SoASettings.InterfacePath + 'fntDarkAlphaCoords.dat' ) then
     begin
-      AssignFile( F, InterfacePath + 'fntDarkAlphaCoords.dat' );
+      AssignFile( F, SoASettings.InterfacePath + 'fntDarkAlphaCoords.dat' );
       Reset( F );
       i := 32;
       while not Eof( F ) do
@@ -366,15 +358,15 @@ begin
     end
     else
     begin
-      AssignFile( F, InterfacePath + 'fnterror.txt' );
+      AssignFile( F, SoASettings.InterfacePath + 'fnterror.txt' );
       Rewrite( F );
       write( F, 'Didnt find file DarkAlphaCoords' );
       CloseFile( F );
     end;
   //And Now the Tiny Font
-    if FileExists( InterfacePath + 'fntTinyCoords.dat' ) then
+    if FileExists( SoASettings.InterfacePath + 'fntTinyCoords.dat' ) then
     begin
-      AssignFile( F, InterfacePath + 'fntTinyCoords.dat' );
+      AssignFile( F, SoASettings.InterfacePath + 'fntTinyCoords.dat' );
       Reset( F );
       i := 32;
       while not Eof( F ) do
@@ -388,16 +380,16 @@ begin
     end
     else
     begin
-      AssignFile( F, InterfacePath + 'fnterror.txt' );
+      AssignFile( F, SoASettings.InterfacePath + 'fnterror.txt' );
       Rewrite( F );
       write( F, 'Didnt find file TinyCoords' );
       CloseFile( F );
     end;
 
   //And Now the Mega Tiny Font
-    if FileExists( InterfacePath + 'fntMegaTinyCoords.dat' ) then
+    if FileExists( SoASettings.InterfacePath + 'fntMegaTinyCoords.dat' ) then
     begin
-      AssignFile( F, InterfacePath + 'fntMegaTinyCoords.dat' );
+      AssignFile( F, SoASettings.InterfacePath + 'fntMegaTinyCoords.dat' );
       Reset( F );
       i := 32;
       while not Eof( F ) do
@@ -411,15 +403,15 @@ begin
     end
     else
     begin
-      AssignFile( F, InterfacePath + 'fnterror.txt' );
+      AssignFile( F, SoASettings.InterfacePath + 'fnterror.txt' );
       Rewrite( F );
       write( F, 'Didnt find file MegaTinyCoords' );
       CloseFile( F );
     end;
   //And Now the 13 Tiny Font
-    if FileExists( InterfacePath + 'fnt13Coords.dat' ) then
+    if FileExists( SoASettings.InterfacePath + 'fnt13Coords.dat' ) then
     begin
-      AssignFile( F, InterfacePath + 'fnt13Coords.dat' );
+      AssignFile( F, SoASettings.InterfacePath + 'fnt13Coords.dat' );
       Reset( F );
       i := 32;
       while not Eof( F ) do
@@ -433,14 +425,14 @@ begin
     end
     else
     begin
-      AssignFile( F, InterfacePath + 'fnterror.txt' );
+      AssignFile( F, SoASettings.InterfacePath + 'fnterror.txt' );
       Rewrite( F );
       write( F, 'Didnt find file fnt13Coords' );
       CloseFile( F );
     end;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.LoadText
 
@@ -454,7 +446,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -465,7 +457,7 @@ begin
     begin
       j := integer( Sentence[ i ] );
 
-      DrawAlpha( DX, Rect( X + XStart + DarkLetter[ j ].AdjPrev, Y + DarkLetter[ j ].AdjTop, X + XStart + DarkLetter[ j ].sw + DarkLetter[ j ].AdjPrev, Y + DarkLetter[ j ].AdjTop + DarkLetter[ j ].sh ), Rect( DarkLetter[ j ].sx, DarkLetter[ j ].sy, DarkLetter[ j ].sx + DarkLetter[ j ].sw, DarkLetter[ j ].sy + DarkLetter[ j ].sh ), DXDarkSurface, true, Alpha );
+      SDL_SetAlpha( DXDarkSurface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha );
      //DrawMult(DX,Rect(X+XStart+ Letter[j].AdjPrev,Y,X+XStart+Letter[j].sw+ Letter[j].AdjPrev,Y+Letter[j].sh),Rect(Letter[j].sx,Letter[j].sy,Letter[j].sx+Letter[j].sw,Letter[j].sy+Letter[j].sh), DXSurface,true,220);
 
       XStart := XStart + DarkLetter[ j ].sw + DarkLetter[ j ].AdjPrev + DarkLetter[ j ].AdjNext;
@@ -474,7 +466,7 @@ begin
     end; //end for
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotDarkText
 
@@ -488,7 +480,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -499,7 +491,8 @@ begin
     begin
       j := integer( Sentence[ i ] );
 
-      DrawAlpha( DX, Rect( X + XStart + TinyLetter[ j ].AdjPrev, Y + TinyLetter[ j ].AdjTop, X + XStart + TinyLetter[ j ].sw + TinyLetter[ j ].AdjPrev, Y + TinyLetter[ j ].AdjTop + TinyLetter[ j ].sh ), Rect( TinyLetter[ j ].sx, TinyLetter[ j ].sy, TinyLetter[ j ].sx + TinyLetter[ j ].sw, TinyLetter[ j ].sy + TinyLetter[ j ].sh ), DXTinySurface, true, Alpha );
+      SDL_SetAlpha( DXTinySurface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha );
+
      //DrawMult(lpDDSBack,Rect(X+XStart+ Letter[j].AdjPrev,Y,X+XStart+Letter[j].sw+ Letter[j].AdjPrev,Y+Letter[j].sh),Rect(Letter[j].sx,Letter[j].sy,Letter[j].sx+Letter[j].sw,Letter[j].sy+Letter[j].sh), DXSurface,true,220);
 
       XStart := XStart + TinyLetter[ j ].sw + TinyLetter[ j ].AdjPrev + TinyLetter[ j ].AdjNext;
@@ -507,13 +500,13 @@ begin
     end; //end for
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotTinyText
 
 procedure TGameText.PlotTinyText( Sentence : string; X, Y, Alpha : integer );
 begin
-  PlotTinyText2( lpDDSBack, Sentence, X, Y, Alpha );
+  PlotTinyText2( SoAoSGame.DisplaySurface, Sentence, X, Y, Alpha );
 end;
 
 procedure TGameText.PlotMegaTinyText( DX : IDirectDrawSurface; Sentence : string; X, Y, Alpha : integer );
@@ -526,20 +519,22 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
     XStart := 0;
-    for i := 1 to Length( Sentence ) do
+    SDL_SetAlpha( DXMegaTinySurface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha );
+    // TODO : Loop
+    {for i := 1 to Length( Sentence ) do
     begin
       j := integer( Sentence[ i ] );
       DrawAlpha( DX, Rect( X + XStart + MegaTinyLetter[ j ].AdjPrev, Y + MegaTinyLetter[ j ].AdjTop, X + XStart + MegaTinyLetter[ j ].sw + MegaTinyLetter[ j ].AdjPrev, Y + MegaTinyLetter[ j ].AdjTop + MegaTinyLetter[ j ].sh ), Rect( MegaTinyLetter[ j ].sx, MegaTinyLetter[ j ].sy, MegaTinyLetter[ j ].sx + MegaTinyLetter[ j ].sw, MegaTinyLetter[ j ].sy + MegaTinyLetter[ j ].sh ), DXMegaTinySurface, true, Alpha );
       XStart := XStart + MegaTinyLetter[ j ].sw + MegaTinyLetter[ j ].AdjPrev + MegaTinyLetter[ j ].AdjNext;
-    end; //end for
+    end; //end for}
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotMegaTinyText
 
@@ -553,20 +548,22 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
     XStart := 0;
-    for i := 1 to Length( Sentence ) do
+    SDL_SetAlpha( DX13Surface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha );
+    {for i := 1 to Length( Sentence ) do
     begin
       j := integer( Sentence[ i ] );
-      DrawAlpha( DX, Rect( X + XStart + F13Letter[ j ].AdjPrev, Y + F13Letter[ j ].AdjTop, X + XStart + F13Letter[ j ].sw + F13Letter[ j ].AdjPrev, Y + F13Letter[ j ].AdjTop + F13Letter[ j ].sh ), Rect( F13Letter[ j ].sx, F13Letter[ j ].sy, F13Letter[ j ].sx + F13Letter[ j ].sw, F13Letter[ j ].sy + F13Letter[ j ].sh ), DX13Surface, true, Alpha );
+      // TODO : DrawAlpha( DX, Rect( X + XStart + F13Letter[ j ].AdjPrev, Y + F13Letter[ j ].AdjTop, X + XStart + F13Letter[ j ].sw + F13Letter[ j ].AdjPrev, Y + F13Letter[ j ].AdjTop + F13Letter[ j ].sh ), Rect( F13Letter[ j ].sx, F13Letter[ j ].sy, F13Letter[ j ].sx + F13Letter[ j ].sw, F13Letter[ j ].sy + F13Letter[ j ].sh ), DX13Surface, true, Alpha );
+
       XStart := XStart + F13Letter[ j ].sw + F13Letter[ j ].AdjPrev + F13Letter[ j ].AdjNext;
-    end; //end for
+    end; //end for}
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotF13Text
 
@@ -581,7 +578,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -592,15 +589,16 @@ begin
       j := integer( Sentence[ i ] );
      //WrapperBltFast( lpDDSBack, X+XStart,Y,DXSurface,Rect(Letter[j].sx,Letter[j].sy,Letter[j].sx + Letter[j].sw, Letter[j].sy+Letter[j].sh),DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT);
       if Alpha > 0 then
-        DrawAlpha( lpDDSBack, Rect( X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, X + XStart + Letter[ j ].sw + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop + Letter[ j ].sh ), Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DXSurface, true, Alpha )
+        // TODO : DrawAlpha( lpDDSBack, Rect( X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, X + XStart + Letter[ j ].sw + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop + Letter[ j ].sh ), Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DXSurface, true, Alpha )
+        SDL_SetAlpha( DXSurface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha )
       else
-        WrapperBltFast( lpDDSBack, X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, DXSurface, Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT );
+        // TODO : SDL_BlitSurface( lpDDSBack, X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, DXSurface, Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT );
       XStart := XStart + Letter[ j ].sw + Letter[ j ].AdjPrev + Letter[ j ].AdjNext;
      //i=i+1;
     end; //wend
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotText
 
@@ -614,7 +612,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -623,14 +621,14 @@ begin
     begin
       j := integer( Sentence[ i ] );
       if Alpha > 0 then
-        DrawAlpha( DX, Rect( X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, X + XStart + Letter[ j ].sw + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop + Letter[ j ].sh ), Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DXSurface, true, Alpha )
+        SDL_SetAlpha( DXSurface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha )
       else
-        WrapperBltFast( DX, X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, DXSurface, Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT );
+        //TODO : WrapperBltFast( DX, X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, DXSurface, Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT );
       XStart := XStart + Letter[ j ].sw + Letter[ j ].AdjPrev + Letter[ j ].AdjNext;
     end; //wend
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotText2
 
@@ -644,7 +642,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -655,15 +653,16 @@ begin
       j := integer( Sentence[ i ] );
      //WrapperBltFast( lpDDSBack, X+XStart,Y,DXSurface,Rect(Letter[j].sx,Letter[j].sy,Letter[j].sx + Letter[j].sw, Letter[j].sy+Letter[j].sh),DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT);
       if Alpha > 0 then
-        DrawAlpha( lpDDSBack, Rect( X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, X + XStart + Letter[ j ].sw + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop + Letter[ j ].sh ), Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DXSurface, true, Alpha )
+        //DrawAlpha( lpDDSBack, Rect( X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, X + XStart + Letter[ j ].sw + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop + Letter[ j ].sh ), Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DXSurface, true, Alpha )
+        SDL_SetAlpha( DXSurface, SDL_RLEACCEL or SDL_SRCALPHA, Alpha )
       else
-        WrapperBltFast( lpDDSBack, X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, DXSurface, Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT );
+        // TODO : WrapperBltFast( lpDDSBack, X + XStart + Letter[ j ].AdjPrev, Y + Letter[ j ].AdjTop, DXSurface, Rect( Letter[ j ].sx, Letter[ j ].sy, Letter[ j ].sx + Letter[ j ].sw, Letter[ j ].sy + Letter[ j ].sh ), DDBLTFAST_SRCCOLORKEY or DDBLTFAST_WAIT );
       XStart := XStart + Letter[ j ].sw + Letter[ j ].AdjPrev + Letter[ j ].AdjNext - 1;
      //i=i+1;
     end; //wend
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotSquishedText
 
@@ -681,7 +680,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := false;
   try
@@ -714,7 +713,7 @@ begin
     Result := ThereWasRoom;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotTextCentered
 
@@ -732,7 +731,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := false;
   try
@@ -765,7 +764,7 @@ begin
     Result := ThereWasRoom;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotTextCentered2
 
@@ -782,7 +781,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := false;
   try
@@ -815,7 +814,7 @@ begin
     Result := ThereWasRoom;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotDarkTextCentered
 
@@ -835,7 +834,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -914,7 +913,7 @@ begin
     Result := k + 1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotTextBlock
 
@@ -934,7 +933,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1014,7 +1013,7 @@ begin
     Result := k + 1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.TextBlockHeight
 
@@ -1035,7 +1034,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1115,7 +1114,7 @@ begin
     Result := k + 1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotF13Block
 
@@ -1136,7 +1135,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1236,7 +1235,7 @@ begin
     Result := k + 1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.PlotTextBlockAroundBox
 
@@ -1250,7 +1249,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1269,7 +1268,7 @@ begin
     Result := XStart;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.TextLength
 
@@ -1283,7 +1282,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1298,7 +1297,7 @@ begin
     Result := XStart;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end; //TGameText.TinyTextLength
 
@@ -1320,7 +1319,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
 //Result:=0;
   try
@@ -1404,7 +1403,7 @@ begin
   //Result:=k+1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 
 end; //BreakTextIntoAStringList
@@ -1433,7 +1432,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -1459,20 +1458,18 @@ begin
 
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
 procedure TGameText.LoadGoldFontGraphic;
-var
-  BM : TBitmap;
 begin
   if assigned( DXGoldSurface ) then
     exit;
-  BM := TBitmap.create;
-  BM.LoadFromFile( InterfacePath + 'fntTinyGold.bmp' );
+
+  SDL_LoadBMP( SoASettings.InterfacePath + 'fntTinyGold.bmp' );
   DXGoldSurface := DDGetImage( lpDD, BM, $00FFFF00, false );
-  BM.free;
+
 end;
 
 procedure TGameText.PlotGoldText( DX : IDirectDrawSurface; Sentence : string;
@@ -1486,7 +1483,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   try
 
@@ -1502,7 +1499,7 @@ begin
     end; //wend
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
@@ -1523,7 +1520,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1602,7 +1599,7 @@ begin
     Result := k + 1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
@@ -1620,7 +1617,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := false;
   try
@@ -1653,7 +1650,7 @@ begin
     Result := ThereWasRoom;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
@@ -1680,7 +1677,7 @@ const
 begin
 {$IFDEF DODEBUG}
   if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
+    // TODO Log.LogEntry( FailName );
 {$ENDIF}
   Result := 0;
   try
@@ -1759,7 +1756,7 @@ begin
     Result := k + 1; //return the number of lines we run through
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      // TODO Log.Log( FailName + E.Message );
   end;
 end;
 
