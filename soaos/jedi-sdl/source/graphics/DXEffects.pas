@@ -62,8 +62,7 @@ unit DXEffects;
 interface
 
 uses
-  sdl,
-  DXRender;
+  sdl;
 
 procedure DrawAdd( Dest : PSDL_Surface; const DestRect, SrcRect : TRect; Source : PSDL_Surface;
   TRANSPARENT : Boolean; Alpha : Integer );

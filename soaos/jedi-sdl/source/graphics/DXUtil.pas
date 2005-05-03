@@ -59,21 +59,15 @@ unit DXUtil;
 {                                                                              }
 {******************************************************************************}
 
-{$INCLUDE Anigrp30cfg.inc}
-
 interface
 
 uses
   Windows,
   Classes,
-{$IFDEF DX5}
-  DirectX,
-{$ELSE}
   DirectDraw,
-{$ENDIF}
   Graphics,
   Sysutils,
-  LogFile;
+  logger;
 
 function DDColorMatch( pdds : IDirectDrawSurface; Color : TColor ) : Longint;
 function DDGetImage( lpDD : IDirectDraw; BITMAP : TBitmap; Color : TColor; Video : Boolean ) : IDirectDrawSurface;
@@ -96,10 +90,6 @@ var
 const
   FailName : string = 'DXUtil.DDColorMatch';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
   Result := 0;
   try
     dw := 0;
@@ -138,7 +128,7 @@ begin
     Result := dw;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -151,10 +141,6 @@ var
 const
   FailName : string = 'DXUtil.DDGetImage';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
   try
     ddsd.dwSize := SizeOf( ddsd );
     ddsd.dwFlags := DDSD_CAPS + DDSD_HEIGHT + DDSD_WIDTH;
@@ -183,7 +169,7 @@ begin
     Result := pdds;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -196,10 +182,6 @@ var
 const
   FailName : string = 'DXUtil.DDGetOverlay';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
   try
     ZeroMemory( @ddsd, SizeOf( ddsd ) );
     ddsd.dwSize := SizeOf( ddsd );
@@ -228,7 +210,7 @@ begin
     Result := pdds;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -238,10 +220,6 @@ var
 const
   FailName : string = 'DXUtil.GetSurfaceDims';
 begin
-{$IFDEF DODEBUG}
-  if ( CurrDbgLvl >= DbgLvlSevere ) then
-    Log.LogEntry( FailName );
-{$ENDIF}
   try
     lpDDSurfaceDesc.dwSize := SizeOf( lpDDSurfaceDesc );
     lpDDSurfaceDesc.dwFlags := DDSD_HEIGHT + DDSD_WIDTH;
@@ -250,7 +228,7 @@ begin
     H := lpDDSurfaceDesc.dwHeight;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -298,7 +276,7 @@ begin
     Result := pdds;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
@@ -347,7 +325,7 @@ begin
     Result := pdds;
   except
     on E : Exception do
-      Log.log( FailName + E.Message );
+      Log.LogError( E.Message, FailName );
   end;
 end;
 

@@ -108,8 +108,8 @@ type
     Deviance : integer;
     CanMove : TMoveTest;
     constructor Create;
-    function FindPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : HGLOBAL ) : word;
-    function FindJaggedPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : HGLOBAL ) : word;
+    function FindPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : THandle ) : word;
+    function FindJaggedPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : THandle ) : word;
   end;
 
 implementation
@@ -200,7 +200,7 @@ begin
   end;
 end;
 
-function TAStar.FindPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : HGLOBAL ) : word;
+function TAStar.FindPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : THandle ) : word;
 const
   FailName : string = 'TAStar.FindPath';
 var
@@ -449,7 +449,7 @@ begin
 
 end;
 
-function TAStar.FindJaggedPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : HGLOBAL ) : word;
+function TAStar.FindJaggedPath( SrcX, SrcY, DestX, DestY : Smallint; var Handle : THandle ) : word;
 const
   FailName : string = 'TAStar.FindJaggedPath';
 var

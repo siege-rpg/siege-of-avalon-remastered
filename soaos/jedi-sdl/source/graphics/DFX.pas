@@ -66,18 +66,14 @@ uses
   Messages,
   SysUtils,
   Classes,
-  Graphics,
-  Controls,
-  Forms,
-  Dialogs,
+  //Graphics,
+  //Controls,
+  //Forms,
+  //Dialogs,
   digifx,
-{$IFDEF DirectX}
   DirectDraw,
   DXUtil,
-  Anigrp30,
-{$ENDIF}
-  StdCtrls,
-  ExtCtrls,
+  //Anigrp30,
   logger;
 
 const
