@@ -37,7 +37,7 @@ type
     property JournalFont: Integer index 15 read GetInteger write SetInteger;
     property SoundVolume : Integer index 16 read GetInteger write SetInteger;
     property MusicVolume : Integer index 17 read GetInteger write SetInteger;
-
+    property TTFName : string index 18 read GetString write SetString;
   end;
 
 
@@ -67,7 +67,8 @@ type
     gsClosingMovie,
     gsJournalFont,
     gsSoundVolume,
-    gsMusicVolume );
+    gsMusicVolume,
+    gsTTFName );
 
 { TGameRegistryUserPreferences }
 constructor TSoAUserPreferences.Create(const FileName: string);
@@ -131,10 +132,11 @@ begin
     gsItemDB : Result := 'ArtLib/Resources/Database/Items.DB';
     gsXRefDB : Result := 'ArtLib/Resources/Database/xref.db';
     gsTitlesDB : Result := 'ArtLib/Resources/Database/Title.db';
-    gsInterfacePath : Result := 'Interface/';
-    gsLanguagePath : Result := 'english/';
-    gsOpeningMovie : Result := 'english/';
-    gsClosingMovie : Result := 'english/';
+    gsInterfacePath : Result := 'Interface';
+    gsLanguagePath : Result := 'english';
+    gsOpeningMovie : Result := 'english';
+    gsClosingMovie : Result := 'english';
+    gsTTFName : Result := 'LBLACK.TTF';
   else
     result := '';
   end;
@@ -161,6 +163,7 @@ begin
     gsJournalFont : Result := 'JournalFont';
     gsSoundVolume : Result := 'SoundVolume';
     gsMusicVolume : Result := 'MusicVolume';
+    gsTTFName : Result := 'TTFName';
   else
     result := '';
   end;
@@ -170,6 +173,7 @@ function TSoAUserPreferences.GetSection( const Index : Integer ) : string;
 begin
   case TGameSettingType( Index ) of
     gsShadowsOn..gsMusicVolume : Result := 'Settings';
+    gsTTFName : Result := LanguagePath;
     //gsPlayerEmail..gsPlayerHighScore : Result := 'PlayerInfo';
   else
     result := '';

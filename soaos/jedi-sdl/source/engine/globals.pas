@@ -31,7 +31,7 @@ initialization
 begin
   SoASettings := TSoAUserPreferences.Create;
   ExText := TExternalizer.create;
-  GameFont :=  TTrueTypeFont.Create( 'interface/LBLACK.TTF', [], 18 );
+  GameFont :=  TTrueTypeFont.Create( 'interface/'+ SoASettings.TTFName, [], 18 );
 end;
 
 finalization
