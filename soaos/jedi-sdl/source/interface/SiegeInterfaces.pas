@@ -59,6 +59,9 @@ unit SiegeInterfaces;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2004/09/30 22:49:20  savage
+  Initial Game Interface units.
+
 
 }
 {******************************************************************************}
@@ -103,4 +106,3 @@ begin
 end;
 
 end.
-
