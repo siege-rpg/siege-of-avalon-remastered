@@ -59,6 +59,9 @@ unit GameIntro;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2004/10/02 21:44:19  savage
+  Repositioned Siege Logo
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -91,6 +94,9 @@ type
 implementation
 
 uses
+  SysUtils,
+  //sdlaudiomixer,
+  logger,
   globals,
   GameMainMenu;
 
@@ -105,84 +111,133 @@ begin
 end;
 
 procedure TGameIntro.KeyDown( var Key : TSDLKey; Shift : TSDLMod; unicode : UInt16 );
+const
+  FailName : string = 'TGameIntro.KeyDown';
 begin
   inherited;
-  MainWindow.Rendering := false;
+  try
+    MainWindow.Rendering := false;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 procedure TGameIntro.LoadSurfaces;
+const
+  FailName : string = 'TGameIntro.LoadSurfaces';
 var
   Flags : Cardinal;
+  //IntroMusic : TSDLMusic;
 begin
   inherited;
-  Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
+  try
+    Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-  DXSiege := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniSiege.bmp' ) );
-  SDL_SetColorKey( DXSiege, Flags, SDL_MapRGB( DXSiege.format, 0, 255, 255 ) );
+    DXSiege := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniSiege.bmp' ) );
+    Log.LogStatus( 'Loaded aniSiege.bmp', FailName );
+    SDL_SetColorKey( DXSiege, Flags, SDL_MapRGB( DXSiege.format, 0, 255, 255 ) );
 
-  DXLogo := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniDTIPresents.bmp' ) );
-  SDL_SetColorKey( DXLogo, Flags, SDL_MapRGB( DXLogo.format, 0, 255, 255 ) );
+    DXLogo := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniDTIPresents.bmp' ) );
+    Log.LogStatus( 'Loaded aniDTIPresents.bmp', FailName );
+    SDL_SetColorKey( DXLogo, Flags, SDL_MapRGB( DXLogo.format, 0, 255, 255 ) );
 
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniBack.bmp' ) );
-  SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
+    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniBack.bmp' ) );
+    Log.LogStatus( 'Loaded aniBack.bmp', FailName );
+    SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-  LogoAlpha := 0;
-  SiegeAlpha := 0;
+    LogoAlpha := 0;
+    SiegeAlpha := 0;
 
-  NextGameInterface := TMainMenu;
+    NextGameInterface := TMainMenu;
+    Log.LogStatus( 'NextGameInterface TMainMenu', FailName );
+
+    // GameAudio.MusicManager.Add( TSDLMusic.Create( ) );
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 procedure TGameIntro.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
+const
+  FailName : string = 'TGameIntro.MouseDown';
 begin
   inherited;
-  MainWindow.Rendering := false;
+  try
+    MainWindow.Rendering := false;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 procedure TGameIntro.MouseWheelScroll( WheelDelta : Integer; Shift : TSDLMod; CurrentPos : TPoint );
+const
+  FailName : string = 'TGameIntro.MouseWheelScroll';
 begin
   inherited;
-  MainWindow.Rendering := false;
+  try
+    MainWindow.Rendering := false;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 procedure TGameIntro.Render;
+const
+  FailName : string = 'TGameIntro.Render';
 var
   Rect : TSDL_Rect;
 begin
   inherited;
-  Rect.x := 0;
-  Rect.y := 0;
-  Rect.w := DxSiege.w;
-  Rect.h := DxSiege.h;
-  SDL_SetAlpha( DxSiege, SDL_RLEACCEL or SDL_SRCALPHA, SiegeAlpha );
-  SDL_BlitSurface( DxSiege, nil, MainWindow.DisplaySurface, @Rect );
+  try
+    Rect.x := 0;
+    Rect.y := 0;
+    Rect.w := DxSiege.w;
+    Rect.h := DxSiege.h;
+    SDL_SetAlpha( DxSiege, SDL_RLEACCEL or SDL_SRCALPHA, SiegeAlpha );
+    SDL_BlitSurface( DxSiege, nil, MainWindow.DisplaySurface, @Rect );
 
-  Rect.x := MainWindow.DisplaySurface.w - ( DxLogo.w - 200 );
-  Rect.y := ( MainWindow.DisplaySurface.h - DxLogo.h ) - 20;
-  Rect.w := DxLogo.w;
-  Rect.h := DxLogo.h;
-  SDL_SetAlpha( DxLogo, SDL_RLEACCEL or SDL_SRCALPHA, LogoAlpha );
-  SDL_BlitSurface( DxLogo, nil, MainWindow.DisplaySurface, @Rect );
+    Rect.x := MainWindow.DisplaySurface.w - ( DxLogo.w - 200 );
+    Rect.y := ( MainWindow.DisplaySurface.h - DxLogo.h ) - 20;
+    Rect.w := DxLogo.w;
+    Rect.h := DxLogo.h;
+    SDL_SetAlpha( DxLogo, SDL_RLEACCEL or SDL_SRCALPHA, LogoAlpha );
+    SDL_BlitSurface( DxLogo, nil, MainWindow.DisplaySurface, @Rect );
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 procedure TGameIntro.Update(aElapsedTime: single);
+const
+  FailName : string = 'TGameIntro.Update';
 begin
   inherited;
-  TotalTime := TotalTime + aElapsedTime;
-  if TotalTime > 1.980 then
-  begin
-    SiegeAlpha := SiegeAlpha + 5;
-    if SiegeAlpha > 255 then
-      SiegeAlpha := 255
-  end;
+  try
+    TotalTime := TotalTime + aElapsedTime;
+    if TotalTime > 1.980 then
+    begin
+      SiegeAlpha := SiegeAlpha + 5;
+      if SiegeAlpha > 255 then
+        SiegeAlpha := 255
+    end;
 
-  if TotalTime > 10.980 then
-  begin
-    LogoAlpha := LogoAlpha + 5;
-    if LogoAlpha > 255 then
-      LogoAlpha := 255
+    if TotalTime > 10.980 then
+    begin
+      LogoAlpha := LogoAlpha + 5;
+      if LogoAlpha > 255 then
+        LogoAlpha := 255
+    end;
+    if TotalTime > 18 then
+      MainWindow.Rendering := false;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
   end;
-  if TotalTime > 18 then
-    MainWindow.Rendering := false;
 end;
 
 end.
