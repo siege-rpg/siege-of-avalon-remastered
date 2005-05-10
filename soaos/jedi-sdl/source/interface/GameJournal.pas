@@ -59,6 +59,9 @@ unit GameJournal;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2004/09/30 22:49:20  savage
+  Initial Game Interface units.
+
 
 }
 {******************************************************************************}
@@ -75,7 +78,10 @@ type
   private
     CurrentLogIndex, StartLogIndex : integer;
     JournalLog : TAdventureLog;
-    DxTextMessage : array[ 0..1 ] of PSDL_Surface;
+    TextMessage : array[ 0..1 ] of string;
+    DxPageNumbers : PSDL_Surface;
+    procedure NextPage;
+    procedure PreviousPage;
   public
     procedure FreeSurfaces; override;
     procedure LoadSurfaces; override;
@@ -91,97 +97,217 @@ uses
   {$IFDEF ver120}
   FileCtrl,
   {$ENDIF}
+  Classes,
   SysUtils,
+  logger,
   globals,
   GameMainMenu;
 
 { TGameJournal }
 
 procedure TGameJournal.FreeSurfaces;
-var
-  i : integer;
 begin
-  for i := Low( DxTextMessage ) to High( DxTextMessage ) do
-    SDL_FreeSurface( DxTextMessage[ i ] );
-    
+  JournalLog.Free;
+  
   ExText.Close;
   inherited;
 end;
 
 procedure TGameJournal.KeyDown( var Key : TSDLKey; Shift : TSDLMod;
   unicode : UInt16 );
+const
+  FailName : string = 'TGameJournal.KeyDown';
 begin
   inherited;
+  try
+    case Key of
+      SDLK_ESCAPE :
+        begin
+          NextGameInterface := TMainMenu;
+          MainWindow.Rendering := false;
+        end;
 
+      SDLK_RIGHT, SDLK_PAGEDOWN :
+      begin
+        NextPage;
+      end;
+
+      SDLK_LEFT, SDLK_PAGEUP :
+      begin
+        PreviousPage;
+      end;
+    end;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 procedure TGameJournal.LoadSurfaces;
+const
+  FailName : string = 'TGameJournal.LoadSurfaces';
+  Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 var
-  Flags : Cardinal;
   i : integer;
+  List : TStringList;
+  C : TSDL_Color;
 begin
   inherited;
-  Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
+  try
+    StartLogIndex := -1;
 
-  ExText.Open( 'Journal' );
-  for i := 0 to 1 do
-  begin
-    DxTextMessage[ i ] := GameFont.DrawText( ExText.GetText( 'Message' + inttostr( i ) ) );
-    SDL_SetColorKey( DxTextMessage[ i ], Flags, SDL_MapRGB( DxTextMessage[ i ].format, 0, 0, 0 ) );
+    ExText.Open( 'Journal' );
+    for i := 0 to 1 do
+    begin
+      TextMessage[ i ] := ExText.GetText( 'Message' + inttostr( i )  );
+    end;
+
+    JournalLog := TAdventureLog.Create;
+    List := TStringList.Create;
+    try
+      List.CommaText := SoASettings.History;
+      for i := 0 to List.Count - 1 do
+      begin
+        JournalLog.AddLogEntry( List.Strings[ i ] + '.jrn' );
+      end;
+    finally
+      List.Free;
+    end;
+
+    if JournalLog.LogFileList.count - 1 > StartLogIndex then
+      inc( StartLogIndex );
+
+    if ( SoASettings.JournalFont = 1 ) and DirectoryExists( SoASettings.ArtPath + '/journalalt/' ) then
+      JournalLog.LogDirectory := SoASettings.ArtPath + '/journalalt/'
+    else
+      JournalLog.LogDirectory := SoASettings.ArtPath + '/journal/';
+
+    CurrentLogIndex := StartLogIndex; //JournalLog.LogFileList.count-1;
+    if CurrentLogIndex >= JournalLog.LogFileList.count then
+        CurrentLogIndex := JournalLog.LogFileList.count - 1;
+
+    DXBack := SDL_LoadBMP( PChar( JournalLog.LogDirectory + ChangeFileExt( JournalLog.LogFileList.strings[ CurrentLogIndex ], '.bmp' ) ) );
+
+    Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
+
+    C.r := 244;
+    C.g := 244;
+    C.b := 244;
+    GameFont.ForeGroundColour := C;
+    C.r := 168;
+    C.g := 144;
+    C.b := 112;
+    GameFont.BackGroundColour := C;
+    {if SoASettings.UseSmallFont then
+      GameFont.FontSize := 13
+    else}
+    GameFont.FontSize := 18;
+    
+    DXPagenumbers := GameFont.DrawText( TextMessage[ 0 ] + intToStr( CurrentLogIndex + 1 ) + TextMessage[ 1 ] + IntToStr( JournalLog.LogFileList.count ) );
+    SDL_SetColorKey( DXPagenumbers, Flags, SDL_MapRGB( DXPagenumbers.format, 168, 144, 112 ) );
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
   end;
-
-  if JournalLog.LogFileList.count - 1 > StartLogIndex then
-    inc( StartLogIndex );
-
-  if ( SoASettings.JournalFont = 1 ) and DirectoryExists( SoASettings.ArtPath + 'journalalt/' ) then
-    JournalLog.LogDirectory := SoASettings.ArtPath + 'journalalt/'
-  else
-    JournalLog.LogDirectory := SoASettings.ArtPath + 'journal/';
-
-  CurrentLogIndex := StartLogIndex; //JournalLog.LogFileList.count-1;
-  if CurrentLogIndex >= JournalLog.LogFileList.count then
-      CurrentLogIndex := JournalLog.LogFileList.count - 1;
-
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'Journal.bmp' ) );
-  SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
-
 end;
 
 procedure TGameJournal.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
+const
+  FailName : string = 'TGameJournal.MouseDown';
+  Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 begin
   inherited;
-  if PointIsInRect( CurrentPos, 582, 575, 659, 596 ) then
-  begin //prev
-    if CurrentLogIndex > 0 then
-    begin
-      CurrentLogIndex := CurrentLogIndex - 1;
+  try
+    if PointIsInRect( CurrentPos, 582, 575, 659, 596 ) then
+    begin //prev
+      PreviousPage;
+    end
+    else if PointIsInRect( CurrentPos, 681, 575, 721, 596 ) then
+    begin //next
+      NextPage;
+    end
+    else if PointIsInRect( CurrentPos, 746, 575, 786, 596 ) then
+    begin //exit
+      NextGameInterface := TMainMenu;
+      MainWindow.Rendering := false;
     end;
-  end
-  else if PointIsInRect( CurrentPos, 681, 575, 721, 596 ) then
-  begin //next
-    if CurrentLogIndex < JournalLog.LogFileList.count - 1 then
-    begin
-      CurrentLogIndex := CurrentLogIndex + 1;
-    end;
-  end
-  else if PointIsInRect( CurrentPos, 746, 575, 786, 596 ) then
-  begin //exit
-    NextGameInterface := TMainMenu;
-    MainWindow.Rendering := false;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
   end;
 end;
 
 procedure TGameJournal.MouseMove( Shift : TSDLMod; CurrentPos,
   RelativePos : TPoint );
+const
+  FailName : string = 'TGameJournal.MouseMove';
 begin
   inherited;
 
 end;
 
+procedure TGameJournal.NextPage;
+const
+  FailName : string = 'TGameJournal.NextPage';
+  Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
+begin
+  try
+    if CurrentLogIndex < JournalLog.LogFileList.count - 1 then
+    begin
+      Inc( CurrentLogIndex );
+      SDL_FreeSurface( DXBack );
+      DXBack := SDL_LoadBMP( PChar( JournalLog.LogDirectory + ChangeFileExt( JournalLog.LogFileList.strings[ CurrentLogIndex ], '.bmp' ) ) );
+      SDL_FreeSurface( DXPagenumbers );
+      DXPagenumbers := GameFont.DrawText( TextMessage[ 0 ] + intToStr( CurrentLogIndex + 1 ) + TextMessage[ 1 ] + IntToStr( JournalLog.LogFileList.count ) );
+      SDL_SetColorKey( DXPagenumbers, Flags, SDL_MapRGB( DXPagenumbers.format, 168, 144, 112 ) );
+    end;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
+end;
+
+procedure TGameJournal.PreviousPage;
+const
+  FailName : string = 'TGameJournal.PreviousPage';
+  Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
+begin
+  try
+    if CurrentLogIndex > 0 then
+    begin
+      Dec( CurrentLogIndex );
+      SDL_FreeSurface( DXBack );
+      DXBack := SDL_LoadBMP( PChar( JournalLog.LogDirectory + ChangeFileExt( JournalLog.LogFileList.strings[ CurrentLogIndex ], '.bmp' ) ) );
+      SDL_FreeSurface( DXPagenumbers );
+      DXPagenumbers := GameFont.DrawText( TextMessage[ 0 ] + intToStr( CurrentLogIndex + 1 ) + TextMessage[ 1 ] + IntToStr( JournalLog.LogFileList.count ) );
+      SDL_SetColorKey( DXPagenumbers, Flags, SDL_MapRGB( DXPagenumbers.format, 168, 144, 112 ) );
+    end;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
+end;
+
 procedure TGameJournal.Render;
+const
+  FailName : string = 'TGameJournal.Render';
+var
+  Rect : TSDL_Rect;
 begin
   inherited;
-
+  try
+    if not SoASettings.NoPageNumbers then
+    begin
+      Rect.x := 20;
+      Rect.y := 570;
+      Rect.w := DxPageNumbers.w;
+      Rect.h := DxPageNumbers.h;
+      SDL_BlitSurface( DxPageNumbers, nil, MainWindow.DisplaySurface, @Rect );
+    end;
+  except
+    on E: Exception do
+      Log.LogError( E.Message, FailName );
+  end;
 end;
 
 end.

@@ -59,6 +59,9 @@ unit GameMainMenu;
 {                                                                              }
 {
   $Log$
+  Revision 1.3  2005/05/07 19:50:53  savage
+  Added Exception logging to help track down errors
+
   Revision 1.2  2004/10/06 22:48:46  savage
   Changes required to make use of YesNoDialog
 
@@ -173,6 +176,7 @@ var
   Rect : TSDL_Rect;
   MainText : PSDL_Surface;
   Y1 : integer;
+  FileData : TSearchRec;
 begin
   inherited;
   try
@@ -198,27 +202,35 @@ begin
     MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'gMainMenuTextBttns.bmp' ) );
     Y1 := YFrame;
     GetMenuRect( MenuItems[ 1 ], XFrame, Y1, MainText );
+    MenuItems[ 1 ].Enabled := true;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 2 ], XFrame, Y1, MainText );
+    MenuItems[ 2 ].Enabled := FindFirst( ExtractFilePath( ParamStr( 0 ) ) + 'games/*.sav', faAnyFile, FileData ) = 0;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 3 ], XFrame, Y1, MainText );
+    MenuItems[ 3 ].Enabled := bInGame;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 4 ], XFrame, Y1, MainText );
+    MenuItems[ 4 ].Enabled := true;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 5 ], XFrame, Y1, MainText );
+    MenuItems[ 5 ].Enabled := true;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 6 ], XFrame, Y1, MainText );
+    MenuItems[ 6 ].Enabled := true;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 7 ], XFrame, Y1, MainText );
+    MenuItems[ 7 ].Enabled := true;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 8 ], XFrame, Y1, MainText );
+    MenuItems[ 8 ].Enabled := bInGame;
 
     ExText.Open( 'Intro' );
 
@@ -267,8 +279,8 @@ begin
   try
     for i := 1 to 8 do
     begin
-      if {MenuItems[ i ].enabled
-      and}PointIsInRect( CurrentPos, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.w, MenuItems[ i ].Rect.h ) then
+      if ( MenuItems[ i ].enabled )
+      and ( PointIsInRect( CurrentPos, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.w, MenuItems[ i ].Rect.h )  ) then
       begin
         FMenuChoice := i;
         SetNextGameInterface;
@@ -291,8 +303,8 @@ begin
   try
     for i := 1 to 8 do
     begin
-      if {MenuItems[ i ].enabled
-      and}PointIsInRect( CurrentPos, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.w, MenuItems[ i ].Rect.h ) then
+      if ( MenuItems[ i ].enabled )
+      and ( PointIsInRect( CurrentPos, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.x, MenuItems[ i ].Rect.w, MenuItems[ i ].Rect.h ) ) then
       begin
         FMenuChoice := i;
         break;

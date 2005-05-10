@@ -59,6 +59,9 @@ unit GameIntro;
 {                                                                              }
 {
   $Log$
+  Revision 1.3  2005/05/07 19:50:53  savage
+  Added Exception logging to help track down errors
+
   Revision 1.2  2004/10/02 21:44:19  savage
   Repositioned Siege Logo
 
@@ -95,8 +98,8 @@ implementation
 
 uses
   SysUtils,
-  //sdlaudiomixer,
   logger,
+  sdlaudiomixer,
   globals,
   GameMainMenu;
 
@@ -104,6 +107,8 @@ uses
 
 procedure TGameIntro.FreeSurfaces;
 begin
+  GameAudio.MusicManager.First.Stop;
+
   SDL_FreeSurface( DXSiege );
 
   SDL_FreeSurface( DXLogo );
@@ -128,31 +133,29 @@ const
   FailName : string = 'TGameIntro.LoadSurfaces';
 var
   Flags : Cardinal;
-  //IntroMusic : TSDLMusic;
 begin
   inherited;
   try
     Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
     DXSiege := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniSiege.bmp' ) );
-    Log.LogStatus( 'Loaded aniSiege.bmp', FailName );
     SDL_SetColorKey( DXSiege, Flags, SDL_MapRGB( DXSiege.format, 0, 255, 255 ) );
 
     DXLogo := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniDTIPresents.bmp' ) );
-    Log.LogStatus( 'Loaded aniDTIPresents.bmp', FailName );
     SDL_SetColorKey( DXLogo, Flags, SDL_MapRGB( DXLogo.format, 0, 255, 255 ) );
 
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniBack.bmp' ) );
-    Log.LogStatus( 'Loaded aniBack.bmp', FailName );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
     LogoAlpha := 0;
     SiegeAlpha := 0;
 
     NextGameInterface := TMainMenu;
-    Log.LogStatus( 'NextGameInterface TMainMenu', FailName );
 
-    // GameAudio.MusicManager.Add( TSDLMusic.Create( ) );
+    // Queue Music and Action
+    GameAudio.MusicManager.Add( TSDLMusic.Create( SoASettings.SoundPath + '/Theme/IntroTitle.mp3' ) );
+    GameAudio.MusicManager.First.Volume := SoASettings.MusicVolume;
+    GameAudio.MusicManager.First.Play;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -221,18 +224,18 @@ begin
     TotalTime := TotalTime + aElapsedTime;
     if TotalTime > 1.980 then
     begin
-      SiegeAlpha := SiegeAlpha + 5;
+      SiegeAlpha := SiegeAlpha + 2;
       if SiegeAlpha > 255 then
         SiegeAlpha := 255
     end;
 
-    if TotalTime > 10.980 then
+    if TotalTime > 9.580 then
     begin
-      LogoAlpha := LogoAlpha + 5;
+      LogoAlpha := LogoAlpha + 2;
       if LogoAlpha > 255 then
         LogoAlpha := 255
     end;
-    if TotalTime > 18 then
+    if TotalTime > 20 then
       MainWindow.Rendering := false;
   except
     on E: Exception do

@@ -59,6 +59,9 @@ unit LoadSaveGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.4  2005/05/08 16:03:44  savage
+  Added Exception Logging
+
   Revision 1.3  2004/10/17 18:36:38  savage
   Slight changes to get things working more smoothly
 
@@ -732,7 +735,9 @@ begin
     SDL_SetColorKey( DXLoadSaveUpper, Flags, SDL_MapRGB( DXLoadSaveUpper.format, 0, 255, 255 ) );
 
     if SelectRect.Count > 0 then
-      CurrentSelectedListItem := 0;
+      CurrentSelectedListItem := 0
+    else
+      CurrentSelectedListItem := -1;
 
     NextGameInterface := TMainMenu; // TODO : Change this to something more appropriate
   except
@@ -839,8 +844,10 @@ begin
     DXCaret := GameFont.DrawText( '|' );
     SDL_SetColorKey( DXCaret, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( DXCaret.format, 0, 0, 0 ) );
 
-    if SelectRect.Count > 0 then
-      CurrentSelectedListItem := 1;
+    if SelectRect.Count > 1 then
+      CurrentSelectedListItem := 1
+    else
+      CurrentSelectedListItem := -1;
 
     SavedFileName := PSelectableRect( SelectRect.items[ 0 ] ).Text;
 
