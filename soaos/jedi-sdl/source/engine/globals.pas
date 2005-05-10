@@ -7,6 +7,7 @@ uses
   sdlwindow,
   sdlgameinterface,
   sdltruetypefont,
+  sdlaudiomixer,
   SoAPreferences,
   SiegeInterfaces,
   GameIntro,
@@ -19,11 +20,13 @@ var
   CurrentGameInterface : TGameInterfaceClass = TGameIntro;
   GameWindow :  TGameInterface;
   GameFont :  TTrueTypeFont;
+  GameAudio : TSDLAudioManager;
   ExText : TExternalizer;
 
-  // Global type variables 
+  // Global type variables
   bShowIntro, bShowOuttro : Boolean;
   ScreenFlags : UInt32;
+  bInGame : boolean = false;
 
 implementation
 
@@ -32,6 +35,7 @@ begin
   SoASettings := TSoAUserPreferences.Create;
   ExText := TExternalizer.create;
   GameFont :=  TTrueTypeFont.Create( 'interface/'+ SoASettings.TTFName, [], 18 );
+  GameAudio := TSDLAudioManager.Create;
 end;
 
 finalization
@@ -39,6 +43,7 @@ begin
   SoASettings.Free;
   ExText.Free;
   GameFont.Free;
+  GameAudio.Free;
 end;
 
 end.

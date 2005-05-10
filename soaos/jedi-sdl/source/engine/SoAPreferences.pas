@@ -7,8 +7,6 @@ uses
 
 type
   TSoAUserPreferences = class( TRegistryUserPreferences )
-  private
-
   protected
     function GetSection( const Index : Integer ) : string; override;
     function GetIdentifier( const Index : Integer ) : string; override;
@@ -37,7 +35,10 @@ type
     property JournalFont: Integer index 15 read GetInteger write SetInteger;
     property SoundVolume : Integer index 16 read GetInteger write SetInteger;
     property MusicVolume : Integer index 17 read GetInteger write SetInteger;
-    property TTFName : string index 18 read GetString write SetString;
+    property History : string index 18 read GetString write SetString;
+    property MoviePath : string index 19 read GetString write SetString;
+    property TTFName : string index 20 read GetString write SetString;
+    property NoPageNumbers: Boolean index 21 read GetBoolean write SetBoolean;
   end;
 
 
@@ -68,7 +69,10 @@ type
     gsJournalFont,
     gsSoundVolume,
     gsMusicVolume,
-    gsTTFName );
+    gsHistory,
+    gsMoviePath,
+    gsTTFName,
+    gsNoPageNumbers );
 
 { TGameRegistryUserPreferences }
 constructor TSoAUserPreferences.Create(const FileName: string);
@@ -89,6 +93,7 @@ begin
   case TGameSettingType( Index ) of
     gsShadowsOn : Result := true;
     gsFullScreen : Result := false;
+    gsNoPageNumbers : Result := false;
   else
     result := false;
   end;
@@ -137,6 +142,8 @@ begin
     gsOpeningMovie : Result := 'english';
     gsClosingMovie : Result := 'english';
     gsTTFName : Result := 'LBLACK.TTF';
+    gsHistory : Result := '';
+    gsMoviePath : Result := 'Movies';
   else
     result := '';
   end;
@@ -163,7 +170,10 @@ begin
     gsJournalFont : Result := 'JournalFont';
     gsSoundVolume : Result := 'SoundVolume';
     gsMusicVolume : Result := 'MusicVolume';
+    gsHistory : Result := 'History';
+    gsMoviePath : Result := 'MoviePath';
     gsTTFName : Result := 'TTFName';
+    gsNoPageNumbers : Result := 'NoPageNumbers';
   else
     result := '';
   end;
@@ -172,8 +182,9 @@ end;
 function TSoAUserPreferences.GetSection( const Index : Integer ) : string;
 begin
   case TGameSettingType( Index ) of
-    gsShadowsOn..gsMusicVolume : Result := 'Settings';
+    gsShadowsOn..gsMoviePath : Result := 'Settings';
     gsTTFName : Result := LanguagePath;
+    gsNoPageNumbers : Result := 'Settings';
     //gsPlayerEmail..gsPlayerHighScore : Result := 'PlayerInfo';
   else
     result := '';
