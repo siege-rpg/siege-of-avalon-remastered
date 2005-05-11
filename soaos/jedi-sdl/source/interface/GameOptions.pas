@@ -59,6 +59,9 @@ unit GameOptions;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2004/10/17 18:36:05  savage
+  Game Options now include language selection
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -104,8 +107,10 @@ implementation
 
 uses
   SysUtils,
+  sdlutils,
   globals,
-  GameMainMenu, sdlgameinterface;
+  GameMainMenu,
+  sdlgameinterface;
 
 { TGameOptions }
 
@@ -494,31 +499,31 @@ begin
   //Sound FX
   Rect.x := 116;
   Rect.y := 92;
-  Rect.w := SoundPos;
-  Rect.h := 12;
-  SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+  Rect.w := SoundPos - 115;
+  Rect.h := 13;
+  SDL_FillRect( MainWindow.DisplaySurface, @Rect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
 
 
   Rect.x := SoundPos - ( DXVolumeSlider.w shr 1 );
   Rect.y := 103;
   Rect.w := DXVolumeSlider.w;
   Rect.h := DXVolumeSlider.h;
-  SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
+  //SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
   SDL_BlitSurface( DXVolumeSlider, nil, MainWindow.DisplaySurface, @Rect );
 
 
   //Music
   Rect.x := 116;
   Rect.y := 175;
-  Rect.w := MusicPos;
-  Rect.h := 12;
-  SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+  Rect.w := MusicPos - 115;
+  Rect.h := 13;
+  SDL_FillRect( MainWindow.DisplaySurface, @Rect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
 
   Rect.x := MusicPos - ( DXVolumeSlider.w shr 1 );
   Rect.y := 184;
   Rect.w := DXVolumeSlider.w;
   Rect.h := DXVolumeSlider.h;
-  SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
+  //SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
   SDL_BlitSurface( DXVolumeSlider, nil, MainWindow.DisplaySurface, @Rect );
 end;
 

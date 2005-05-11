@@ -61,26 +61,28 @@ begin
   bShowOuttro := False; // Game must force to true to show closing movie
 
   SoAoSGame := TSDL2DWindow.Create( SoASettings.ScreenWidth, SoASettings.ScreenHeight, SoASettings.ScreenBPP, ScreenFlags );
-  SoAoSGame.SetIcon( SDL_LoadBMP( '' ), 0 );
-  SoAoSGame.ActivateVideoMode;
-  SoAoSGame.SetCaption( 'Siege of Avalon : Open Source Edition', '' );
+  try
+    SoAoSGame.SetIcon( SDL_LoadBMP( '' ), 0 );
+    SoAoSGame.ActivateVideoMode;
+    SoAoSGame.SetCaption( 'Siege of Avalon : Open Source Edition', '' );
 
-  // Instantiate to get into our game loop.
-  CurrentGameInterface := TGameIntro;
-  
-  while CurrentGameInterface <> nil do
-  begin
-    GameWindow := CurrentGameInterface.Create( SoAoSGame );
-    GameWindow.LoadSurfaces;
+    // Instantiate to get into our game loop.
+    CurrentGameInterface := TGameIntro;
 
-    SoAoSGame.Show;
-    CurrentGameInterface := GameWindow.NextGameInterface;
+    while CurrentGameInterface <> nil do
+    begin
+      GameWindow := CurrentGameInterface.Create( SoAoSGame );
+      GameWindow.LoadSurfaces;
 
-    if ( GameWindow <> nil ) then
-      FreeAndNil( GameWindow );
+      SoAoSGame.Show;
+      CurrentGameInterface := GameWindow.NextGameInterface;
+
+      if ( GameWindow <> nil ) then
+        FreeAndNil( GameWindow );
+    end;
+
+    PlayClosingMovie;
+  finally
+    SoAoSGame.Free;
   end;
-
-  PlayClosingMovie;
-
-  SoAoSGame.Free;
 end.

@@ -59,6 +59,9 @@ unit GameJournal;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2005/05/10 14:12:48  savage
+  Latest Enhancments and bug fixes
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -187,8 +190,6 @@ begin
         CurrentLogIndex := JournalLog.LogFileList.count - 1;
 
     DXBack := SDL_LoadBMP( PChar( JournalLog.LogDirectory + ChangeFileExt( JournalLog.LogFileList.strings[ CurrentLogIndex ], '.bmp' ) ) );
-
-    Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
     C.r := 244;
     C.g := 244;
