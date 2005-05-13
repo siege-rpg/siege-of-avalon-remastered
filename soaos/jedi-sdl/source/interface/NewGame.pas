@@ -59,6 +59,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.6  2005/05/13 12:33:15  savage
+  Various Changes and bug fixes. Main work on the NewGame screen.
+
   Revision 1.5  2005/05/08 14:43:59  savage
   Added Exception Logging
 
@@ -675,7 +678,7 @@ begin
     SDL_SetColorKey( DXBox, Flags, SDL_MapRGB( DXBox.format, 0, 255, 255 ) );
 
     DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaContinue.bmp' ) );
-    SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 0, 255, 255 ) );
+    SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 255, 255, 255 ) );
 
     DXCancel := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaCancel.bmp' ) );
     SDL_SetColorKey( DXCancel, Flags, SDL_MapRGB( DXCancel.format, 0, 255, 255 ) );
