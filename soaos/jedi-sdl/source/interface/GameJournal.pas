@@ -59,6 +59,9 @@ unit GameJournal;
 {                                                                              }
 {
   $Log$
+  Revision 1.3  2005/05/11 13:38:29  savage
+  Fix for GameOption Sliders and tidying up the GameJournal and AdventureLog files.
+
   Revision 1.2  2005/05/10 14:12:48  savage
   Latest Enhancments and bug fixes
 
@@ -191,9 +194,9 @@ begin
 
     DXBack := SDL_LoadBMP( PChar( JournalLog.LogDirectory + ChangeFileExt( JournalLog.LogFileList.strings[ CurrentLogIndex ], '.bmp' ) ) );
 
-    C.r := 244;
-    C.g := 244;
-    C.b := 244;
+    C.r := 0;
+    C.g := 0;
+    C.b := 0;
     GameFont.ForeGroundColour := C;
     C.r := 168;
     C.g := 144;

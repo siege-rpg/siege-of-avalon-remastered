@@ -59,6 +59,9 @@ unit GameIntro;
 {                                                                              }
 {
   $Log$
+  Revision 1.4  2005/05/10 14:12:47  savage
+  Latest Enhancments and bug fixes
+
   Revision 1.3  2005/05/07 19:50:53  savage
   Added Exception logging to help track down errors
 
@@ -101,13 +104,14 @@ uses
   logger,
   sdlaudiomixer,
   globals,
+  GameJournal,
   GameMainMenu;
 
 { TGameIntro }
 
 procedure TGameIntro.FreeSurfaces;
 begin
-  GameAudio.MusicManager.First.Stop;
+  GameAudio.MusicManager.TrackNames['Intro'].Stop;
 
   SDL_FreeSurface( DXSiege );
 
@@ -150,12 +154,18 @@ begin
     LogoAlpha := 0;
     SiegeAlpha := 0;
 
-    NextGameInterface := TMainMenu;
+    if SoASettings.ShowHistory then
+    begin
+      NextGameInterface := TGameJournal;
+      SoASettings.ShowHistory := false;
+    end
+    else
+      NextGameInterface := TMainMenu;
 
     // Queue Music and Action
-    GameAudio.MusicManager.Add( TSDLMusic.Create( SoASettings.SoundPath + '/Theme/IntroTitle.mp3' ) );
-    GameAudio.MusicManager.First.Volume := SoASettings.MusicVolume;
-    GameAudio.MusicManager.First.Play;
+    GameAudio.MusicManager.Add( TSDLMusic.Create( SoASettings.SoundPath + '/Theme/IntroTitle.mp3' ), 'intro' );
+    GameAudio.MusicManager.TrackNames['intro'].Volume := SoASettings.MusicVolume;
+    GameAudio.MusicManager.TrackNames['intro'].Play;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );

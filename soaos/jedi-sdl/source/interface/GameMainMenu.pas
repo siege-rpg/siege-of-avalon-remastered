@@ -59,6 +59,9 @@ unit GameMainMenu;
 {                                                                              }
 {
   $Log$
+  Revision 1.4  2005/05/10 14:12:48  savage
+  Latest Enhancments and bug fixes
+
   Revision 1.3  2005/05/07 19:50:53  savage
   Added Exception logging to help track down errors
 
@@ -150,15 +153,24 @@ begin
           SetNextGameInterface;
         end;
 
-      SDLK_UP : dec( FMenuChoice );
+      SDLK_UP :
+      begin
+        dec( FMenuChoice );
+        if FMenuChoice < Low( MenuItems ) then
+          FMenuChoice := High( MenuItems );
+        while not MenuItems[ FMenuChoice ].Enabled do
+          dec( FMenuChoice );
+      end;
 
-      SDLK_DOWN : inc( FMenuChoice );
+      SDLK_DOWN :
+      begin
+        inc( FMenuChoice );
+        while not MenuItems[ FMenuChoice ].Enabled do
+          inc( FMenuChoice );
+        if FMenuChoice > High( MenuItems ) then
+          FMenuChoice := Low( MenuItems );
+      end
     end;
-
-    if FMenuChoice > High( MenuItems ) then
-      FMenuChoice := Low( MenuItems )
-    else if FMenuChoice < Low( MenuItems ) then
-      FMenuChoice := High( MenuItems );
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -171,8 +183,8 @@ const
   YFrame = 41;
 
   FailName : string = 'TMainMenu.LoadSurfaces';
+  Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 var
-  Flags : Cardinal;
   Rect : TSDL_Rect;
   MainText : PSDL_Surface;
   Y1 : integer;
@@ -182,8 +194,6 @@ begin
   try
     FPrevChoice := 0; // Reset menu item
     FMenuChoice := 1; // Highlight new game
-
-    Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'gMainMenuBlank.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
@@ -202,7 +212,7 @@ begin
     MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'gMainMenuTextBttns.bmp' ) );
     Y1 := YFrame;
     GetMenuRect( MenuItems[ 1 ], XFrame, Y1, MainText );
-    MenuItems[ 1 ].Enabled := true;
+    MenuItems[ 1 ].Enabled := not bInGame;
 
     inc( Y1, 52 );
     GetMenuRect( MenuItems[ 2 ], XFrame, Y1, MainText );

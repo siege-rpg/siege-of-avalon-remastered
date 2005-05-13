@@ -59,6 +59,9 @@ unit GameCredits;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2005/05/10 14:12:46  savage
+  Latest Enhancments and bug fixes
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -96,7 +99,7 @@ uses
 
 procedure TGameCredits.FreeSurfaces;
 begin
-  GameAudio.MusicManager.First.Stop;
+  GameAudio.MusicManager.TrackNames['credits'].Stop;
   inherited;
 end;
 
@@ -110,37 +113,32 @@ end;
 procedure TGameCredits.LoadSurfaces;
 const
   FailName : string = 'TGameCredits.LoadSurfaces';
-var
-  Flags : Cardinal;
+  Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 begin
   inherited;
   try
-    Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
-
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'CreditsScreen.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
     NextGameInterface := TMainMenu;
 
     // Queue Music and Action
-    GameAudio.MusicManager.First.LoadFromFile( SoASettings.SoundPath + '/Theme/exCARLibur.mp3' );
-    GameAudio.MusicManager.First.Volume := SoASettings.MusicVolume;
-    GameAudio.MusicManager.First.Play;
+    GameAudio.MusicManager.Add( TSDLMusic.Create( SoASettings.SoundPath + '/Theme/exCARLibur.mp3' ), 'credits' );
+    GameAudio.MusicManager.TrackNames['credits'].Volume := SoASettings.MusicVolume;
+    GameAudio.MusicManager.TrackNames['credits'].Play;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
   end;
 end;
 
-procedure TGameCredits.MouseDown( Button : Integer; Shift : TSDLMod;
-  CurrentPos : TPoint );
+procedure TGameCredits.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
 begin
   inherited;
   MainWindow.Rendering := false;
 end;
 
-procedure TGameCredits.MouseMove( Shift : TSDLMod; CurrentPos,
-  RelativePos : TPoint );
+procedure TGameCredits.MouseMove( Shift : TSDLMod; CurrentPos, RelativePos : TPoint );
 begin
   inherited;
 

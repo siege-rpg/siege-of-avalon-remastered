@@ -59,6 +59,9 @@ unit GameOptions;
 {                                                                              }
 {
   $Log$
+  Revision 1.3  2005/05/11 13:38:29  savage
+  Fix for GameOption Sliders and tidying up the GameJournal and AdventureLog files.
+
   Revision 1.2  2004/10/17 18:36:05  savage
   Game Options now include language selection
 
@@ -83,7 +86,7 @@ type
   
   TGameOptions = class( TSimpleSoAInterface )
   private
-    DXContinue, DXYellow, DXVolumeSlider, DXVolumeShadow : PSDL_Surface;
+    DXContinue, DXVolumeSlider, DXBackHighlight : PSDL_Surface;
     DxLangEng, DxLangSpa, DxLangGer : PSDL_Surface;
     DxTextMessage : array[ 0..4 ] of PSDL_Surface;
     SpellList : TStringList;
@@ -119,9 +122,8 @@ var
   i : integer;
 begin
   SDL_FreeSurface( DXContinue );
-  SDL_FreeSurface( DXYellow );
   SDL_FreeSurface( DXVolumeSlider );
-  SDL_FreeSurface( DXVolumeShadow );
+  SDL_FreeSurface( DXBackHighlight );
   SDL_FreeSurface( DxLangEng );
   SDL_FreeSurface( DxLangSpa );
   SDL_FreeSurface( DxLangGer );
@@ -176,14 +178,8 @@ begin
   DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'opContinue.bmp' ) );
   SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 0, 255, 255 ) );
 
-  DXYellow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opYellow.bmp' ) );
-  SDL_SetColorKey( DXYellow, Flags, SDL_MapRGB( DXYellow.format, 0, 255, 255 ) );
-
   DXVolumeSlider := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opVolume.bmp' ) );
   SDL_SetColorKey( DXVolumeSlider, Flags, SDL_MapRGB( DXVolumeSlider.format, 0, 255, 255 ) );
-
-  DXVolumeShadow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opVolumeShadow.bmp' ) );
-  SDL_SetColorKey( DXVolumeShadow, Flags, SDL_MapRGB( DXVolumeShadow.format, 0, 0, 0 ) );
 
   DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'options.bmp' ) );
   SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
@@ -246,10 +242,16 @@ begin
   ContinueRect.w := 200;
   ContinueRect.h := 45;
 
-  SpellsRect.x := 500;
-  SpellsRect.y := 450;
+  SpellsRect.x := 0;
+  SpellsRect.y := 0;
   SpellsRect.w := 200;
   SpellsRect.h := 45;
+  DXBackHighlight := SDL_CreateRGBSurface( SDL_SWSURFACE, SpellsRect.w, SpellsRect.h,
+    MainWindow.DisplaySurface.format.BitsPerPixel, MainWindow.DisplaySurface.format.RMask, MainWindow.DisplaySurface.format.GMask,
+    MainWindow.DisplaySurface.format.BMask, MainWindow.DisplaySurface.format.AMask );
+  SDL_FillRect( DXBackHighlight, @SpellsRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
+  SpellsRect.x := 500;
+  SpellsRect.y := 450;
 
   // Load Selections from SoASettings
   ShadowsOn := SoASettings.ShadowsOn;
@@ -415,19 +417,19 @@ begin
 
   if ShadowsOn then
   begin
-    Rect.x := 561;
+    Rect.x := 560;
     Rect.y := 75;
-    Rect.w := DXYellow.w;
-    Rect.h := DXYellow.h;
-    SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+    Rect.w := 12;
+    Rect.h := 12;
+    SDL_FillRect( MainWindow.DisplaySurface, @Rect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
   end
   else
   begin
-    Rect.x := 633;
+    Rect.x := 632;
     Rect.y := 75;
-    Rect.w := DXYellow.w;
-    Rect.h := DXYellow.h;
-    SDL_BlitSurface( DXYellow, nil, MainWindow.DisplaySurface, @Rect );
+    Rect.w := 12;
+    Rect.h := 12;
+    SDL_FillRect( MainWindow.DisplaySurface, @Rect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
   end;
 
   case LanguageSelected of
@@ -508,7 +510,6 @@ begin
   Rect.y := 103;
   Rect.w := DXVolumeSlider.w;
   Rect.h := DXVolumeSlider.h;
-  //SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
   SDL_BlitSurface( DXVolumeSlider, nil, MainWindow.DisplaySurface, @Rect );
 
 
@@ -523,8 +524,11 @@ begin
   Rect.y := 184;
   Rect.w := DXVolumeSlider.w;
   Rect.h := DXVolumeSlider.h;
-  //SDL_BlitSurface( DXVolumeShadow, nil, MainWindow.DisplaySurface, @Rect );
   SDL_BlitSurface( DXVolumeSlider, nil, MainWindow.DisplaySurface, @Rect );
+
+  // Needed for spell selection
+  //SDL_SetAlpha( DXBackHighlight, SDL_RLEACCEL or SDL_SRCALPHA, 64 );
+  //SDL_BlitSurface( DXBackHighlight, nil, MainWindow.DisplaySurface, @SpellsRect );
 end;
 
 end.

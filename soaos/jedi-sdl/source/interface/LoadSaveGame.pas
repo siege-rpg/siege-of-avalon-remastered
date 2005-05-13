@@ -59,6 +59,9 @@ unit LoadSaveGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.5  2005/05/10 14:12:49  savage
+  Latest Enhancments and bug fixes
+
   Revision 1.4  2005/05/08 16:03:44  savage
   Added Exception Logging
 
@@ -322,9 +325,6 @@ begin
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldLoadSave.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-    DXBackHighlight := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opYellow.bmp' ) );
-    SDL_SetColorKey( DXBackHighlight, Flags, SDL_MapRGB( DXBackHighlight.format, 0, 255, 255 ) );
-
     DXCancel := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldCancel.bmp' ) );
     SDL_SetColorKey( DXCancel, Flags, SDL_MapRGB( DXCancel.format, 0, 255, 255 ) );
 
@@ -354,10 +354,16 @@ begin
     LoadSaveUpperRect.w := 357;
     LoadSaveUpperRect.h := 64;
 
+    SelectionRect.x := 0;
+    SelectionRect.y := 0;
+    SelectionRect.w := 280;
+    SelectionRect.h := 24;
+    DXBackHighlight := SDL_CreateRGBSurface( SDL_SWSURFACE, SelectionRect.w, SelectionRect.h,
+      MainWindow.DisplaySurface.format.BitsPerPixel, MainWindow.DisplaySurface.format.RMask, MainWindow.DisplaySurface.format.GMask,
+      MainWindow.DisplaySurface.format.BMask, MainWindow.DisplaySurface.format.AMask );
+    SDL_FillRect( DXBackHighlight, @SelectionRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
     SelectionRect.x := 385;
     SelectionRect.y := 60;
-    SelectionRect.w := 296;
-    SelectionRect.h := 27;
 
     MapRect.x := 123;
     MapRect.y := 70;

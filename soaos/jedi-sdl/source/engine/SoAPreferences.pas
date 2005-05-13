@@ -39,6 +39,8 @@ type
     property MoviePath : string index 19 read GetString write SetString;
     property TTFName : string index 20 read GetString write SetString;
     property NoPageNumbers: Boolean index 21 read GetBoolean write SetBoolean;
+    property ShowHistory: Boolean index 22 read GetBoolean write SetBoolean;
+    property ShowIntro: Boolean index 23 read GetBoolean write SetBoolean;
   end;
 
 
@@ -72,7 +74,9 @@ type
     gsHistory,
     gsMoviePath,
     gsTTFName,
-    gsNoPageNumbers );
+    gsNoPageNumbers,
+    gsShowHistory,
+    gsShowIntro );
 
 { TGameRegistryUserPreferences }
 constructor TSoAUserPreferences.Create(const FileName: string);
@@ -94,6 +98,8 @@ begin
     gsShadowsOn : Result := true;
     gsFullScreen : Result := false;
     gsNoPageNumbers : Result := false;
+    gsShowHistory :  Result := true;
+    gsShowIntro :  Result := true;
   else
     result := false;
   end;
@@ -174,6 +180,8 @@ begin
     gsMoviePath : Result := 'MoviePath';
     gsTTFName : Result := 'TTFName';
     gsNoPageNumbers : Result := 'NoPageNumbers';
+    gsShowHistory : Result := 'ShowHistory';
+    gsShowIntro : Result := 'ShowIntro';
   else
     result := '';
   end;
@@ -185,6 +193,8 @@ begin
     gsShadowsOn..gsMoviePath : Result := 'Settings';
     gsTTFName : Result := LanguagePath;
     gsNoPageNumbers : Result := 'Settings';
+    gsShowHistory : Result := 'Settings';
+    gsShowIntro : Result := 'Settings';
     //gsPlayerEmail..gsPlayerHighScore : Result := 'PlayerInfo';
   else
     result := '';
