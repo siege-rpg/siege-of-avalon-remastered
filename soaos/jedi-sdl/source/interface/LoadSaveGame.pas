@@ -59,6 +59,9 @@ unit LoadSaveGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.6  2005/05/13 12:33:15  savage
+  Various Changes and bug fixes. Main work on the NewGame screen.
+
   Revision 1.5  2005/05/10 14:12:49  savage
   Latest Enhancments and bug fixes
 
@@ -358,10 +361,13 @@ begin
     SelectionRect.y := 0;
     SelectionRect.w := 280;
     SelectionRect.h := 24;
+
     DXBackHighlight := SDL_CreateRGBSurface( SDL_SWSURFACE, SelectionRect.w, SelectionRect.h,
       MainWindow.DisplaySurface.format.BitsPerPixel, MainWindow.DisplaySurface.format.RMask, MainWindow.DisplaySurface.format.GMask,
       MainWindow.DisplaySurface.format.BMask, MainWindow.DisplaySurface.format.AMask );
     SDL_FillRect( DXBackHighlight, @SelectionRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 255, 255, 0 ) );
+    SDL_SetAlpha( DXBackHighlight, SDL_RLEACCEL or SDL_SRCALPHA, 64 );
+
     SelectionRect.x := 385;
     SelectionRect.y := 60;
 
@@ -546,7 +552,6 @@ begin
       SelectionRect.x := PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).rect.x;
       SelectionRect.y := PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).rect.y;
 
-      SDL_SetAlpha( DXBackHighlight, SDL_RLEACCEL or SDL_SRCALPHA, 64 );
       SDL_BlitSurface( DXBackHighlight, nil, MainWindow.DisplaySurface, @SelectionRect );
 
       SDL_BlitSurface( PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).ScreenShotSurface, nil, MainWindow.DisplaySurface, @ScreenShotRect );
