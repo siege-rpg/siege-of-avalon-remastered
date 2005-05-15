@@ -59,6 +59,9 @@ unit YesNoDialog;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2004/10/06 22:48:46  savage
+  Changes required to make use of YesNoDialog
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -78,7 +81,7 @@ type
   
   TYesNoDialog = class( TSimpleSoAInterface )
   private
-    DxTextMessage : PSDL_Surface;
+    DxTextMessage, DxChooseBox : PSDL_Surface;
     FQuestionText: string;
     FDialogResult: TDialogResult;
     procedure SetDialogResult(const Value: TDialogResult);
@@ -104,6 +107,7 @@ uses
 procedure TYesNoDialog.FreeSurfaces;
 begin
   SDL_FreeSurface( DxTextMessage );
+  SDL_FreeSurface( DxChooseBox );
   inherited;
 end;
 
@@ -124,15 +128,29 @@ begin
 end;
 
 procedure TYesNoDialog.LoadSurfaces;
+const
+  Flags : Cardinal= SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 var
-  Flags : Cardinal;
   C : TSDL_Color;
+  WindowRect : TSDL_Rect;
 begin
   inherited;
-  Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldChooseBox.bmp' ) );
-  SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
+  WindowRect.x := 0;
+  WindowRect.y := 0;
+  WindowRect.w := MainWindow.DisplaySurface.w;
+  WindowRect.h := MainWindow.DisplaySurface.h;
+
+  DXBack := SDL_CreateRGBSurface( SDL_SWSURFACE, WindowRect.w, WindowRect.h,
+      MainWindow.DisplaySurface.format.BitsPerPixel, MainWindow.DisplaySurface.format.RMask, MainWindow.DisplaySurface.format.GMask,
+      MainWindow.DisplaySurface.format.BMask, MainWindow.DisplaySurface.format.AMask );
+
+  SDL_FillRect( DXBack, @WindowRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 128, 128, 128 ) );
+
+  SDL_SetAlpha( DXBack, SDL_RLEACCEL or SDL_SRCALPHA, 16 );
+
+  DxChooseBox := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldChooseBox.bmp' ) );
+  SDL_SetColorKey( DxChooseBox, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
   C.r := 231;
   C.g := 156;
@@ -173,6 +191,12 @@ var
   Rect : TSDL_Rect;
 begin
   inherited;
+  Rect.x := ( ( MainWindow.DisplaySurface.w - DxTextMessage.w ) shr 1 ) - 20;
+  Rect.y := ( ( MainWindow.DisplaySurface.h - DxTextMessage.h ) shr 1 ) - 30;
+  Rect.w := DxChooseBox.w;
+  Rect.h := DxChooseBox.h;  
+  SDL_BlitSurface( DxChooseBox,  nil, MainWindow.DisplaySurface, @Rect );
+  
   Rect.x := ( MainWindow.DisplaySurface.w - DxTextMessage.w ) shr 1;
   Rect.y := ( ( MainWindow.DisplaySurface.h - DxTextMessage.h ) shr 1 ) - 20;
   Rect.w := DxTextMessage.w;
