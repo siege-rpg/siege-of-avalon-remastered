@@ -63,6 +63,9 @@ program SoAoS;
 {                                                                              }
 {
   $Log$
+  Revision 1.7  2005/05/24 22:15:02  savage
+  Latest additions to determine if it is the first time the game is run.
+
 
 }
 {******************************************************************************}
@@ -70,9 +73,12 @@ program SoAoS;
 uses
   IniFiles,
   SysUtils,
-  sdl,
-  sdlwindow,
-  sdlgameinterface,
+  sdl in 'sdl\sdl.pas',
+  sdlwindow in 'sdl\sdlwindow.pas',
+  sdlgameinterface in 'sdl\sdlgameinterface.pas',
+  sdltruetypefont in 'sdl\sdltruetypefont.pas',
+  sdlticks in 'sdl\sdlticks.pas',
+  sdlinput in 'sdl\sdlinput.pas',
   SiegeInterfaces in 'interface\SiegeInterfaces.pas',
   globals in 'engine\globals.pas',
   SoAPreferences in 'engine\SoAPreferences.pas',
@@ -88,10 +94,16 @@ uses
   YesNoDialog in 'interface\YesNoDialog.pas',
   SaveFile in 'engine\SaveFile.pas',
   AStar in 'ai\AStar.pas',
-  DXEffects in 'graphics\DXEffects.pas',
   SiegeTypes in 'engine\SiegeTypes.pas',
   CustomAniFigure in 'engine\CustomAniFigure.pas',
-  ListBoxDialog in 'interface\ListBoxDialog.pas';
+  ListBoxDialog in 'interface\ListBoxDialog.pas',
+  logger in 'sdl\logger.pas',
+  sdl_ttf in 'sdl\sdl_ttf.pas',
+  sdlaudiomixer in 'sdl\sdlaudiomixer.pas',
+  sdl_mixer in 'sdl\sdl_mixer.pas',
+  smpeg in 'sdl\smpeg.pas',
+  registryuserpreferences in 'sdl\registryuserpreferences.pas',
+  userpreferences in 'sdl\userpreferences.pas';
 
 {$IFDEF WIN32}
 {$R *.res}
@@ -128,11 +140,11 @@ begin
   PlayOpeningMovie;
   bShowOuttro := False; // Game must force to true to show closing movie
 
-  SoAoSGame := TSDL2DWindow.Create( SoASettings.ScreenWidth, SoASettings.ScreenHeight, SoASettings.ScreenBPP, ScreenFlags );
+  Application := TSDL2DWindow.Create( SoASettings.ScreenWidth, SoASettings.ScreenHeight, SoASettings.ScreenBPP, ScreenFlags );
   try
-    SoAoSGame.SetIcon( SDL_LoadBMP( '' ), 0 );
-    SoAoSGame.ActivateVideoMode;
-    SoAoSGame.SetCaption( 'Siege of Avalon : Open Source Edition', '' );
+    Application.SetIcon( nil, 0 );
+    Application.ActivateVideoMode;
+    Application.SetCaption( 'Siege of Avalon : Open Source Edition', '' );
 
     // Instantiate to get into our game loop.
     if SoASettings.ShowIntro then
@@ -142,10 +154,10 @@ begin
 
     while CurrentGameInterface <> nil do
     begin
-      GameWindow := CurrentGameInterface.Create( SoAoSGame );
+      GameWindow := CurrentGameInterface.Create( Application );
       GameWindow.LoadSurfaces;
 
-      SoAoSGame.Show;
+      Application.Show;
       CurrentGameInterface := GameWindow.NextGameInterface;
 
       if ( GameWindow <> nil ) then
@@ -154,6 +166,6 @@ begin
 
     PlayClosingMovie;
   finally
-    SoAoSGame.Free;
+    Application.Free;
   end;
 end.

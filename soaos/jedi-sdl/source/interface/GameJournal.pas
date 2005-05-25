@@ -59,6 +59,9 @@ unit GameJournal;
 {                                                                              }
 {
   $Log$
+  Revision 1.4  2005/05/13 12:33:15  savage
+  Various Changes and bug fixes. Main work on the NewGame screen.
+
   Revision 1.3  2005/05/11 13:38:29  savage
   Fix for GameOption Sliders and tidying up the GameJournal and AdventureLog files.
 
@@ -241,8 +244,7 @@ begin
   end;
 end;
 
-procedure TGameJournal.MouseMove( Shift : TSDLMod; CurrentPos,
-  RelativePos : TPoint );
+procedure TGameJournal.MouseMove( Shift : TSDLMod; CurrentPos, RelativePos : TPoint );
 const
   FailName : string = 'TGameJournal.MouseMove';
 begin

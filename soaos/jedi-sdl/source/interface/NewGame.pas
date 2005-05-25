@@ -1,5 +1,9 @@
 unit NewGame;
 {******************************************************************************}
+{
+  $Id$
+
+}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
@@ -59,6 +63,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.7  2005/05/13 20:09:30  savage
+  Changed so that german Continue appears correctly.
+
   Revision 1.6  2005/05/13 12:33:15  savage
   Various Changes and bug fixes. Main work on the NewGame screen.
 
@@ -88,18 +95,24 @@ uses
 
 type
   TMouseOverNewOptions = (
-    moNone,
-    moContinue,
-    moCancel,
+    moTrainingPoints,
+    moPrimarySkill, // No longer used
+    moStrength,
+    moCoordination,
+    moConstitution,
+    moPerception,
+    moCharm,
+    moMysticism,
+    moCombat,
+    moStealth,
+    moCharacterName,
     moAppearance,
     moShirtColour,
     moPantsColour,
     moHairColour,
     moHairStyle,
     moBeard,
-    moName,
     moTrainingStyle,
-    moTrainingPoints,
     moStrengthMinus,
     moCoordinationMinus,
     moConstitutionMinus,
@@ -116,16 +129,13 @@ type
     moMysticismPlus,
     moCombatPlus,
     moStealthPlus,
-    moStrength,
-    moCoordination,
-    moConstitution,
-    moPerception,
-    moCharm,
-    moMysticism,
-    moCombat,
-    moStealth,
+    moContinue,
+    moCancel,
     moLeftArrow,
-    moRightArrow );
+    moRightArrow,
+    moNone );
+
+  TRenderMode = ( rmNormal, rmPickList );
 
   TInformationRect = record
     FRect : TSDL_Rect;
@@ -139,6 +149,8 @@ type
   end;
 
   TCharacter = class
+  private
+    FName: string;
   public
     BaseStrength : Integer;
     BaseCoordination : Integer;
@@ -160,16 +172,19 @@ type
     Damage : TDamageProfile;
     Resistance : TDamageResistanceProfile;
     TrainingPoints : Integer;
+    constructor Create;
+    property Name : string read FName write FName;
   end;
 
   TNewGame = class( TSimpleSoAInterface )
   private
-    DXCircle : PSDL_Surface; //circle used for outline
-    DXBox : PSDL_Surface;
+    DXSelectRect : PSDL_Surface; // rectangle used for outline
     DXBlack : PSDL_Surface;
     DXContinue : PSDL_Surface;
     DXCancel : PSDL_Surface;
     DXLeftArrow, DXRightArrow : PSDL_Surface;
+    DXPickList : PSDL_Surface;
+    DXPlayerName : PSDL_Surface;
     TextMessage : array[ 0..104 ] of string;
     ContinueRect, CancelRect, LeftArrowRect, RightArrowRect : TSDL_Rect;
     InfoPanel : TSDL_Rect;
@@ -197,13 +212,12 @@ type
     ixSelectedHairStyle : integer; //current selected Hairstyle
     ixSelectedBeard : integer;
     ixSelectedTraining : integer;
-    
+    RenderMode : TRenderMode;
+    iPickListLow, iPickListHigh : integer;
     procedure LoadBaseValues; //saves the base stats of the character
     procedure LoadNames;
     procedure CreateCollisionRects; //create the rects for the collision detection
-    function ShowListBox( aX, aY : integer; aMoOptions : TMouseOverNewOptions ): integer;
   public
-    Character : TCharacter;
     procedure FreeSurfaces; override;
     procedure LoadSurfaces; override;
     procedure Render; override;
@@ -371,161 +385,161 @@ begin
                        //'character''s combat ability, Scouting emphasizes your character''s stealth talents '+
                        //'and Magic emphasizes your character''s spellcasting ability.';
 
-     //now for the selectable text
-     //Shirt color
+    //now for the selectable text
+    //Shirt color
     i := 0;
-    SelectRect[ i ].FRect.x := -148;
-    SelectRect[ i ].FRect.y := 80;
-    SelectRect[ i ].FRect.w := -186 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 101 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 49 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 70 ] );
+    SelectRect[ i ].FRect.x := 293;
+    SelectRect[ i ].FRect.y := 265;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -197;
-    SelectRect[ i ].FRect.y := 80;
-    SelectRect[ i ].FRect.w := -258 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 101 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 50 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 71 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -269;
-    SelectRect[ i ].FRect.y := 80;
-    SelectRect[ i ].FRect.w := -320 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 101 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 51 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 72 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -331;
-    SelectRect[ i ].FRect.y := 80;
-    SelectRect[ i ].FRect.w := -382 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 101 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 52 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 73 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
      //Pants color
     inc( i );
-    SelectRect[ i ].FRect.x := -148;
-    SelectRect[ i ].FRect.y := 110;
-    SelectRect[ i ].FRect.w := -186 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 131 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 53 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 70 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := 307;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -197;
-    SelectRect[ i ].FRect.y := 110;
-    SelectRect[ i ].FRect.w := -258 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 131 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 54 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 71 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -269;
-    SelectRect[ i ].FRect.y := 110;
-    SelectRect[ i ].FRect.w := -320 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 131 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 55 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 72 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -331;
-    SelectRect[ i ].FRect.y := 110;
-    SelectRect[ i ].FRect.w := -382 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 131 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 56 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 73 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
      //hair color
     inc( i );
-    SelectRect[ i ].FRect.x := -149;
-    SelectRect[ i ].FRect.y := 140;
-    SelectRect[ i ].FRect.w := -201 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 161 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 57 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 74 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := 350;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -210;
-    SelectRect[ i ].FRect.y := 140;
-    SelectRect[ i ].FRect.w := -271 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 161 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 58 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 71 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := -281;
-    SelectRect[ i ].FRect.y := 140;
-    SelectRect[ i ].FRect.w := -320 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 161 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 59 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 75 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 329;
-    SelectRect[ i ].FRect.y := 140;
-    SelectRect[ i ].FRect.w := 373 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 161 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 60 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 76 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
      //Hair style
     inc( i );
-    SelectRect[ i ].FRect.x := 149;
-    SelectRect[ i ].FRect.y := 170;
-    SelectRect[ i ].FRect.w := 196 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 191 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 61 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 77 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := 393;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 206;
-    SelectRect[ i ].FRect.y := 170;
-    SelectRect[ i ].FRect.w := 249 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 191 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 62 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 78 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 259;
-    SelectRect[ i ].FRect.y := 170;
-    SelectRect[ i ].FRect.w := 331;
-    SelectRect[ i ].FRect.h := 194;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 63 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 79 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 340;
-    SelectRect[ i ].FRect.y := 170;
-    SelectRect[ i ].FRect.w := 382 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 191 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 64 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 80 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
      //beard
     inc( i );
-    SelectRect[ i ].FRect.x := 149;
-    SelectRect[ i ].FRect.y := 200;
-    SelectRect[ i ].FRect.w := 185 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 223 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 65 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 81 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := 436;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 194;
-    SelectRect[ i ].FRect.y := 200;
-    SelectRect[ i ].FRect.w := 239 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 223 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 66 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 82 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
 
     //Training
     inc( i );
-    SelectRect[ i ].FRect.x := 40;
-    SelectRect[ i ].FRect.y := 270;
-    SelectRect[ i ].FRect.w := 113 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 293 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 67 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 83 ] );
+    SelectRect[ i ].FRect.x := 480;
+    SelectRect[ i ].FRect.y := 160;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 127;
-    SelectRect[ i ].FRect.y := 270;
-    SelectRect[ i ].FRect.w := 200 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 293 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 68 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 84 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FRect.x := 216;
-    SelectRect[ i ].FRect.y := 270;
-    SelectRect[ i ].FRect.w := 270 - InfoRect[ i ].FRect.x;
-    SelectRect[ i ].FRect.h := 293 - InfoRect[ i ].FRect.y;
     SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 69 ], InfoPanel.w, InfoPanel.h );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 85 ] );
+    SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
+    SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
+    SelectRect[ i ].FRect.w := 96;
+    SelectRect[ i ].FRect.h := 21;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -536,13 +550,14 @@ procedure TNewGame.FreeSurfaces;
 var
   i : integer;
 begin
-  SDL_FreeSurface( DXCircle ); //circle used for outline
-  SDL_FreeSurface( DXBox );
+  SDL_FreeSurface( DXSelectRect ); //circle used for outline
   SDL_FreeSurface( DXBlack );
   SDL_FreeSurface( DXContinue );
   SDL_FreeSurface( DXCancel );
   SDL_FreeSurface( DXLeftArrow );
   SDL_FreeSurface( DXRightArrow );
+  SDL_FreeSurface( DXPickList );
+  SDL_FreeSurface( DXPlayerName );
 
   for i := Low( InfoRect ) to High( InfoRect ) do
     if InfoRect[ i ].FInfo <> nil then
@@ -571,18 +586,48 @@ const
 begin
   inherited;
   try
-    case Key of
-      SDLK_RETURN :
-        begin
-          NextGameInterface := TMainMenu;
-        end;
+    case RenderMode of
+      rmNormal :
+      begin
+        case Key of
+          SDLK_RETURN :
+            begin
+              NextGameInterface := TMainMenu;
+            end;
 
-      SDLK_ESCAPE :
-        begin
-          NextGameInterface := TMainMenu;
+          SDLK_ESCAPE :
+            begin
+              NextGameInterface := TMainMenu;
+            end;
         end;
+        MainWindow.Rendering := false;
+      end;
+
+      rmPickList :
+      begin
+        case Key of
+          SDLK_RETURN :
+            begin
+              RenderMode := rmNormal;
+            end;
+
+          SDLK_ESCAPE :
+            begin
+              RenderMode := rmNormal;
+            end;
+
+          SDLK_UP :
+          begin
+
+          end;
+
+          SDLK_DOWN :
+          begin
+            
+          end;
+        end;
+      end;
     end;
-    MainWindow.Rendering := false;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -596,23 +641,37 @@ var
   i : integer;
 begin
   try
+    if Player <> nil then
+      Player.Free;
+
+    Player := TCharacter.Create;
+    Player.TrainingPoints := 20;
+
     //we store thse values so that we can keep the player from lowering his score beyon its start
-    Damage := Character.Damage;
-    Resistance := Character.Resistance;
-    BaseStrength := Character.BaseStrength;
-    BaseCoordination := Character.BaseCoordination;
-    BaseConstitution := Character.BaseConstitution;
-    BasePerception := Character.BasePerception;
-    BaseCharm := Character.BaseCharm;
-    BaseMysticism := Character.BaseMysticism;
-    BaseCombat := Character.BaseCombat;
-    BaseStealth := Character.BaseStealth;
-    TrainingPoints := Character.TrainingPoints;
+    Damage := Player.Damage;
+    Resistance := Player.Resistance;
+    BaseStrength := Player.BaseStrength;
+    BaseCoordination := Player.BaseCoordination;
+    BaseConstitution := Player.BaseConstitution;
+    BasePerception := Player.BasePerception;
+    BaseCharm := Player.BaseCharm;
+    BaseMysticism := Player.BaseMysticism;
+    BaseCombat := Player.BaseCombat;
+    BaseStealth := Player.BaseStealth;
+    TrainingPoints := Player.TrainingPoints;
 
     for i := 0 to 7 do
     begin //initialize adjustments to zero
       StatAdjustments[ i ] := 0;
     end;
+
+    // Set Default Appearance
+    ixSelectedShirt := 0;
+    ixSelectedPants := 4;
+    ixSelectedHair := 8;
+    ixSelectedHairStyle := 12;
+    ixSelectedBeard := 17;
+    ixSelectedTraining := 18;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -668,14 +727,11 @@ begin
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'CharCreate.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-    DXCircle := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaRedOval.bmp' ) );
-    SDL_SetColorKey( DXCircle, Flags, SDL_MapRGB( DXCircle.format, 0, 255, 255 ) );
+    DXSelectRect := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaRedOval.bmp' ) );
+    SDL_SetColorKey( DXSelectRect, Flags, SDL_MapRGB( DXSelectRect.format, 0, 255, 255 ) );
 
     DXBlack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaBlack.bmp' ) );
     SDL_SetColorKey( DXBlack, Flags, SDL_MapRGB( DXBlack.format, 0, 255, 255 ) );
-
-    DXBox := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaChooseBox.bmp' ) );
-    SDL_SetColorKey( DXBox, Flags, SDL_MapRGB( DXBox.format, 0, 255, 255 ) );
 
     DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaContinue.bmp' ) );
     SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 255, 255, 255 ) );
@@ -688,6 +744,9 @@ begin
 
     DXRightArrow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'rightarrow.bmp' ) );
     SDL_SetColorKey( DXRightArrow, Flags, SDL_MapRGB( DXRightArrow.format, 0, 255, 255 ) );
+
+    DXPickList := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaChooseBox.bmp' ) );
+    SDL_SetColorKey( DXPickList, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
     ContinueRect.x := 400;
     ContinueRect.y := 449;
@@ -716,9 +775,11 @@ begin
 
     LoadNames;
     CreateCollisionRects;
-    //LoadBaseValues;
+    LoadBaseValues;
     //ShowStats;
     //DrawTheGuy;
+
+    RenderMode := rmNormal;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -728,36 +789,186 @@ end;
 procedure TNewGame.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint );
 const
   FailName : string = 'TNewGame.MouseDown';
+var
+  x : integer;
+  CharacterName : string;
 begin
   inherited;
   try
-    if PointIsInRect( CurrentPos, 452, 133, 467, 159 ) then
-      ixSelectedTraining := ShowListBox( 313, 175, moTrainingStyle )
-    else if PointIsInRect( CurrentPos, 265, 239, 279, 264  ) then
-      ixSelectedShirt := ShowListBox( 280, 239, moShirtColour )
-    else if PointIsInRect( CurrentPos, 265, 280, 279, 295 ) then
-      ixSelectedPants := ShowListBox( 280, 281, moPantsColour )
-    else if PointIsInRect( CurrentPos, 265, 322, 279, 337 ) then
-      ixSelectedHair := ShowListBox( 280, 323, moHairColour )
-    else if PointIsInRect( CurrentPos, 265, 364, 279, 379 ) then
-      ixSelectedHairStyle := ShowListBox( 280, 365, moHairStyle )
-    else if PointIsInRect( CurrentPos, 265, 408, 279, 423 ) then
-      ixSelectedBeard := ShowListBox( 280, 409, moBeard )
-    else if PointIsInRect( CurrentPos, CancelRect.x, CancelRect.y, CancelRect.x + CancelRect.w, CancelRect.y + CancelRect.h ) then
-    begin
-      NextGameInterface := TMainMenu;
-      MainWindow.Rendering := false;
-    end
-    else if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
-    begin
-      // Check to see we have all data before starting the new game
-      NextGameInterface := TMainMenu;
-      MainWindow.Rendering := false;
-    end
-    else if PointIsInRect( CurrentPos, LeftArrowRect.x, LeftArrowRect.y, LeftArrowRect.x + LeftArrowRect.w, LeftArrowRect.y + LeftArrowRect.h ) then
-      // Set Previous Character
-    else if PointIsInRect( CurrentPos, RightArrowRect.x, RightArrowRect.y, RightArrowRect.x + RightArrowRect.w, RightArrowRect.y + RightArrowRect.h ) then
-      // Set Next Character
+    case RenderMode of
+      rmNormal :
+      begin
+        MouseOverOptions := moNone;
+        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
+        begin
+          // Check to see we have all data before starting the new game
+          NextGameInterface := TMainMenu;
+          MainWindow.Rendering := false;
+        end
+        else if PointIsInRect( CurrentPos, CancelRect.x, CancelRect.y, CancelRect.x + CancelRect.w, CancelRect.y + CancelRect.h ) then
+        begin
+          NextGameInterface := TMainMenu;
+          MainWindow.Rendering := false;
+        end
+        else if PointIsInRect( CurrentPos, LeftArrowRect.x, LeftArrowRect.y, LeftArrowRect.x + LeftArrowRect.w, LeftArrowRect.y + LeftArrowRect.h ) then
+          MouseOverOptions := moLeftArrow
+        else if PointIsInRect( CurrentPos, RightArrowRect.x, RightArrowRect.y, RightArrowRect.x + RightArrowRect.w, RightArrowRect.y + RightArrowRect.h ) then
+          MouseOverOptions := moRightArrow
+        else
+        begin
+          for x := Low( ArrowRect ) to High( ArrowRect ) do
+          begin
+            if PointIsInRect( CurrentPos, ArrowRect[ x ].FRect.x, ArrowRect[ x ].FRect.y, ArrowRect[ x ].FRect.x + ArrowRect[ x ].FRect.w, ArrowRect[ x ].FRect.y + ArrowRect[ x ].FRect.h ) then
+            begin
+              MouseOverOptions := TMouseOverNewOptions( x + 18 );
+              exit;
+            end;
+          end;
+
+          for x := Low( InfoRect ) to High( InfoRect ) do
+          begin
+            if PointIsInRect( CurrentPos, InfoRect[ x ].FRect.x, InfoRect[ x ].FRect.y, InfoRect[ x ].FRect.x + InfoRect[ x ].FRect.w, InfoRect[ x ].FRect.y + InfoRect[ x ].FRect.h ) then
+            begin
+              MouseOverOptions := TMouseOverNewOptions( x );
+              case MouseOverOptions of
+                moCharacterName :
+                begin
+                  CharacterName := Player.Name;
+                  DXPlayerName := GameFont.Input( MainWindow.DisplaySurface, InfoRect[ Ord( moCharacterName ) ].FRect.x + 2, InfoRect[ Ord( moCharacterName ) ].FRect.y + 2, InfoRect[ Ord( moCharacterName ) ].FRect.w - 24, InfoRect[ Ord( moCharacterName ) ].FRect.h - 3, CharacterName );
+                  Player.Name := CharacterName;
+                end;
+
+                moShirtColour :
+                begin
+                  RenderMode := rmPickList;
+                  iPickListLow := 0;
+                  iPickListHigh := 3;
+                end;
+
+                moPantsColour :
+                begin
+                  RenderMode := rmPickList;
+                  iPickListLow := 4;
+                  iPickListHigh := 7;
+                end;
+
+                moHairColour :
+                begin
+                  RenderMode := rmPickList;
+                  iPickListLow := 8;
+                  iPickListHigh := 11;
+                end;
+
+                moHairStyle :
+                begin
+                  RenderMode := rmPickList;
+                  iPickListLow := 12;
+                  iPickListHigh := 15;
+                end;
+
+                moBeard :
+                begin
+                  RenderMode := rmPickList;
+                  iPickListLow := 16;
+                  iPickListHigh := 17;
+                end;
+
+                moTrainingStyle :
+                begin
+                  RenderMode := rmPickList;
+                  iPickListLow := 18;
+                  iPickListHigh := 20;
+                end;
+              end;
+              exit;
+            end;
+          end;
+        end;
+      end;
+
+      rmPickList :
+      begin
+        case MouseOverOptions of
+          moTrainingStyle :
+          begin
+            for x := iPickListLow to iPickListHigh do
+            begin
+              if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+              begin
+                ixSelectedTraining := x;
+                break;
+              end;
+            end;
+          end;
+          
+          moShirtColour :
+          begin
+            for x := iPickListLow to iPickListHigh do
+            begin
+              if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+              begin
+                ixSelectedShirt := x;
+                break;
+              end;
+            end;
+          end;
+
+          moPantsColour :
+          begin
+            for x := iPickListLow to iPickListHigh do
+            begin
+              if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+              begin
+                ixSelectedPants := x;
+                break;
+              end;
+            end;
+          end;
+
+          moHairColour :
+          begin
+            for x := iPickListLow to iPickListHigh do
+            begin
+              if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+              begin
+                ixSelectedHair := x;
+                break;
+              end;
+            end;
+          end;
+
+          moHairStyle :
+          begin
+            for x := iPickListLow to iPickListHigh do
+            begin
+              if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+              begin
+                ixSelectedHairStyle := x;
+                break;
+              end;
+            end;
+          end;
+
+          moBeard :
+          begin
+            for x := iPickListLow to iPickListHigh do
+            begin
+              if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+              begin
+                ixSelectedBeard := x;
+                break;
+              end;
+            end;
+            if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+            begin
+              RenderMode := rmNormal;
+            end;
+          end;
+        else
+          RenderMode := rmNormal;
+        end;
+      end;
+    end;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -768,62 +979,47 @@ procedure TNewGame.MouseMove( Shift : TSDLMod; CurrentPos, RelativePos : TPoint 
 const
   FailName : string = 'TNewGame.MouseMove';
 var
-  i : integer;
+  x : integer;
 begin
   inherited;
   try
-    MouseOverOptions := moNone;
-    if PointIsInRect( CurrentPos, 113, 92, 261, 222 ) then
-      MouseOverOptions := moAppearance
-    else if PointIsInRect( CurrentPos, 113, 236, 261, 264 ) then
-      MouseOverOptions := moShirtColour
-    else if PointIsInRect( CurrentPos, 113, 278, 261, 306 ) then
-      MouseOverOptions := moPantsColour
-    else if PointIsInRect( CurrentPos, 113, 320, 261, 348 ) then
-      MouseOverOptions := moHairColour
-    else if PointIsInRect( CurrentPos, 113, 363, 261, 391 ) then
-      MouseOverOptions := moHairStyle
-    else if PointIsInRect( CurrentPos, 113, 406, 261, 434 ) then
-      MouseOverOptions := moBeard
-    else if PointIsInRect( CurrentPos, 300, 92, 448, 120 ) then
-      MouseOverOptions := moName
-    else if PointIsInRect( CurrentPos, 300, 132, 448, 160 ) then
-      MouseOverOptions := moTrainingStyle
-    else if PointIsInRect( CurrentPos, 288, 205, 460, 236 ) then
-      MouseOverOptions := moTrainingPoints
-    else if PointIsInRect( CurrentPos, 288, 240, 387, 264 ) then
-      MouseOverOptions := moStrength
-    else if PointIsInRect( CurrentPos, 288, 265, 387, 289 ) then
-      MouseOverOptions := moCoordination
-    else if PointIsInRect( CurrentPos, 288, 290, 387, 314 ) then
-      MouseOverOptions := moConstitution
-    else if PointIsInRect( CurrentPos, 288, 315, 387, 339 ) then
-      MouseOverOptions := moPerception
-    else if PointIsInRect( CurrentPos, 288, 340, 387, 364 ) then
-      MouseOverOptions := moCharm
-    else if PointIsInRect( CurrentPos, 288, 365, 387, 389 ) then
-      MouseOverOptions := moMysticism
-    else if PointIsInRect( CurrentPos, 288, 390, 387, 414 ) then
-      MouseOverOptions := moCombat
-    else if PointIsInRect( CurrentPos, 288, 415, 387, 439 ) then
-      MouseOverOptions := moStealth
-    else if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
-      MouseOverOptions := moContinue
-    else if PointIsInRect( CurrentPos, CancelRect.x, CancelRect.y, CancelRect.x + CancelRect.w, CancelRect.y + CancelRect.h ) then
-      MouseOverOptions := moCancel
-    else if PointIsInRect( CurrentPos, LeftArrowRect.x, LeftArrowRect.y, LeftArrowRect.x + LeftArrowRect.w, LeftArrowRect.y + LeftArrowRect.h ) then
-      MouseOverOptions := moLeftArrow
-    else if PointIsInRect( CurrentPos, RightArrowRect.x, RightArrowRect.y, RightArrowRect.x + RightArrowRect.w, RightArrowRect.y + RightArrowRect.h ) then
-      MouseOverOptions := moRightArrow
-    else
-    begin
-      for i := 0 to 15 do
+    case RenderMode of
+      rmNormal :
       begin
-        if PointIsInRect( CurrentPos, ArrowRect[ i ].FRect.x, ArrowRect[ i ].FRect.y, ArrowRect[ i ].FRect.x + ArrowRect[ i ].FRect.w, ArrowRect[ i ].FRect.y + ArrowRect[ i ].FRect.h ) then
+        MouseOverOptions := moNone;
+        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
+          MouseOverOptions := moContinue
+        else if PointIsInRect( CurrentPos, CancelRect.x, CancelRect.y, CancelRect.x + CancelRect.w, CancelRect.y + CancelRect.h ) then
+          MouseOverOptions := moCancel
+        else if PointIsInRect( CurrentPos, LeftArrowRect.x, LeftArrowRect.y, LeftArrowRect.x + LeftArrowRect.w, LeftArrowRect.y + LeftArrowRect.h ) then
+          MouseOverOptions := moLeftArrow
+        else if PointIsInRect( CurrentPos, RightArrowRect.x, RightArrowRect.y, RightArrowRect.x + RightArrowRect.w, RightArrowRect.y + RightArrowRect.h ) then
+          MouseOverOptions := moRightArrow
+        else
         begin
-          MouseOverOptions := TMouseOverNewOptions( i + 12 );
-          break;
+          for x := Low( ArrowRect ) to High( ArrowRect ) do
+          begin
+            if PointIsInRect( CurrentPos, ArrowRect[ x ].FRect.x, ArrowRect[ x ].FRect.y, ArrowRect[ x ].FRect.x + ArrowRect[ x ].FRect.w, ArrowRect[ x ].FRect.y + ArrowRect[ x ].FRect.h ) then
+            begin
+              MouseOverOptions := TMouseOverNewOptions( x + 18 );
+              exit;
+            end;
+          end;
+
+          for x := Low( InfoRect ) to High( InfoRect ) do
+          begin
+            if PointIsInRect( CurrentPos, InfoRect[ x ].FRect.x, InfoRect[ x ].FRect.y, InfoRect[ x ].FRect.x + InfoRect[ x ].FRect.w, InfoRect[ x ].FRect.y + InfoRect[ x ].FRect.h ) then
+            begin
+              MouseOverOptions := TMouseOverNewOptions( x );
+              exit;
+            end;
+          end;
         end;
+      end;
+
+      rmPickList :
+      begin
+      
       end;
     end;
   except
@@ -835,89 +1031,162 @@ end;
 procedure TNewGame.Render;
 const
   FailName : string = 'TNewGame.Render';
+var
+  x : integer;
+  lRect : TSDL_Rect;
 begin
   inherited;
   try
-    case MouseOverOptions of
-      moName :
+    case RenderMode of
+      rmNormal :
       begin
-        SDL_BlitSurface( InfoRect[ 10 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
+        case MouseOverOptions of
+          moTrainingPoints..moTrainingStyle :
+          begin
+            SDL_BlitSurface( InfoRect[ Ord( MouseOverOptions ) ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
+          end;
+
+          moContinue :
+            begin
+              SDL_BlitSurface( DXContinue, nil, MainWindow.DisplaySurface, @ContinueRect );
+            end;
+
+          moCancel :
+            begin
+              SDL_BlitSurface( DXCancel, nil, MainWindow.DisplaySurface, @CancelRect );
+            end;
+
+          moStrengthMinus..moStealthPlus :
+            SDL_BlitSurface( ArrowRect[ Ord( MouseOverOptions ) - 18 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
+        end;
       end;
 
-      moAppearance :
+      rmPickList :
       begin
-        SDL_BlitSurface( InfoRect[ 11 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
-      
-      moShirtColour :
-      begin
-        SDL_BlitSurface( InfoRect[ 12 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
+        case MouseOverOptions of
+          moShirtColour :
+          begin
+            lRect.x := 280;
+            lRect.y := 239;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end;
 
-      moPantsColour :
-      begin
-        SDL_BlitSurface( InfoRect[ 13 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
+          moPantsColour :
+          begin
+            lRect.x := 280;
+            lRect.y := 281;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end;
 
-      moHairColour :
-      begin
-        SDL_BlitSurface( InfoRect[ 14 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
+          moHairColour :
+          begin
+            lRect.x := 280;
+            lRect.y := 323;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end;
 
-      moHairStyle :
-      begin
-        SDL_BlitSurface( InfoRect[ 15 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
+          moHairStyle :
+          begin
+            lRect.x := 280;
+            lRect.y := 365;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end;
 
-      moBeard :
-      begin
-        SDL_BlitSurface( InfoRect[ 16 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
+          moBeard :
+          begin
+            lRect.x := 280;
+            lRect.y := 409;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end;
 
-      moTrainingStyle :
-      begin
-        SDL_BlitSurface( InfoRect[ 17 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-      end;
-
-      moTrainingPoints :
-        SDL_BlitSurface( InfoRect[ 0 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-        
-      moStrength :
-        SDL_BlitSurface( InfoRect[ 2 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moCoordination :
-        SDL_BlitSurface( InfoRect[ 3 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moConstitution :
-        SDL_BlitSurface( InfoRect[ 4 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moPerception :
-        SDL_BlitSurface( InfoRect[ 5 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moCharm :
-        SDL_BlitSurface( InfoRect[ 6 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moMysticism :
-        SDL_BlitSurface( InfoRect[ 7 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moCombat :
-        SDL_BlitSurface( InfoRect[ 8 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moStealth :
-        SDL_BlitSurface( InfoRect[ 9 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
-
-      moContinue :
-        begin
-          SDL_BlitSurface( DXContinue, nil, MainWindow.DisplaySurface, @ContinueRect );
+          moTrainingStyle :
+          begin
+            lRect.x := 467;
+            lRect.y := 134;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end;
+        else
+          begin
+            iPickListLow := 0;
+            iPickListHigh := 3;
+            lRect.x := 25;
+            lRect.y := 25;
+            lRect.w := DXPickList.w;
+            lRect.h := DXPickList.h;
+          end
         end;
 
-      moCancel :
-        begin
-          SDL_BlitSurface( DXCancel, nil, MainWindow.DisplaySurface, @CancelRect );
-        end;
+        SDL_BlitSurface( DXPickList, nil, MainWindow.DisplaySurface, @lRect );
 
-      moStrengthMinus..moStealthPlus :
-        SDL_BlitSurface( ArrowRect[ Ord( MouseOverOptions ) - 12 ].FInfo, nil, MainWindow.DisplaySurface, @InfoPanel );
+        for x := iPickListLow to iPickListHigh do
+        begin
+          SDL_BlitSurface( SelectRect[ x ].FText, nil, MainWindow.DisplaySurface, @SelectRect[ x ].FRect );
+        end;
+      end;
+    end;
+
+    lRect := InfoRect[ Ord( moShirtColour ) ].FRect;
+    lRect.x := lRect.x + 2;
+    lRect.y := lRect.y + 2;
+    lRect.w := lRect.w - 24;
+    lRect.h := lRect.h - 3;
+    SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
+    SDL_BlitSurface( SelectRect[ ixSelectedShirt ].FText, nil, MainWindow.DisplaySurface, @lRect );
+
+    lRect := InfoRect[ Ord( moPantsColour ) ].FRect;
+    lRect.x := lRect.x + 2;
+    lRect.y := lRect.y + 2;
+    lRect.w := lRect.w - 24;
+    lRect.h := lRect.h - 3;
+    SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
+    SDL_BlitSurface( SelectRect[ ixSelectedPants ].FText, nil, MainWindow.DisplaySurface, @lRect );
+
+    lRect := InfoRect[ Ord( moHairColour ) ].FRect;
+    lRect.x := lRect.x + 2;
+    lRect.y := lRect.y + 2;
+    lRect.w := lRect.w - 24;
+    lRect.h := lRect.h - 3;
+    SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
+    SDL_BlitSurface( SelectRect[ ixSelectedHair ].FText, nil, MainWindow.DisplaySurface, @lRect );
+
+    lRect := InfoRect[ Ord( moHairStyle ) ].FRect;
+    lRect.x := lRect.x + 2;
+    lRect.y := lRect.y + 2;
+    lRect.w := lRect.w - 24;
+    lRect.h := lRect.h - 3;
+    SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
+    SDL_BlitSurface( SelectRect[ ixSelectedHairStyle ].FText, nil, MainWindow.DisplaySurface, @lRect );
+
+    lRect := InfoRect[ Ord( moBeard ) ].FRect;
+    lRect.x := lRect.x + 2;
+    lRect.y := lRect.y + 2;
+    lRect.w := lRect.w - 24;
+    lRect.h := lRect.h - 3;
+    SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
+    SDL_BlitSurface( SelectRect[ ixSelectedBeard ].FText, nil, MainWindow.DisplaySurface, @lRect );
+
+    lRect := InfoRect[ Ord( moTrainingStyle ) ].FRect;
+    lRect.x := lRect.x + 2;
+    lRect.y := lRect.y + 2;
+    lRect.w := lRect.w - 24;
+    lRect.h := lRect.h - 3;
+    SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
+    SDL_BlitSurface( SelectRect[ ixSelectedTraining ].FText, nil, MainWindow.DisplaySurface, @lRect );
+
+    if Player.Name <> '' then
+    begin
+      lRect := InfoRect[ Ord( moCharacterName ) ].FRect;
+      lRect.x := lRect.x + 2;
+      lRect.y := lRect.y + 2;
+      lRect.w := lRect.w - 24;
+      lRect.h := lRect.h - 3;
+      SDL_BlitSurface( DXPlayerName, nil, MainWindow.DisplaySurface, @lRect );
     end;
 
     SDL_BlitSurface( DXLeftArrow, nil, MainWindow.DisplaySurface, @LeftArrowRect );
@@ -928,77 +1197,26 @@ begin
   end;
 end;
 
-function TNewGame.ShowListBox( aX, aY : integer; aMoOptions : TMouseOverNewOptions ) : integer;
-const
-  FailName : string = 'TNewGame.ShowListBox';
-var
-  ListBoxDialog : TListBoxDialog;
-  i, x, iLow, iHigh : integer;
+{ TCharacter }
+
+constructor TCharacter.Create;
 begin
-  Result := -1;
-  try
-    iLow := 0;
-    iHigh := 3;
-    ListBoxDialog := TListBoxDialog.Create( SoAoSGame, aX, aY );
-    try
-      case aMoOptions of
-        moShirtColour :
-        begin
-          iLow := 0;
-          iHigh := 3;
-        end;
-
-        moPantsColour :
-        begin
-          iLow := 4;
-          iHigh := 7;
-        end;
-
-        moHairColour :
-        begin
-          iLow := 8;
-          iHigh := 11;
-        end;
-
-        moHairStyle :
-        begin
-          iLow := 12;
-          iHigh := 15;
-        end;
-
-        moBeard :
-        begin
-          iLow := 16;
-          iHigh := 17;
-        end;
-
-        moTrainingStyle :
-        begin
-          iLow := 18;
-          iHigh := 20;
-        end;
-      end;
-
-      x := 0;
-      SetLength( ListBoxDialog.ListItems, iHigh - iLow );
-      for i := iLow to iHigh do
-      begin
-        ListBoxDialog.ListItems[ x ].FInfo := SelectRect[ i ].FInfo;
-        ListBoxDialog.ListItems[ X ].FText := SelectRect[ i ].FText;
-        inc( x );
-      end;
-    
-      ListBoxDialog.LoadSurfaces;
-      SoAoSGame.Show;
-      Result := ListBoxDialog.SelectedIndex;
-    finally
-      ListBoxDialog.Free;
-    end;
-    ResetInputManager;
-  except
-    on E: Exception do
-      Log.LogError( E.Message, FailName );
-  end;
+  inherited;
+  BaseStrength := 7;
+  BaseCoordination := 7;
+  BaseConstitution := 7;
+  BaseMysticism := 5;
+  BaseCombat := 5;
+  BaseStealth := 5;
+  BasePerception := 10;
+  BaseCharm := 10;
+  BaseHealingRate := 10;
+  BaseRechargeRate := 10;
+  BaseHitPoints := 20;
+  BaseMana := 10;
+  BaseAttackRecovery := 12;
+  BaseHitRecovery := 0;
+  TrainingPoints := 0;
 end;
 
 end.

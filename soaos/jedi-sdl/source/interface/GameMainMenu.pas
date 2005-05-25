@@ -59,6 +59,9 @@ unit GameMainMenu;
 {                                                                              }
 {
   $Log$
+  Revision 1.5  2005/05/13 12:33:15  savage
+  Various Changes and bug fixes. Main work on the NewGame screen.
+
   Revision 1.4  2005/05/10 14:12:48  savage
   Latest Enhancments and bug fixes
 
@@ -169,7 +172,7 @@ begin
           inc( FMenuChoice );
         if FMenuChoice > High( MenuItems ) then
           FMenuChoice := Low( MenuItems );
-      end
+      end;
     end;
   except
     on E: Exception do
@@ -384,11 +387,11 @@ var
 begin
   Result := false;
   try
-    YesNo := TYesNoDialog.Create( SoAoSGame );
+    YesNo := TYesNoDialog.Create( Application );
     try
       YesNo.QuestionText := ExText.GetText( 'Message0' );
       YesNo.LoadSurfaces;
-      SoAoSGame.Show;
+      Application.Show;
       Result := ( YesNo.DialogResult = drYes );
     finally
       YesNo.Free;

@@ -11,12 +11,14 @@ uses
   SoAPreferences,
   SiegeInterfaces,
   GameIntro,
-  Externalizer;
+  Externalizer,
+  //Character,
+  NewGame;
 
 var
   // Global Class variables
   SoASettings : TSoAUserPreferences;
-  SoAoSGame : TSDL2DWindow;
+  Application : TSDL2DWindow;
   CurrentGameInterface : TGameInterfaceClass = TGameIntro;
   GameWindow :  TGameInterface;
   GameFont :  TTrueTypeFont;
@@ -27,6 +29,9 @@ var
   bShowIntro, bShowOuttro : Boolean;
   ScreenFlags : UInt32;
   bInGame : boolean = false;
+
+  //Player
+  Player, Current : TCharacter;
 
 implementation
 
@@ -40,6 +45,7 @@ end;
 
 finalization
 begin
+  Player.Free;
   SoASettings.Free;
   ExText.Free;
   GameFont.Free;

@@ -59,6 +59,9 @@ unit LoadSaveGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.7  2005/05/15 14:22:55  savage
+  Moved SetAlpha call out to LoadSurfaces
+
   Revision 1.6  2005/05/13 12:33:15  savage
   Various Changes and bug fixes. Main work on the NewGame screen.
 
@@ -647,11 +650,11 @@ var
   aCharacter : string;
 begin
   try
-    YesNo := TYesNoDialog.Create( SoAoSGame );
+    YesNo := TYesNoDialog.Create( Application );
     try
       YesNo.QuestionText := TextMessage[ 0 ];
       YesNo.LoadSurfaces;
-      SoAoSGame.Show;
+      Application.Show;
       if YesNo.DialogResult = drYes then
       begin
         DeleteFile( PChar( ExtractFilePath( ParamStr( 0 ) ) + 'games/' + PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).text + '.sav' ) );

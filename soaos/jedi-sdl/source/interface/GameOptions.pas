@@ -59,6 +59,9 @@ unit GameOptions;
 {                                                                              }
 {
   $Log$
+  Revision 1.4  2005/05/13 12:33:15  savage
+  Various Changes and bug fixes. Main work on the NewGame screen.
+
   Revision 1.3  2005/05/11 13:38:29  savage
   Fix for GameOption Sliders and tidying up the GameJournal and AdventureLog files.
 
@@ -110,7 +113,6 @@ implementation
 
 uses
   SysUtils,
-  sdlutils,
   globals,
   GameMainMenu,
   sdlgameinterface;
