@@ -62,6 +62,9 @@ unit sdltruetypefont;
 {   September   23 2004 - DL : Initial Creation                                }
 {
   $Log$
+  Revision 1.1  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.4  2005/05/25 22:55:01  savage
   Added InputRect support.
 
@@ -492,6 +495,9 @@ begin
           if ( Length( aText ) > 0 ) then
           begin
             aText := Copy( aText, 0, Length( aText ) - 1 );
+            if TextSurface <> nil then
+                SDL_FreeSurface( TextSurface );
+            TextSurface := DrawText( aText + '|' );
           end;
         end;
       else
