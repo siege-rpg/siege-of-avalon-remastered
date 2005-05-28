@@ -63,6 +63,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.8  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.7  2005/05/13 20:09:30  savage
   Changed so that german Continue appears correctly.
 
@@ -185,14 +188,15 @@ type
     DXLeftArrow, DXRightArrow : PSDL_Surface;
     DXPickList : PSDL_Surface;
     DXPlayerName : PSDL_Surface;
-    TextMessage : array[ 0..104 ] of string;
-    ContinueRect, CancelRect, LeftArrowRect, RightArrowRect : TSDL_Rect;
+    TextMessage : array[ 0..104 ] of WideString;
+    DXTextMessage : array[ 0..7 ] of PSDL_Surface;
+    ContinueRect, CancelRect, LeftArrowRect, RightArrowRect, OKRect : TSDL_Rect;
     InfoPanel : TSDL_Rect;
     MouseOverOptions : TMouseOverNewOptions;
     InfoRect : array[ 0..17 ] of TInformationRect; //was 35  //collision rects for information
     ArrowRect : array[ 0..15 ] of TInformationRect; //collision rects for arrows
     StatAdjustments : array[ 0..7 ] of integer; //used to see if we've added points to a stat or not
-    StatName : array[ 0..1, 0..11 ] of string;
+    StatName : array[ 0..1, 0..11 ] of WideString;
     SelectRect : array[ 0..20 ] of TSelectableRect; //collision rects for selectable text
     //base stuff - saved in case we do a cancel
     Damage : TDamageProfile;
@@ -244,24 +248,8 @@ const
 var
   i, j : integer;
   LineHeight : integer;
-  C : TSDL_Color;
 begin
   try
-    C.r := 231;
-    C.g := 156;
-    C.b := 0;
-    GameFont.ForeGroundColour := C;
-    C.r := 0;
-    C.g := 0;
-    C.b := 0;
-    GameFont.BackGroundColour := C;
-    {if SoASettings.UseSmallFont then
-      GameFont.FontSize := 13
-    else}
-    GameFont.FontSize := 18;
-
-
-  
     LineHeight := 24;
      //first the ArrowRects
     for i := 0 to 7 do
@@ -575,6 +563,12 @@ begin
       SDL_FreeSurface( SelectRect[ i ].FText );
   end;
 
+  for i := Low( DXTextMessage ) to High( DXTextMessage ) do
+  begin
+    if DXTextMessage[ i ] <> nil then
+      SDL_FreeSurface( DXTextMessage[ i ] );
+  end;
+
   ExText.Close;
 
   inherited;
@@ -593,14 +587,15 @@ begin
           SDLK_RETURN :
             begin
               NextGameInterface := TMainMenu;
+              MainWindow.Rendering := false;
             end;
 
           SDLK_ESCAPE :
             begin
               NextGameInterface := TMainMenu;
+              MainWindow.Rendering := false;
             end;
         end;
-        MainWindow.Rendering := false;
       end;
 
       rmPickList :
@@ -647,7 +642,7 @@ begin
     Player := TCharacter.Create;
     Player.TrainingPoints := 20;
 
-    //we store thse values so that we can keep the player from lowering his score beyon its start
+    //we store thse values so that we can keep the player from lowering his score beyond its start
     Damage := Player.Damage;
     Resistance := Player.Resistance;
     BaseStrength := Player.BaseStrength;
@@ -715,13 +710,32 @@ const
   Flags : Cardinal = SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 var
   i : integer;
+  C : TSDL_Color;
 begin
   inherited;
   try
+    C.r := 231;
+    C.g := 156;
+    C.b := 0;
+    GameFont.ForeGroundColour := C;
+    C.r := 0;
+    C.g := 0;
+    C.b := 0;
+    GameFont.BackGroundColour := C;
+    {if SoASettings.UseSmallFont then
+      GameFont.FontSize := 13
+    else}
+    GameFont.FontSize := 18;
+
     ExText.Open( 'CharCreation' );
     for i := Low( TextMessage ) to High( TextMessage ) do
     begin
       TextMessage[ i ] := ExText.GetText( 'Message' + IntToStr( i ) );
+    end;
+
+    for i := Low( DXTextMessage ) to High( DXTextMessage ) do
+    begin
+      DXTextMessage[ i ] := GameFont.DrawText( TextMessage[ i ] );
     end;
 
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'CharCreate.bmp' ) );
@@ -773,6 +787,11 @@ begin
     InfoPanel.w := 194;
     InfoPanel.h := 274;
 
+    OKRect.x := 37;
+    OKRect.y := 144;
+    OKRect.w := 44;
+    OKRect.h := 28;
+
     LoadNames;
     CreateCollisionRects;
     LoadBaseValues;
@@ -799,7 +818,9 @@ begin
       rmNormal :
       begin
         MouseOverOptions := moNone;
-        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
+        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h )
+        and ( Player.Name <> '' )
+        and ( Player.TrainingPoints = 0 ) then
         begin
           // Check to see we have all data before starting the new game
           NextGameInterface := TMainMenu;
@@ -834,6 +855,8 @@ begin
                 moCharacterName :
                 begin
                   CharacterName := Player.Name;
+                  if DXPlayerName <> nil then
+                    SDL_FreeSurface( DXPlayerName );
                   DXPlayerName := GameFont.Input( MainWindow.DisplaySurface, InfoRect[ Ord( moCharacterName ) ].FRect.x + 2, InfoRect[ Ord( moCharacterName ) ].FRect.y + 2, InfoRect[ Ord( moCharacterName ) ].FRect.w - 24, InfoRect[ Ord( moCharacterName ) ].FRect.h - 3, CharacterName );
                   Player.Name := CharacterName;
                 end;
@@ -899,6 +922,9 @@ begin
                 break;
               end;
             end;
+
+            if PointIsInRect( CurrentPos, OKRect.x, OKRect.y, OKRect.x + OKRect.w, OKRect.y + OKRect.h ) then
+              RenderMode := rmNormal;  
           end;
           
           moShirtColour :
@@ -911,6 +937,10 @@ begin
                 break;
               end;
             end;
+
+            // Check if OK button hit
+            if PointIsInRect( CurrentPos, OKRect.x, OKRect.y, OKRect.x + OKRect.w, OKRect.y + OKRect.h ) then
+              RenderMode := rmNormal;
           end;
 
           moPantsColour :
@@ -923,6 +953,10 @@ begin
                 break;
               end;
             end;
+
+            // Check if OK button hit
+            if PointIsInRect( CurrentPos, OKRect.x, OKRect.y, OKRect.x + OKRect.w, OKRect.y + OKRect.h ) then
+              RenderMode := rmNormal;
           end;
 
           moHairColour :
@@ -935,6 +969,10 @@ begin
                 break;
               end;
             end;
+
+            // Check if OK button hit
+            if PointIsInRect( CurrentPos, OKRect.x, OKRect.y, OKRect.x + OKRect.w, OKRect.y + OKRect.h ) then
+              RenderMode := rmNormal;
           end;
 
           moHairStyle :
@@ -947,6 +985,10 @@ begin
                 break;
               end;
             end;
+
+            // Check if OK button hit
+            if PointIsInRect( CurrentPos, OKRect.x, OKRect.y, OKRect.x + OKRect.w, OKRect.y + OKRect.h ) then
+              RenderMode := rmNormal;
           end;
 
           moBeard :
@@ -959,10 +1001,10 @@ begin
                 break;
               end;
             end;
-            if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
-            begin
+
+            // Check if OK button hit
+            if PointIsInRect( CurrentPos, OKRect.x, OKRect.y, OKRect.x + OKRect.w, OKRect.y + OKRect.h ) then
               RenderMode := rmNormal;
-            end;
           end;
         else
           RenderMode := rmNormal;
@@ -987,7 +1029,9 @@ begin
       rmNormal :
       begin
         MouseOverOptions := moNone;
-        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
+        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h )
+        and ( Player.Name <> '' )
+        and ( Player.TrainingPoints = 0 ) then
           MouseOverOptions := moContinue
         else if PointIsInRect( CurrentPos, CancelRect.x, CancelRect.y, CancelRect.x + CancelRect.w, CancelRect.y + CancelRect.h ) then
           MouseOverOptions := moCancel
@@ -1122,6 +1166,9 @@ begin
           end
         end;
 
+        OKRect.x := lRect.x + 37;
+        OKRect.y := lRect.y + 144;
+
         SDL_BlitSurface( DXPickList, nil, MainWindow.DisplaySurface, @lRect );
 
         for x := iPickListLow to iPickListHigh do
@@ -1138,6 +1185,8 @@ begin
     lRect.h := lRect.h - 3;
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
     SDL_BlitSurface( SelectRect[ ixSelectedShirt ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    lRect.x := InfoRect[ Ord( moShirtColour ) ].FRect.x + SelectRect[ ixSelectedShirt ].FText.w + 3;
+    SDL_BlitSurface( DXTextMessage[ 0 ], nil, MainWindow.DisplaySurface, @lRect );
 
     lRect := InfoRect[ Ord( moPantsColour ) ].FRect;
     lRect.x := lRect.x + 2;
@@ -1146,6 +1195,8 @@ begin
     lRect.h := lRect.h - 3;
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
     SDL_BlitSurface( SelectRect[ ixSelectedPants ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    lRect.x := InfoRect[ Ord( moPantsColour ) ].FRect.x + SelectRect[ ixSelectedPants ].FText.w + 3;
+    SDL_BlitSurface( DXTextMessage[ 1 ], nil, MainWindow.DisplaySurface, @lRect );
 
     lRect := InfoRect[ Ord( moHairColour ) ].FRect;
     lRect.x := lRect.x + 2;
@@ -1154,6 +1205,8 @@ begin
     lRect.h := lRect.h - 3;
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
     SDL_BlitSurface( SelectRect[ ixSelectedHair ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    lRect.x := InfoRect[ Ord( moHairColour ) ].FRect.x + SelectRect[ ixSelectedHair ].FText.w + 3;
+    SDL_BlitSurface( DXTextMessage[ 2 ], nil, MainWindow.DisplaySurface, @lRect );
 
     lRect := InfoRect[ Ord( moHairStyle ) ].FRect;
     lRect.x := lRect.x + 2;
@@ -1162,6 +1215,11 @@ begin
     lRect.h := lRect.h - 3;
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
     SDL_BlitSurface( SelectRect[ ixSelectedHairStyle ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    if ixSelectedHairStyle < 14 then
+    begin
+      lRect.x := InfoRect[ Ord( moHairStyle ) ].FRect.x + SelectRect[ ixSelectedHairStyle ].FText.w + 3;
+      SDL_BlitSurface( DXTextMessage[ 2 ], nil, MainWindow.DisplaySurface, @lRect )
+    end;
 
     lRect := InfoRect[ Ord( moBeard ) ].FRect;
     lRect.x := lRect.x + 2;
@@ -1169,7 +1227,12 @@ begin
     lRect.w := lRect.w - 24;
     lRect.h := lRect.h - 3;
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
-    SDL_BlitSurface( SelectRect[ ixSelectedBeard ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    //SDL_BlitSurface( SelectRect[ ixSelectedBeard ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    //lRect.x := SelectRect[ ixSelectedBeard ].FText.w + 10;
+    if ixSelectedBeard = 16 then
+      SDL_BlitSurface( DXTextMessage[ 3 ], nil, MainWindow.DisplaySurface, @lRect )
+    else
+      SDL_BlitSurface( DXTextMessage[ 4 ], nil, MainWindow.DisplaySurface, @lRect );
 
     lRect := InfoRect[ Ord( moTrainingStyle ) ].FRect;
     lRect.x := lRect.x + 2;
@@ -1177,7 +1240,20 @@ begin
     lRect.w := lRect.w - 24;
     lRect.h := lRect.h - 3;
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
-    SDL_BlitSurface( SelectRect[ ixSelectedTraining ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    //lRect.x := InfoRect[ Ord( moTrainingStyle ) ].FRect.x + SelectRect[ ixSelectedHairStyle ].FText.w + 3;
+    //SDL_BlitSurface( SelectRect[ ixSelectedTraining ].FText, nil, MainWindow.DisplaySurface, @lRect );
+    if ixSelectedTraining = 18 then
+    begin
+      SDL_BlitSurface( DXTextMessage[ 5 ], nil, MainWindow.DisplaySurface, @lRect )
+    end;
+    if ixSelectedTraining = 19 then
+    begin
+      SDL_BlitSurface( DXTextMessage[ 6 ], nil, MainWindow.DisplaySurface, @lRect )
+    end;
+    if ixSelectedTraining = 20 then
+    begin
+      SDL_BlitSurface( DXTextMessage[ 7 ], nil, MainWindow.DisplaySurface, @lRect )
+    end;
 
     if Player.Name <> '' then
     begin
