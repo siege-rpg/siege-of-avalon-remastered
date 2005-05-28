@@ -59,6 +59,9 @@ unit GameMainMenu;
 {                                                                              }
 {
   $Log$
+  Revision 1.6  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.5  2005/05/13 12:33:15  savage
   Various Changes and bug fixes. Main work on the NewGame screen.
 
@@ -367,7 +370,10 @@ begin
       7 :
       begin
         if Exit then
-          NextGameInterface := nil
+          if bInGame then
+            NextGameInterface := TMainMenu
+          else
+            NextGameInterface := nil
         else
           MainWindow.Rendering := true;
       end ;
