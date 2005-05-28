@@ -63,6 +63,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.9  2005/05/28 09:56:10  savage
+  Get Selections working correctly.
+
   Revision 1.8  2005/05/25 23:15:42  savage
   Latest Changes
 
@@ -154,27 +157,65 @@ type
   TCharacter = class
   private
     FName: string;
+    FBaseAttackRecovery: Integer;
+    FBaseMysticism: Integer;
+    FBaseConstitution: Integer;
+    FBaseCombat: Integer;
+    FBaseHitRecovery: integer;
+    FBaseHealingRate: Integer;
+    FBaseRechargeRate: Integer;
+    FBaseCoordination: Integer;
+    FBaseCharm: Integer;
+    FBaseStrength: Integer;
+    FTrainingPoints: Integer;
+    FBasePerception: Integer;
+    FBaseStealth: Integer;
+    FBaseMana: Single;
+    FBaseMovement: Single;
+    FBaseDefense: Single;
+    FBaseAttackBonus: Single;
+    FBaseHitPoints: Single;
+    FDamage: TDamageProfile;
+    FResistance: TDamageResistanceProfile;
+    FStealth: Integer;
+    FCharm: Integer;
+    FMysticism: Integer;
+    FPerception: Integer;
+    FCoordination: Integer;
+    FCombat: Integer;
+    FConstitution: Integer;
+    FStrength: Integer;
+    FMovement: Single;
   public
-    BaseStrength : Integer;
-    BaseCoordination : Integer;
-    BaseConstitution : Integer;
-    BaseMysticism : Integer;
-    BaseCombat : Integer;
-    BaseStealth : Integer;
-    BaseMovement : Single;
-    BasePerception : Integer;
-    BaseCharm : Integer;
-    BaseHealingRate : Integer;
-    BaseRechargeRate : Integer;
-    BaseHitPoints : Single;
-    BaseMana : Single;
-    BaseAttackRecovery : Integer;
-    BaseAttackBonus : Single;
-    BaseDefense : Single;
-    BaseHitRecovery : integer;
-    Damage : TDamageProfile;
-    Resistance : TDamageResistanceProfile;
-    TrainingPoints : Integer;
+    property BaseStrength : Integer read FBaseStrength write FBaseStrength;
+    property BaseCoordination : Integer read FBaseCoordination write FBaseCoordination;
+    property BaseConstitution : Integer read FBaseConstitution write FBaseConstitution;
+    property BaseMysticism : Integer read FBaseMysticism write FBaseMysticism;
+    property BaseCombat : Integer read FBaseCombat write FBaseCombat;
+    property BaseStealth : Integer read FBaseStealth write FBaseStealth;
+    property BaseMovement : Single read FBaseMovement write FBaseMovement;
+    property BasePerception : Integer read FBasePerception write FBasePerception;
+    property BaseCharm : Integer read FBaseCharm write FBaseCharm;
+    property Strength : Integer read FStrength write FStrength;
+    property Coordination : Integer read FCoordination write FCoordination;
+    property Constitution : Integer read FConstitution write FConstitution;
+    property Mysticism : Integer read FMysticism write FMysticism;
+    property Combat : Integer read FCombat write FCombat;
+    property Stealth : Integer read FStealth write FStealth;
+    property Movement : Single read FMovement write FMovement;
+    property Perception : Integer read FPerception write FPerception;
+    property Charm : Integer read FCharm write FCharm;
+    property BaseHealingRate : Integer read FBaseHealingRate write FBaseHealingRate;
+    property BaseRechargeRate : Integer read FBaseRechargeRate write FBaseRechargeRate;
+    property BaseHitPoints : Single read FBaseHitPoints write FBaseHitPoints;
+    property BaseMana : Single read FBaseMana write FBaseMana;
+    property BaseAttackRecovery : Integer read FBaseAttackRecovery write FBaseAttackRecovery;
+    property BaseAttackBonus : Single read FBaseAttackBonus write FBaseAttackBonus;
+    property BaseDefense : Single read FBaseDefense write FBaseDefense;
+    property BaseHitRecovery : integer read FBaseHitRecovery write FBaseHitRecovery;
+    property Damage : TDamageProfile read FDamage write FDamage;
+    property Resistance : TDamageResistanceProfile read FResistance write FResistance;
+    property TrainingPoints : Integer read FTrainingPoints write FTrainingPoints;
     constructor Create;
     property Name : string read FName write FName;
   end;
@@ -195,11 +236,12 @@ type
     MouseOverOptions : TMouseOverNewOptions;
     InfoRect : array[ 0..17 ] of TInformationRect; //was 35  //collision rects for information
     ArrowRect : array[ 0..15 ] of TInformationRect; //collision rects for arrows
-    StatAdjustments : array[ 0..7 ] of integer; //used to see if we've added points to a stat or not
+    StatRect : array[ 0..8 ] of TInformationRect; //collision rects for arrows
+    //StatAdjustments : array[ 0..7 ] of integer; //used to see if we've added points to a stat or not
     StatName : array[ 0..1, 0..11 ] of WideString;
     SelectRect : array[ 0..20 ] of TSelectableRect; //collision rects for selectable text
     //base stuff - saved in case we do a cancel
-    Damage : TDamageProfile;
+   { Damage : TDamageProfile;
     Resistance : TDamageResistanceProfile;
     BaseStrength : integer;
     BaseCoordination : integer;
@@ -209,7 +251,7 @@ type
     BaseMysticism : integer;
     BaseCombat : integer;
     BaseStealth : integer;
-    TrainingPoints : integer;
+    TrainingPoints : integer; }
     ixSelectedShirt : integer; //current selected shirt color
     ixSelectedPants : integer; //current selected pants color
     ixSelectedHair : integer; //current selected Hair color
@@ -221,13 +263,15 @@ type
     procedure LoadBaseValues; //saves the base stats of the character
     procedure LoadNames;
     procedure CreateCollisionRects; //create the rects for the collision detection
+    procedure ReCreateStats;
   public
     procedure FreeSurfaces; override;
     procedure LoadSurfaces; override;
-    procedure Render; override;
+    procedure KeyDown( var Key : TSDLKey; Shift : TSDLMod; unicode : UInt16 ); override;
     procedure MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TPoint ); override;
     procedure MouseMove( Shift : TSDLMod; CurrentPos : TPoint; RelativePos : TPoint ); override;
-    procedure KeyDown( var Key : TSDLKey; Shift : TSDLMod; unicode : UInt16 ); override;
+    procedure Render; override;
+    procedure Update( aElapsedTime : single ); override;
   end;
 
 implementation
@@ -237,7 +281,9 @@ uses
   logger,
   globals,
   GameMainMenu,
-  ListBoxDialog, sdlgameinterface, Math;
+  ListBoxDialog,
+  sdlgameinterface,
+  Math;
 
 { TNewGame }
 
@@ -528,6 +574,62 @@ begin
     SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
     SelectRect[ i ].FRect.w := 96;
     SelectRect[ i ].FRect.h := 21;
+
+    // Set up the Statistic Rectangles
+    i := 0;
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := 211;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.TrainingPoints ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Strength ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Coordination ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Constitution ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Perception ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Charm ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Mysticism ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Combat ) );
+    inc( i );
+    StatRect[ i ].FRect.x := 431;
+    StatRect[ i ].FRect.y := ArrowRect[ i - 1 ].FRect.y - 2;
+    StatRect[ i ].FRect.w := 20;
+    StatRect[ i ].FRect.h := 24;
+    StatRect[ i ].FInfo := GameFont.DrawText( IntToStr( Player.Stealth ) );
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -567,6 +669,12 @@ begin
   begin
     if DXTextMessage[ i ] <> nil then
       SDL_FreeSurface( DXTextMessage[ i ] );
+  end;
+
+  for i := Low( StatRect ) to High( StatRect ) do
+  begin
+    if StatRect[ i ].FInfo <> nil then
+      SDL_FreeSurface( StatRect[ i ].FInfo );
   end;
 
   ExText.Close;
@@ -632,8 +740,8 @@ end;
 procedure TNewGame.LoadBaseValues;
 const
   FailName : string = 'TNewGame.LoadBaseValues';
-var
-  i : integer;
+{var
+  i : integer; }
 begin
   try
     if Player <> nil then
@@ -643,7 +751,7 @@ begin
     Player.TrainingPoints := 20;
 
     //we store thse values so that we can keep the player from lowering his score beyond its start
-    Damage := Player.Damage;
+    {Damage := Player.Damage;
     Resistance := Player.Resistance;
     BaseStrength := Player.BaseStrength;
     BaseCoordination := Player.BaseCoordination;
@@ -653,12 +761,12 @@ begin
     BaseMysticism := Player.BaseMysticism;
     BaseCombat := Player.BaseCombat;
     BaseStealth := Player.BaseStealth;
-    TrainingPoints := Player.TrainingPoints;
+    TrainingPoints := Player.TrainingPoints;}
 
-    for i := 0 to 7 do
+    {for i := 0 to 7 do
     begin //initialize adjustments to zero
       StatAdjustments[ i ] := 0;
-    end;
+    end;}
 
     // Set Default Appearance
     ixSelectedShirt := 0;
@@ -667,6 +775,15 @@ begin
     ixSelectedHairStyle := 12;
     ixSelectedBeard := 17;
     ixSelectedTraining := 18;
+
+    Player.Strength := Player.BaseStrength + 5;
+    Player.Coordination := Player.BaseCoordination + 2;
+    Player.Constitution := Player.BaseConstitution + 3;
+    Player.Perception := Player.BasePerception - 3;
+    Player.Charm := Player.BaseCharm - 3;
+    Player.Mysticism := Player.BaseMysticism - 3;
+    Player.Combat := Player.BaseCombat + 10;
+    Player.Stealth := Player.BaseStealth + 0;
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
@@ -793,8 +910,8 @@ begin
     OKRect.h := 28;
 
     LoadNames;
-    CreateCollisionRects;
     LoadBaseValues;
+    CreateCollisionRects;
     //ShowStats;
     //DrawTheGuy;
 
@@ -809,7 +926,7 @@ procedure TNewGame.MouseDown( Button : Integer; Shift : TSDLMod; CurrentPos : TP
 const
   FailName : string = 'TNewGame.MouseDown';
 var
-  x : integer;
+  x, StatAdjustment : integer;
   CharacterName : string;
 begin
   inherited;
@@ -842,6 +959,78 @@ begin
             if PointIsInRect( CurrentPos, ArrowRect[ x ].FRect.x, ArrowRect[ x ].FRect.y, ArrowRect[ x ].FRect.x + ArrowRect[ x ].FRect.w, ArrowRect[ x ].FRect.y + ArrowRect[ x ].FRect.h ) then
             begin
               MouseOverOptions := TMouseOverNewOptions( x + 18 );
+              StatAdjustment := 0;
+              case MouseOverOptions of
+                moStrengthPlus..moCharmPlus :
+                begin
+                  StatAdjustment := -4;
+                  if Player.TrainingPoints + StatAdjustment < 0 then
+                    exit;
+                  case MouseOverOptions of
+                    moStrengthPlus :
+                      Player.Strength := Player.Strength + 1;
+                    moCoordinationPlus :
+                      Player.Coordination := Player.Coordination + 1;
+                    moConstitutionPlus :
+                      Player.Constitution := Player.Constitution + 1;
+                    moPerceptionPlus :
+                      Player.Perception := Player.Perception + 1;
+                    moCharmPlus :
+                      Player.Charm := Player.Charm + 1;
+                  end;
+                end;
+
+                moMysticismPlus..moStealthPlus :
+                begin
+                  StatAdjustment := -2;
+                  if Player.TrainingPoints + StatAdjustment < 0 then
+                    exit;
+                  case MouseOverOptions of
+                    moMysticismPlus :
+                      Player.Mysticism := Player.Mysticism + 1;
+                    moCombatPlus :
+                      Player.Combat := Player.Combat + 1;
+                    moStealthPlus :
+                      Player.Stealth := Player.Stealth + 1;
+                  end;
+                end;
+
+                moStrengthMinus..moCharmMinus :
+                begin
+                  StatAdjustment := +4;
+                  if Player.TrainingPoints + StatAdjustment > 20 then
+                    exit;
+                  case MouseOverOptions of
+                    moStrengthMinus :
+                      Player.Strength := Player.Strength - 1;
+                    moCoordinationMinus :
+                      Player.Coordination := Player.Coordination - 1;
+                    moConstitutionMinus :
+                      Player.Constitution := Player.Constitution - 1;
+                    moPerceptionMinus :
+                      Player.Perception := Player.Perception - 1;
+                    moCharmMinus :
+                      Player.Charm := Player.Charm - 1;
+                  end;
+                end;
+
+                moMysticismMinus..moStealthMinus :
+                begin
+                  StatAdjustment := +2;
+                  if Player.TrainingPoints + StatAdjustment > 20 then
+                    exit;
+                  case MouseOverOptions of
+                    moMysticismMinus :
+                      Player.Mysticism := Player.Mysticism - 1;
+                    moCombatMinus :
+                      Player.Combat := Player.Combat - 1;
+                    moStealthMinus :
+                      Player.Stealth := Player.Stealth - 1;
+                  end;
+                end;
+              end;
+              Player.TrainingPoints := Player.TrainingPoints + StatAdjustment;
+              ReCreateStats;
               exit;
             end;
           end;
@@ -919,6 +1108,47 @@ begin
               if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
               begin
                 ixSelectedTraining := x;
+                Player.TrainingPoints := 20;
+
+                case ixSelectedTraining of
+                  18 :
+                  begin
+                    Player.Strength := Player.BaseStrength + 5;
+                    Player.Coordination := Player.BaseCoordination + 2;
+                    Player.Constitution := Player.BaseConstitution + 3;
+                    Player.Perception := Player.BasePerception - 3;
+                    Player.Charm := Player.BaseCharm - 3;
+                    Player.Mysticism := Player.BaseMysticism - 3;
+                    Player.Combat := Player.BaseCombat + 10;
+                    Player.Stealth := Player.BaseStealth + 0;
+                  end;
+
+                  19 :
+                  begin
+                    Player.Strength := Player.BaseStrength + 2;
+                    Player.Coordination := Player.BaseCoordination + 5;
+                    Player.Constitution := Player.BaseConstitution + 0;
+                    Player.Perception := Player.BasePerception + 0;
+                    Player.Charm := Player.BaseCharm - 3;
+                    Player.Mysticism := Player.BaseMysticism - 3;
+                    Player.Combat := Player.BaseCombat + 0;
+                    Player.Stealth := Player.BaseStealth + 10;
+                  end;
+
+                  20 :
+                  begin
+                    Player.Strength := Player.BaseStrength + 0;
+                    Player.Coordination := Player.BaseCoordination + 3;
+                    Player.Constitution := Player.BaseConstitution + 2;
+                    Player.Perception := Player.BasePerception + 2;
+                    Player.Charm := Player.BaseCharm - 3;
+                    Player.Mysticism := Player.BaseMysticism + 10;
+                    Player.Combat := Player.BaseCombat + 0;
+                    Player.Stealth := Player.BaseStealth - 3;
+                  end;
+                end;
+
+                ReCreateStats;
                 break;
               end;
             end;
@@ -1070,6 +1300,45 @@ begin
     on E: Exception do
       Log.LogError( E.Message, FailName );
   end;
+end;
+
+procedure TNewGame.ReCreateStats;
+begin
+  if StatRect[ 0 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 0 ].FInfo );
+  StatRect[ 0 ].FInfo := GameFont.DrawText( IntToStr( Player.TrainingPoints ) );
+
+  if StatRect[ 1 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 1 ].FInfo );
+  StatRect[ 1 ].FInfo := GameFont.DrawText( IntToStr( Player.Strength ) );
+
+  if StatRect[ 2 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 2 ].FInfo );
+  StatRect[ 2 ].FInfo := GameFont.DrawText( IntToStr( Player.Coordination ) );
+
+  if StatRect[ 3 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 3 ].FInfo );
+  StatRect[ 3 ].FInfo := GameFont.DrawText( IntToStr( Player.Constitution ) );
+
+  if StatRect[ 4 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 4 ].FInfo );
+  StatRect[ 4 ].FInfo := GameFont.DrawText( IntToStr( Player.Perception ) );
+
+  if StatRect[ 5 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 5 ].FInfo );
+  StatRect[ 5 ].FInfo := GameFont.DrawText( IntToStr( Player.Charm ) );
+
+  if StatRect[ 6 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 6 ].FInfo );
+  StatRect[ 6 ].FInfo := GameFont.DrawText( IntToStr( Player.Mysticism ) );
+
+  if StatRect[ 7 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 7 ].FInfo );
+  StatRect[ 7 ].FInfo := GameFont.DrawText( IntToStr( Player.Combat ) );
+
+  if StatRect[ 8 ].FInfo <> nil then
+    SDL_FreeSurface( StatRect[ 8 ].FInfo );
+  StatRect[ 8 ].FInfo := GameFont.DrawText( IntToStr( Player.Stealth ) );
 end;
 
 procedure TNewGame.Render;
@@ -1265,12 +1534,25 @@ begin
       SDL_BlitSurface( DXPlayerName, nil, MainWindow.DisplaySurface, @lRect );
     end;
 
+    // Draw the Stats
+    for x := Low( StatRect ) to High( StatRect ) do
+    begin
+      lRect := StatRect[ x ].FRect;
+      SDL_BlitSurface( StatRect[ x ].FInfo, nil, MainWindow.DisplaySurface, @lRect );
+    end;
+
     SDL_BlitSurface( DXLeftArrow, nil, MainWindow.DisplaySurface, @LeftArrowRect );
     SDL_BlitSurface( DXRightArrow, nil, MainWindow.DisplaySurface, @RightArrowRect );
   except
     on E: Exception do
       Log.LogError( E.Message, FailName );
   end;
+end;
+
+procedure TNewGame.Update(aElapsedTime: single);
+begin
+  inherited;
+
 end;
 
 { TCharacter }
