@@ -26,7 +26,8 @@ var
   ExText : TExternalizer;
 
   // Global type variables
-  bShowIntro, bShowOuttro : Boolean;
+  bShowIntro : Boolean = true;
+  bShowOuttro : Boolean = false;
   ScreenFlags : UInt32;
   bInGame : boolean = false;
 

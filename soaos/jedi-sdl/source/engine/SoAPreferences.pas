@@ -41,6 +41,7 @@ type
     property NoPageNumbers: Boolean index 21 read GetBoolean write SetBoolean;
     property ShowHistory: Boolean index 22 read GetBoolean write SetBoolean;
     property ShowIntro: Boolean index 23 read GetBoolean write SetBoolean;
+    property MovieSwitches : string index 24 read GetString write SetString;
   end;
 
 
@@ -76,7 +77,8 @@ type
     gsTTFName,
     gsNoPageNumbers,
     gsShowHistory,
-    gsShowIntro );
+    gsShowIntro,
+    gsMovieSwitches );
 
 { TGameRegistryUserPreferences }
 constructor TSoAUserPreferences.Create(const FileName: string);
@@ -145,11 +147,12 @@ begin
     gsTitlesDB : Result := 'ArtLib/Resources/Database/Title.db';
     gsInterfacePath : Result := 'Interface';
     gsLanguagePath : Result := 'english';
-    gsOpeningMovie : Result := 'english';
-    gsClosingMovie : Result := 'english';
+    gsOpeningMovie : Result := 'SiegeOpening.bik';
+    gsClosingMovie : Result := 'SiegeClosing.bik';
     gsTTFName : Result := 'LBLACK.TTF';
     gsHistory : Result := '';
     gsMoviePath : Result := 'Movies';
+    gsMovieSwitches : Result := '/R/C/U1/I102/D9/B0';
   else
     result := '';
   end;
@@ -171,8 +174,8 @@ begin
     gsTitlesDB : Result := 'TitlesDB';
     gsInterfacePath : Result := 'Interface';
     gsLanguagePath : Result := 'LanguagePath';
-    gsOpeningMovie : Result := 'Open.mpeg';
-    gsClosingMovie : Result := 'Closing.mpeg';
+    gsOpeningMovie : Result := 'OpeningMovie';
+    gsClosingMovie : Result := 'ClosingMovie';
     gsJournalFont : Result := 'JournalFont';
     gsSoundVolume : Result := 'SoundVolume';
     gsMusicVolume : Result := 'MusicVolume';
@@ -182,6 +185,7 @@ begin
     gsNoPageNumbers : Result := 'NoPageNumbers';
     gsShowHistory : Result := 'ShowHistory';
     gsShowIntro : Result := 'ShowIntro';
+    gsMovieSwitches : Result := 'MovieSwitches';
   else
     result := '';
   end;
@@ -195,6 +199,7 @@ begin
     gsNoPageNumbers : Result := 'Settings';
     gsShowHistory : Result := 'Settings';
     gsShowIntro : Result := 'Settings';
+    gsMovieSwitches : Result := 'Settings';
     //gsPlayerEmail..gsPlayerHighScore : Result := 'PlayerInfo';
   else
     result := '';

@@ -63,6 +63,9 @@ program SoAoS;
 {                                                                              }
 {
   $Log$
+  Revision 1.8  2005/05/25 23:15:34  savage
+  Latest Changes
+
   Revision 1.7  2005/05/24 22:15:02  savage
   Latest additions to determine if it is the first time the game is run.
 
@@ -71,6 +74,9 @@ program SoAoS;
 {******************************************************************************}
 
 uses
+  {$IFDEF WIN32}
+  Windows,
+  {$ENDIF}
   IniFiles,
   SysUtils,
   sdl in 'sdl\sdl.pas',
@@ -103,27 +109,78 @@ uses
   sdl_mixer in 'sdl\sdl_mixer.pas',
   smpeg in 'sdl\smpeg.pas',
   registryuserpreferences in 'sdl\registryuserpreferences.pas',
-  userpreferences in 'sdl\userpreferences.pas';
+  userpreferences in 'sdl\userpreferences.pas',
+  AniDec30 in 'engine\AniDec30.pas';
 
 {$IFDEF WIN32}
 {$R *.res}
 {$ENDIF}
 
+procedure PlayBinkMovie( aSwitches : string );
+const
+  {$IFDEF WIN32}
+  BinkPlayer : string = 'BinkPlay';
+  {$ELSE}
+  BinkPlayer : string = 'BinkPlayer';
+  {$ENDIF}
+var
+  MovieCommandLine : string;
+{$IFDEF WIN32}
+  ProcessInfo: TProcessInformation;
+  Startupinfo: TStartupInfo;
+  ExitCode: longword;
+{$ELSE}
+
+{$ENDIF}
+begin
+  MovieCommandLine := ExtractFilePath( ParamStr( 0 ) ) + BinkPlayer + ' ' + SoASettings.MoviePath + '\' + SoASettings.OpeningMovie + ' ' + aSwitches;
+  {$IFDEF WIN32}
+  // Initialize the structures
+  FillChar(ProcessInfo, sizeof(TProcessInformation), 0);
+  FillChar(Startupinfo, sizeof(TStartupInfo), 0);
+  Startupinfo.cb := sizeof(TStartupInfo);
+
+  // Attempts to create the process
+  Startupinfo.dwFlags := STARTF_USESHOWWINDOW;
+  Startupinfo.wShowWindow := 1;
+  if CreateProcess( nil, PChar( MovieCommandLine ), nil, nil, False, {CREATE_NEW_CONSOLE or} NORMAL_PRIORITY_CLASS
+    , nil, nil, Startupinfo, ProcessInfo ) then
+  begin
+    // The process has been successfully created
+    // No let's wait till it ends...
+    WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
+
+    // Process has finished. Now we should close it.
+    GetExitCodeProcess(ProcessInfo.hProcess, ExitCode);  // Optional
+    CloseHandle(ProcessInfo.hThread);
+    CloseHandle(ProcessInfo.hProcess);
+  end;
+  {$ELSE}
+  {$ENDIF}
+end;
+
+
 procedure PlayOpeningMovie;
 begin
-  if FileExists( SoASettings.OpeningMovie )
+  if FileExists( SoASettings.MoviePath + '/' + SoASettings.OpeningMovie )
   and ( bShowIntro ) then
   begin
-
+     if ( SoASettings.FullScreen ) then
+       PlayBinkMovie( SoASettings.MovieSwitches + '/P' )
+     else
+       PlayBinkMovie( '/I1' );
   end;
 end;
 
 procedure PlayClosingMovie;
 begin
-  if FileExists( SoASettings.ClosingMovie )
+  if FileExists( SoASettings.MoviePath + '/' + SoASettings.ClosingMovie )
   and ( bShowOuttro ) then
   begin
-
+    if ( SoASettings.FullScreen ) then
+      PlayBinkMovie( SoASettings.MovieSwitches )
+    else
+      PlayBinkMovie( '/I1' );
   end;
 end;
 
