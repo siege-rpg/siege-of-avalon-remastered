@@ -63,6 +63,9 @@ program SoAoS;
 {                                                                              }
 {
   $Log$
+  Revision 1.9  2005/05/29 00:30:40  savage
+  Play Opening movie if it is available
+
   Revision 1.8  2005/05/25 23:15:34  savage
   Latest Changes
 
@@ -76,6 +79,19 @@ program SoAoS;
 uses
   {$IFDEF WIN32}
   Windows,
+  {$ELSE}
+  {$IFDEF UNIX}
+    {$IFDEF FPC}
+    pthreads,
+    baseunix,
+    unix,
+    x,
+    xlib;
+    {$ELSE}
+    Libc,
+    Xlib;
+    {$ENDIF}
+  {$ENDIF}
   {$ENDIF}
   IniFiles,
   SysUtils,
@@ -116,7 +132,7 @@ uses
 {$R *.res}
 {$ENDIF}
 
-procedure PlayBinkMovie( aSwitches : string );
+procedure PlayBinkMovie( aMoviePath, aSwitches : string );
 const
   {$IFDEF WIN32}
   BinkPlayer : string = 'BinkPlay';
@@ -124,16 +140,24 @@ const
   BinkPlayer : string = 'BinkPlayer';
   {$ENDIF}
 var
-  MovieCommandLine : string;
+  MovieProcess : string;
 {$IFDEF WIN32}
   ProcessInfo: TProcessInformation;
   Startupinfo: TStartupInfo;
   ExitCode: longword;
 {$ELSE}
-
+{$IFDEF UNIX}
+  pid: PID_T;
+  Max: Integer;
+  I: Integer;
+  parg: PPCharArray;
+  argnum: Integer;
+  returnvalue : Integer;
+  arguments : array[0..1] of string;
+{$ENDIF}
 {$ENDIF}
 begin
-  MovieCommandLine := ExtractFilePath( ParamStr( 0 ) ) + BinkPlayer + ' ' + SoASettings.MoviePath + '\' + SoASettings.OpeningMovie + ' ' + aSwitches;
+  MovieProcess := ExtractFilePath( ParamStr( 0 ) ) + BinkPlayer;
   {$IFDEF WIN32}
   // Initialize the structures
   FillChar(ProcessInfo, sizeof(TProcessInformation), 0);
@@ -143,7 +167,7 @@ begin
   // Attempts to create the process
   Startupinfo.dwFlags := STARTF_USESHOWWINDOW;
   Startupinfo.wShowWindow := 1;
-  if CreateProcess( nil, PChar( MovieCommandLine ), nil, nil, False, {CREATE_NEW_CONSOLE or} NORMAL_PRIORITY_CLASS
+  if CreateProcess( nil, PChar( MovieProcess + ' ' + aMoviePath + ' ' + aSwitches ), nil, nil, False, {CREATE_NEW_CONSOLE or} NORMAL_PRIORITY_CLASS
     , nil, nil, Startupinfo, ProcessInfo ) then
   begin
     // The process has been successfully created
@@ -156,31 +180,74 @@ begin
     CloseHandle(ProcessInfo.hProcess);
   end;
   {$ELSE}
+  {$IFDEF UNIX}
+  arguments[0] := aMoviePath;
+  arguments[1] := aSwitches;
+  
+  pid := fork;
+
+  if pid = 0 then
+  begin
+    Max := sysconf(_SC_OPEN_MAX);
+    for i := (STDERR_FILENO+1) to Max do
+    begin
+      fcntl(i, F_SETFD, FD_CLOEXEC);
+    end;
+
+    argnum := High(arguments) + 1;
+
+    GetMem(parg,(2 + argnum) * sizeof(PChar));
+    parg[0] := PChar(MovieProcess);
+
+    i := 0;
+
+    while i <= high(arguments) do
+    begin
+      inc(i);
+      parg[i] := PChar(arguments[i-1]);
+    end;
+
+    parg[i+1] := nil;
+    execvp(PChar(MovieProcess),PPChar(@parg[0]));
+    halt;
+  end;
+
+  if pid > 0 then
+  begin
+    waitpid(pid,@returnvalue,0);
+  end;
+  {$ENDIF}
   {$ENDIF}
 end;
 
 
 procedure PlayOpeningMovie;
+var
+  Movie : string;
 begin
-  if FileExists( SoASettings.MoviePath + '/' + SoASettings.OpeningMovie )
+  Movie := SoASettings.MoviePath + '\' + SoASettings.OpeningMovie;
+  if FileExists( Movie )
   and ( bShowIntro ) then
   begin
      if ( SoASettings.FullScreen ) then
-       PlayBinkMovie( SoASettings.MovieSwitches + '/P' )
+       PlayBinkMovie( Movie, SoASettings.MovieSwitches + '/P' )
      else
-       PlayBinkMovie( '/I1' );
+       PlayBinkMovie( Movie, '/I1' );
   end;
 end;
 
 procedure PlayClosingMovie;
+var
+  Movie : string;
 begin
-  if FileExists( SoASettings.MoviePath + '/' + SoASettings.ClosingMovie )
+  Movie := SoASettings.MoviePath + '\' + SoASettings.ClosingMovie;
+  if FileExists( Movie )
   and ( bShowOuttro ) then
   begin
     if ( SoASettings.FullScreen ) then
-      PlayBinkMovie( SoASettings.MovieSwitches )
+      PlayBinkMovie( Movie, SoASettings.MovieSwitches )
     else
-      PlayBinkMovie( '/I1' );
+      PlayBinkMovie( Movie, '/I1' );
   end;
 end;
 
