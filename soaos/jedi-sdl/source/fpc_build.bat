@@ -1,1 +1,1 @@
-fpc SoAoS.dpr -Sd -B -FE..\..\..\game -FUdcu
+fpc SoAoS.dpr -Sd -B -FE../../../game -FUdcu

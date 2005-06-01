@@ -59,6 +59,9 @@ unit YesNoDialog;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2005/05/15 14:17:17  savage
+  Fade our background when dialog has the focus.
+
   Revision 1.1  2004/10/06 22:48:46  savage
   Changes required to make use of YesNoDialog
 
@@ -149,7 +152,7 @@ begin
 
   SDL_SetAlpha( DXBack, SDL_RLEACCEL or SDL_SRCALPHA, 16 );
 
-  DxChooseBox := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldChooseBox.bmp' ) );
+  DxChooseBox := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldChoosebox.bmp' ) );
   SDL_SetColorKey( DxChooseBox, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
   C.r := 231;

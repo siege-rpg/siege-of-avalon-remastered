@@ -63,6 +63,9 @@ program SoAoS;
 {                                                                              }
 {
   $Log$
+  Revision 1.10  2005/05/31 23:30:38  savage
+  Added Linux code to show opening movie.
+
   Revision 1.9  2005/05/29 00:30:40  savage
   Play Opening movie if it is available
 
@@ -82,14 +85,10 @@ uses
   {$ELSE}
   {$IFDEF UNIX}
     {$IFDEF FPC}
-    pthreads,
-    baseunix,
-    unix,
-    x,
-    xlib;
+    libc,
     {$ELSE}
     Libc,
-    Xlib;
+    Xlib,
     {$ENDIF}
   {$ENDIF}
   {$ENDIF}

@@ -63,6 +63,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.10  2005/05/28 16:31:28  savage
+  StatChanges are now reflected, You cannot click Continue unless TrainingPoints are 0 and you have entered a CharacterName
+
   Revision 1.9  2005/05/28 09:56:10  savage
   Get Selections working correctly.
 
@@ -855,10 +858,10 @@ begin
       DXTextMessage[ i ] := GameFont.DrawText( TextMessage[ i ] );
     end;
 
-    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'CharCreate.bmp' ) );
+    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'charcreate.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-    DXSelectRect := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaRedOval.bmp' ) );
+    DXSelectRect := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaRedoval.bmp' ) );
     SDL_SetColorKey( DXSelectRect, Flags, SDL_MapRGB( DXSelectRect.format, 0, 255, 255 ) );
 
     DXBlack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaBlack.bmp' ) );

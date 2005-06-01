@@ -59,6 +59,9 @@ unit GameJournal;
 {                                                                              }
 {
   $Log$
+  Revision 1.5  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.4  2005/05/13 12:33:15  savage
   Various Changes and bug fixes. Main work on the NewGame screen.
 
@@ -186,10 +189,10 @@ begin
     if JournalLog.LogFileList.count - 1 > StartLogIndex then
       inc( StartLogIndex );
 
-    if ( SoASettings.JournalFont = 1 ) and DirectoryExists( SoASettings.ArtPath + '/journalalt/' ) then
-      JournalLog.LogDirectory := SoASettings.ArtPath + '/journalalt/'
+    if ( SoASettings.JournalFont = 1 ) and DirectoryExists( SoASettings.ArtPath + '/JournalAlt/' ) then
+      JournalLog.LogDirectory := SoASettings.ArtPath + '/JournalAlt/'
     else
-      JournalLog.LogDirectory := SoASettings.ArtPath + '/journal/';
+      JournalLog.LogDirectory := SoASettings.ArtPath + '/Journal/';
 
     CurrentLogIndex := StartLogIndex; //JournalLog.LogFileList.count-1;
     if CurrentLogIndex >= JournalLog.LogFileList.count then
