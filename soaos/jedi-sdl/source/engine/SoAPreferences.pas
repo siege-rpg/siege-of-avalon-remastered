@@ -179,7 +179,7 @@ begin
     gsJournalFont : Result := 'JournalFont';
     gsSoundVolume : Result := 'SoundVolume';
     gsMusicVolume : Result := 'MusicVolume';
-    gsHistory : Result := 'History';
+    gsHistory : Result := 'history';
     gsMoviePath : Result := 'MoviePath';
     gsTTFName : Result := 'TTFName';
     gsNoPageNumbers : Result := 'NoPageNumbers';

@@ -59,6 +59,9 @@ unit Externalizer;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2004/09/30 22:49:20  savage
+  Initial Game Interface units.
+
 
 }
 {******************************************************************************}
@@ -121,7 +124,7 @@ procedure TExternalizer.Open(const Section: string);
 begin
   FSection := Section;
   if not assigned( INI ) then
-    INI := TIniFile.create( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'text.ini' );
+    INI := TIniFile.create( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'Text.ini' );
 end;
 
 initialization

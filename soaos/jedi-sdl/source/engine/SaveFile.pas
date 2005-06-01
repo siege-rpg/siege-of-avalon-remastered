@@ -277,7 +277,7 @@ begin
     end
     else
     begin
-      FileStream := TFileStream.create( ChangeFileExt( FFilename, '.map' ), fmOpenRead or fmShareCompat );
+      FileStream := TFileStream.create( ChangeFileExt( FFilename, '.map' ), fmOpenRead  );
       try
         FileStream.Position := CurrentBlockPointer.MapKnownPos;
         FileStream.Read( result.Memory^, CurrentBlockPointer.MapKnownSize );
@@ -320,7 +320,7 @@ begin
   begin
     result.Size := CurrentBlockPointer.DataSize;
 
-    FileStream := TFileStream.create( Filename, fmOpenRead or fmShareCompat );
+    FileStream := TFileStream.create( Filename, fmOpenRead  );
     try
       FileStream.Position := CurrentBlockPointer.DataPos;
       FileStream.Read( result.Memory^, CurrentBlockPointer.DataSize );
@@ -450,7 +450,7 @@ begin
     NewFormat := FileExists( IdxFile );
     if NewFormat then
     begin
-      Stream := TFileStream.create( IdxFile, fmOpenRead or fmShareCompat );
+      Stream := TFileStream.create( IdxFile, fmOpenRead  );
       try
         while Stream.Position < Stream.Size do
         begin
@@ -577,7 +577,7 @@ begin
     end
     else
     begin
-      Stream := TFileStream.create( Filename, fmOpenRead or fmShareCompat );
+      Stream := TFileStream.create( Filename, fmOpenRead  );
       try
         while Stream.Position < Stream.Size do
         begin
@@ -803,7 +803,7 @@ begin
           begin
             OlderFile := TFileStream.Create(FFilename, fmOpenRead or fmShareDenyWrite);
             try
-              NewerFile := TFileStream.Create(NewFileName, fmCreate or fmShareDenyRead);
+              NewerFile := TFileStream.Create(NewFileName, fmCreate );
               try
                 NewerFile.CopyFrom(OlderFile, OlderFile.Size);
               finally
@@ -827,7 +827,7 @@ begin
           //Move current block to end
           Mem := TMemoryStream.create;
           try
-            Stream := TFileStream.create( FFilename, fmOpenReadWrite or fmShareCompat );
+            Stream := TFileStream.create( FFilename, fmOpenReadWrite  );
             try
               if NewIndex then
               begin
@@ -876,7 +876,7 @@ begin
         end
         else
         begin
-          Stream := TFileStream.create( FFilename, fmCreate or fmShareCompat );
+          Stream := TFileStream.create( FFilename, fmCreate  );
           try
             if NewIndex then
             begin
@@ -900,7 +900,7 @@ begin
         begin
           Mem := TMemoryStream.create;
           try
-            Stream := TFileStream.create( FFilename, fmOpenRead or fmShareCompat );
+            Stream := TFileStream.create( FFilename, fmOpenRead  );
             try
               for i := 0 to MapIndex.count - 1 do
               begin
@@ -951,9 +951,9 @@ begin
         else
         begin
           if NewFile then
-            Stream := TFileStream.create( NewFilename, fmCreate or fmShareCompat )
+            Stream := TFileStream.create( NewFilename, fmCreate  )
           else
-            Stream := TFileStream.create( FFilename, fmCreate or fmShareCompat );
+            Stream := TFileStream.create( FFilename, fmCreate  );
           try
             if NewIndex then
             begin
@@ -985,7 +985,7 @@ begin
           begin
             OlderFile := TFileStream.Create(S, fmOpenRead or fmShareDenyWrite);
             try
-              NewerFile := TFileStream.Create(MapFilename, fmCreate or fmShareDenyRead);
+              NewerFile := TFileStream.Create(MapFilename, fmCreate );
               try
                 NewerFile.CopyFrom(OlderFile, OlderFile.Size);
               finally
@@ -1018,9 +1018,9 @@ begin
       else
       begin
         if FileExists( MapFilename ) then
-          Stream := TFileStream.create( MapFilename, fmOpenReadWrite or fmShareCompat )
+          Stream := TFileStream.create( MapFilename, fmOpenReadWrite  )
         else
-          Stream := TFileStream.create( MapFilename, fmCreate or fmShareCompat );
+          Stream := TFileStream.create( MapFilename, fmCreate  );
         try
           if NewIndex then
           begin
@@ -1039,9 +1039,9 @@ begin
       MapStream.SaveToFile( MapFilename );
 
     if NewFile then
-      Stream := TFileStream.create( ChangeFileExt( NewFilename, '.idx' ), fmCreate or fmShareCompat )
+      Stream := TFileStream.create( ChangeFileExt( NewFilename, '.idx' ), fmCreate )
     else
-      Stream := TFileStream.create( ChangeFileExt( FFilename, '.idx' ), fmCreate or fmShareCompat );
+      Stream := TFileStream.create( ChangeFileExt( FFilename, '.idx' ), fmCreate );
     try
 
       Block := sbIndex;
