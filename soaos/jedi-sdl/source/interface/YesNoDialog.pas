@@ -59,6 +59,9 @@ unit YesNoDialog;
 {                                                                              }
 {
   $Log$
+  Revision 1.3  2005/06/01 20:24:27  savage
+  Fix for Linux case sensitivity issues
+
   Revision 1.2  2005/05/15 14:17:17  savage
   Fade our background when dialog has the focus.
 
@@ -102,6 +105,7 @@ type
 implementation
 
 uses
+  xplatformutils,
   globals,
   GameMainMenu;
 
@@ -152,7 +156,7 @@ begin
 
   SDL_SetAlpha( DXBack, SDL_RLEACCEL or SDL_SRCALPHA, 16 );
 
-  DxChooseBox := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldChoosebox.bmp' ) );
+  DxChooseBox := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'ldChoosebox.bmp' ) );
   SDL_SetColorKey( DxChooseBox, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
   C.r := 231;

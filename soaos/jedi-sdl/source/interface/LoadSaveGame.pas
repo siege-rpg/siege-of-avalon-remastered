@@ -59,6 +59,9 @@ unit LoadSaveGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.8  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.7  2005/05/15 14:22:55  savage
   Moved SetAlpha call out to LoadSurfaces
 
@@ -175,6 +178,7 @@ implementation
 
 uses
   SysUtils,
+  xplatformutils,
   sdlgameinterface,
   logger,
   globals,
@@ -328,13 +332,13 @@ begin
 
     LoadText;
 
-    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldLoadSave.bmp' ) );
+    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'ldLoadSave.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-    DXCancel := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldCancel.bmp' ) );
+    DXCancel := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'ldCancel.bmp' ) );
     SDL_SetColorKey( DXCancel, Flags, SDL_MapRGB( DXCancel.format, 0, 255, 255 ) );
 
-    DXok := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldOk.bmp' ) );
+    DXok := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'ldOk.bmp' ) );
     SDL_SetColorKey( DXok, Flags, SDL_MapRGB( DXok.format, 0, 255, 255 ) );
 
 
@@ -431,9 +435,9 @@ begin
         DecodeDate( FileDateToDateTime( pTextitem.time ), fYear, fMonth, fDay );
         DecodeTime( FileDateToDateTime( pTextitem.time ), fHour, fMin, fSec, fMsec );
         if fMin > 10 then
-          pTextItem.Date := intToStr( fMonth ) + '/' + intToStr( fDay ) + '  ' + intToStr( fHour ) + ':' + intToStr( fMin ) //'/'+intToStr(fYear);
+          pTextItem.Date := intToStr( fMonth ) + DIR_SEP + intToStr( fDay ) + '  ' + intToStr( fHour ) + ':' + intToStr( fMin ) //DIR_SEP+intToStr(fYear);
         else
-          pTextItem.Date := intToStr( fMonth ) + '/' + intToStr( fDay ) + '  ' + intToStr( fHour ) + ':0' + intToStr( fMin ); //'/'+intToStr(fYear);
+          pTextItem.Date := intToStr( fMonth ) + DIR_SEP + intToStr( fDay ) + '  ' + intToStr( fHour ) + ':0' + intToStr( fMin ); //DIR_SEP+intToStr(fYear);
         GameFont.FontSize := 16;
         pTextItem.TextSurface := GameFont.DrawText( pTextItem.text );
         SDL_SetColorKey( pTextItem.TextSurface, SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL, SDL_MapRGB( pTextItem.TextSurface.format, 0, 0, 0 ) );
@@ -670,7 +674,7 @@ begin
             DeleteFile( PChar( ExtractFilePath( ParamStr( 0 ) ) + 'games/' + PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).text + '.map' ) );
         except
         end;
-        aCharacter := ChangeFileExt( SoASettings.ArtPath + '/' + PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).CharacterGif, '.pox' );
+        aCharacter := ChangeFileExt( SoASettings.ArtPath + DIR_SEP + PSelectableRect( SelectRect.items[ CurrentSelectedListItem ] ).CharacterGif, '.pox' );
             //if FileExists(a) then
                //DeleteFile(PChar(a)); -> This is OUT in a June 11 modification
         DeleteSelectableRectItem( CurrentSelectedListItem );
@@ -739,13 +743,13 @@ begin
   try
     Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-    DXLoadLight := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldLoadLight.bmp' ) );
+    DXLoadLight := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'ldLoadLight.bmp' ) );
     SDL_SetColorKey( DXLoadLight, Flags, SDL_MapRGB( DXLoadLight.format, 0, 255, 255 ) );
 
-    DXLoadDark := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldLoadDark.bmp' ) );
+    DXLoadDark := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'ldLoadDark.bmp' ) );
     SDL_SetColorKey( DXLoadDark, Flags, SDL_MapRGB( DXLoadDark.format, 0, 255, 255 ) );
 
-    DXLoadSaveUpper := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldLoadUpper.bmp' ) );
+    DXLoadSaveUpper := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'ldLoadUpper.bmp' ) );
     SDL_SetColorKey( DXLoadSaveUpper, Flags, SDL_MapRGB( DXLoadSaveUpper.format, 0, 255, 255 ) );
 
     if SelectRect.Count > 0 then
@@ -845,13 +849,13 @@ begin
   try
     Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-    DXLoadLight := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldSaveLight.bmp' ) );
+    DXLoadLight := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'ldSaveLight.bmp' ) );
     SDL_SetColorKey( DXLoadLight, Flags, SDL_MapRGB( DXLoadLight.format, 0, 255, 255 ) );
 
-    DXLoadDark := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'ldSaveDark.bmp' ) );
+    DXLoadDark := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'ldSaveDark.bmp' ) );
     SDL_SetColorKey( DXLoadDark, Flags, SDL_MapRGB( DXLoadDark.format, 0, 255, 255 ) );
 
-    DXLoadSaveUpper := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'ldSaveUpper.bmp' ) );
+    DXLoadSaveUpper := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'ldSaveUpper.bmp' ) );
     SDL_SetColorKey( DXLoadSaveUpper, Flags, SDL_MapRGB( DXLoadSaveUpper.format, 0, 255, 255 ) );
 
     // Create the Caret Surface

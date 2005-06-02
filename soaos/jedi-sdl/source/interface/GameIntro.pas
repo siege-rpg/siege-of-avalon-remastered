@@ -59,6 +59,9 @@ unit GameIntro;
 {                                                                              }
 {
   $Log$
+  Revision 1.5  2005/05/13 12:33:15  savage
+  Various Changes and bug fixes. Main work on the NewGame screen.
+
   Revision 1.4  2005/05/10 14:12:47  savage
   Latest Enhancments and bug fixes
 
@@ -101,6 +104,7 @@ implementation
 
 uses
   SysUtils,
+  xplatformutils,
   logger,
   sdlaudiomixer,
   globals,
@@ -142,13 +146,13 @@ begin
   try
     Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-    DXSiege := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniSiege.bmp' ) );
+    DXSiege := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'aniSiege.bmp' ) );
     SDL_SetColorKey( DXSiege, Flags, SDL_MapRGB( DXSiege.format, 0, 255, 255 ) );
 
-    DXLogo := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniDTIPresents.bmp' ) );
+    DXLogo := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'aniDTIPresents.bmp' ) );
     SDL_SetColorKey( DXLogo, Flags, SDL_MapRGB( DXLogo.format, 0, 255, 255 ) );
 
-    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'aniBack.bmp' ) );
+    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'aniBack.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
     LogoAlpha := 0;

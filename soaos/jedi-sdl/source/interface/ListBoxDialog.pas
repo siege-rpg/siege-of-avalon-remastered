@@ -59,6 +59,9 @@ unit ListBoxDialog;
 {                                                                              }
 {
   $Log$
+  Revision 1.1  2005/05/06 08:18:55  savage
+  ListBoxDialog used in New GUI
+
   Revision 1.1  2004/10/06 22:48:46  savage
   Changes required to make use of YesNoDialog
 
@@ -104,6 +107,7 @@ type
 implementation
 
 uses
+  xplatformutils,
   globals,
   GameMainMenu;
 
@@ -146,7 +150,7 @@ begin
   inherited;
   Flags := SDL_SRCCOLORKEY or SDL_RLEACCEL or SDL_HWACCEL;
 
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaChooseBox.bmp' ) );
+  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'chaChooseBox.bmp' ) );
   SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 end;
 

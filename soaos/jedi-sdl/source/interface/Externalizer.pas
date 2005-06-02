@@ -59,6 +59,9 @@ unit Externalizer;
 {                                                                              }
 {
   $Log$
+  Revision 1.2  2005/06/01 21:42:41  savage
+  More Linux compatability fixes.
+
   Revision 1.1  2004/09/30 22:49:20  savage
   Initial Game Interface units.
 
@@ -89,6 +92,7 @@ type
 implementation
 
 uses
+  xplatformutils,
   globals;
 
 { TExternalizer }
@@ -124,7 +128,7 @@ procedure TExternalizer.Open(const Section: string);
 begin
   FSection := Section;
   if not assigned( INI ) then
-    INI := TIniFile.create( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'Text.ini' );
+    INI := TIniFile.create( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'Text.ini' );
 end;
 
 initialization

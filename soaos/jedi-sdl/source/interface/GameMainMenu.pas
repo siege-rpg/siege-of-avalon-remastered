@@ -59,6 +59,9 @@ unit GameMainMenu;
 {                                                                              }
 {
   $Log$
+  Revision 1.7  2005/05/28 16:16:56  savage
+  If InGame and we click Exit we want to go back to the MainMenu.
+
   Revision 1.6  2005/05/25 23:15:42  savage
   Latest Changes
 
@@ -115,6 +118,7 @@ implementation
 
 uses
   SysUtils,
+  xplatformutils,
   logger,
   globals,
   NewGame,
@@ -201,10 +205,10 @@ begin
     FPrevChoice := 0; // Reset menu item
     FMenuChoice := 1; // Highlight new game
 
-    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'gMainMenuBlank.bmp' ) );
+    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'gMainMenuBlank.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-    MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'gMainMenuText.bmp' ) );
+    MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'gMainMenuText.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
     Rect.x := 106;
     Rect.y := 41;
@@ -215,7 +219,7 @@ begin
 
     SDL_FreeSurface( MainText );
 
-    MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'gMainMenuTextBttns.bmp' ) );
+    MainText := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'gMainMenuTextBttns.bmp' ) );
     Y1 := YFrame;
     GetMenuRect( MenuItems[ 1 ], XFrame, Y1, MainText );
     MenuItems[ 1 ].Enabled := not bInGame;

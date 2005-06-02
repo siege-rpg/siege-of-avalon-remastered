@@ -36,11 +36,14 @@ var
 
 implementation
 
+uses
+  xplatformutils;
+
 initialization
 begin
   SoASettings := TSoAUserPreferences.Create;
   ExText := TExternalizer.create;
-  GameFont :=  TTrueTypeFont.Create( SoASettings.InterfacePath + '/' + SoASettings.TTFName, [], 18 );
+  GameFont :=  TTrueTypeFont.Create( SoASettings.InterfacePath + DIR_SEP + SoASettings.TTFName, [], 18 );
   GameAudio := TSDLAudioManager.Create;
 end;
 

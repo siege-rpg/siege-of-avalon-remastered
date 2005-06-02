@@ -59,6 +59,9 @@ unit GameOptions;
 {                                                                              }
 {
   $Log$
+  Revision 1.5  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.4  2005/05/13 12:33:15  savage
   Various Changes and bug fixes. Main work on the NewGame screen.
 
@@ -113,6 +116,7 @@ implementation
 
 uses
   SysUtils,
+  xplatformutils,
   globals,
   GameMainMenu,
   sdlgameinterface;
@@ -177,22 +181,22 @@ begin
 
   //TODO : { if Character <> nil then SpellList := Character.SpellList; }
 
-  DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'opContinue.bmp' ) );
+  DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'opContinue.bmp' ) );
   SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 0, 255, 255 ) );
 
-  DXVolumeSlider := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'opVolume.bmp' ) );
+  DXVolumeSlider := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'opVolume.bmp' ) );
   SDL_SetColorKey( DXVolumeSlider, Flags, SDL_MapRGB( DXVolumeSlider.format, 0, 255, 255 ) );
 
-  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'options.bmp' ) );
+  DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'options.bmp' ) );
   SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-  DxLangEng := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'english.bmp' ) );
+  DxLangEng := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'english.bmp' ) );
   SDL_SetColorKey( DxLangEng, Flags, SDL_MapRGB( DxLangEng.format, 0, 255, 255 ) );
 
-  DxLangSpa := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'spanish.bmp' ) );
+  DxLangSpa := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'spanish.bmp' ) );
   SDL_SetColorKey( DxLangSpa, Flags, SDL_MapRGB( DxLangSpa.format, 0, 255, 255 ) );
 
-  DxLangGer := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'german.bmp' ) );
+  DxLangGer := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'german.bmp' ) );
   SDL_SetColorKey( DxLangGer, Flags, SDL_MapRGB( DxLangGer.format, 0, 255, 255 ) );
 
   // Setup Rects

@@ -63,6 +63,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.11  2005/06/01 20:24:27  savage
+  Fix for Linux case sensitivity issues
+
   Revision 1.10  2005/05/28 16:31:28  savage
   StatChanges are now reflected, You cannot click Continue unless TrainingPoints are 0 and you have entered a CharacterName
 
@@ -281,6 +284,7 @@ implementation
 
 uses
   SysUtils,
+  xplatformutils,
   logger,
   globals,
   GameMainMenu,
@@ -858,28 +862,28 @@ begin
       DXTextMessage[ i ] := GameFont.DrawText( TextMessage[ i ] );
     end;
 
-    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'charcreate.bmp' ) );
+    DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'charcreate.bmp' ) );
     SDL_SetColorKey( DXBack, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
-    DXSelectRect := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaRedoval.bmp' ) );
+    DXSelectRect := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'chaRedoval.bmp' ) );
     SDL_SetColorKey( DXSelectRect, Flags, SDL_MapRGB( DXSelectRect.format, 0, 255, 255 ) );
 
-    DXBlack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'chaBlack.bmp' ) );
+    DXBlack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'chaBlack.bmp' ) );
     SDL_SetColorKey( DXBlack, Flags, SDL_MapRGB( DXBlack.format, 0, 255, 255 ) );
 
-    DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaContinue.bmp' ) );
+    DXContinue := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'chaContinue.bmp' ) );
     SDL_SetColorKey( DXContinue, Flags, SDL_MapRGB( DXContinue.format, 255, 255, 255 ) );
 
-    DXCancel := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaCancel.bmp' ) );
+    DXCancel := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'chaCancel.bmp' ) );
     SDL_SetColorKey( DXCancel, Flags, SDL_MapRGB( DXCancel.format, 0, 255, 255 ) );
 
-    DXLeftArrow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'leftarrow.bmp' ) );
+    DXLeftArrow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'leftarrow.bmp' ) );
     SDL_SetColorKey( DXLeftArrow, Flags, SDL_MapRGB( DXLeftArrow.format, 0, 255, 255  ) );
 
-    DXRightArrow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + 'rightarrow.bmp' ) );
+    DXRightArrow := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + 'rightarrow.bmp' ) );
     SDL_SetColorKey( DXRightArrow, Flags, SDL_MapRGB( DXRightArrow.format, 0, 255, 255 ) );
 
-    DXPickList := SDL_LoadBMP( PChar( SoASettings.InterfacePath + '/' + SoASettings.LanguagePath + '/' + 'chaChooseBox.bmp' ) );
+    DXPickList := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'chaChooseBox.bmp' ) );
     SDL_SetColorKey( DXPickList, Flags, SDL_MapRGB( DXBack.format, 0, 255, 255 ) );
 
     ContinueRect.x := 400;
