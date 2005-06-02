@@ -63,6 +63,9 @@ program SoAoS;
 {                                                                              }
 {
   $Log$
+  Revision 1.11  2005/06/01 20:24:19  savage
+  Fix for Linux case sensitivity issues
+
   Revision 1.10  2005/05/31 23:30:38  savage
   Added Linux code to show opening movie.
 
@@ -80,52 +83,41 @@ program SoAoS;
 {******************************************************************************}
 
 uses
-  {$IFDEF WIN32}
-  Windows,
-  {$ELSE}
-  {$IFDEF UNIX}
-    {$IFDEF FPC}
-    libc,
-    {$ELSE}
-    Libc,
-    Xlib,
-    {$ENDIF}
-  {$ENDIF}
-  {$ENDIF}
   IniFiles,
   SysUtils,
-  sdl in 'sdl\sdl.pas',
-  sdlwindow in 'sdl\sdlwindow.pas',
-  sdlgameinterface in 'sdl\sdlgameinterface.pas',
-  sdltruetypefont in 'sdl\sdltruetypefont.pas',
-  sdlticks in 'sdl\sdlticks.pas',
-  sdlinput in 'sdl\sdlinput.pas',
-  SiegeInterfaces in 'interface\SiegeInterfaces.pas',
-  globals in 'engine\globals.pas',
-  SoAPreferences in 'engine\SoAPreferences.pas',
-  Externalizer in 'interface\Externalizer.pas',
-  AdventureLog in 'engine\AdventureLog.pas',
-  GameIntro in 'interface\GameIntro.pas',
-  GameMainMenu in 'interface\GameMainMenu.pas',
-  NewGame in 'interface\NewGame.pas',
-  LoadSaveGame in 'interface\LoadSaveGame.pas',
-  GameOptions in 'interface\GameOptions.pas',
-  GameJournal in 'interface\GameJournal.pas',
-  GameCredits in 'interface\GameCredits.pas',
-  YesNoDialog in 'interface\YesNoDialog.pas',
-  SaveFile in 'engine\SaveFile.pas',
-  AStar in 'ai\AStar.pas',
-  SiegeTypes in 'engine\SiegeTypes.pas',
-  CustomAniFigure in 'engine\CustomAniFigure.pas',
-  ListBoxDialog in 'interface\ListBoxDialog.pas',
-  logger in 'sdl\logger.pas',
-  sdl_ttf in 'sdl\sdl_ttf.pas',
-  sdlaudiomixer in 'sdl\sdlaudiomixer.pas',
-  sdl_mixer in 'sdl\sdl_mixer.pas',
-  smpeg in 'sdl\smpeg.pas',
-  registryuserpreferences in 'sdl\registryuserpreferences.pas',
-  userpreferences in 'sdl\userpreferences.pas',
-  AniDec30 in 'engine\AniDec30.pas';
+  sdl in 'sdl/sdl.pas',
+  sdlwindow in 'sdl/sdlwindow.pas',
+  sdlgameinterface in 'sdl/sdlgameinterface.pas',
+  sdltruetypefont in 'sdl/sdltruetypefont.pas',
+  sdlticks in 'sdl/sdlticks.pas',
+  sdlinput in 'sdl/sdlinput.pas',
+  SiegeInterfaces in 'interface/SiegeInterfaces.pas',
+  globals in 'engine/globals.pas',
+  SoAPreferences in 'engine/SoAPreferences.pas',
+  Externalizer in 'interface/Externalizer.pas',
+  AdventureLog in 'engine/AdventureLog.pas',
+  GameIntro in 'interface/GameIntro.pas',
+  GameMainMenu in 'interface/GameMainMenu.pas',
+  NewGame in 'interface/NewGame.pas',
+  LoadSaveGame in 'interface/LoadSaveGame.pas',
+  GameOptions in 'interface/GameOptions.pas',
+  GameJournal in 'interface/GameJournal.pas',
+  GameCredits in 'interface/GameCredits.pas',
+  YesNoDialog in 'interface/YesNoDialog.pas',
+  SaveFile in 'engine/SaveFile.pas',
+  AStar in 'ai/AStar.pas',
+  SiegeTypes in 'engine/SiegeTypes.pas',
+  CustomAniFigure in 'engine/CustomAniFigure.pas',
+  ListBoxDialog in 'interface/ListBoxDialog.pas',
+  logger in 'sdl/logger.pas',
+  sdl_ttf in 'sdl/sdl_ttf.pas',
+  sdlaudiomixer in 'sdl/sdlaudiomixer.pas',
+  sdl_mixer in 'sdl/sdl_mixer.pas',
+  smpeg in 'sdl/smpeg.pas',
+  registryuserpreferences in 'sdl/registryuserpreferences.pas',
+  userpreferences in 'sdl/userpreferences.pas',
+  AniDec30 in 'engine/AniDec30.pas',
+  xplatformutils in 'sdl/xplatformutils.pas';
 
 {$IFDEF WIN32}
 {$R *.res}
@@ -140,83 +132,12 @@ const
   {$ENDIF}
 var
   MovieProcess : string;
-{$IFDEF WIN32}
-  ProcessInfo: TProcessInformation;
-  Startupinfo: TStartupInfo;
-  ExitCode: longword;
-{$ELSE}
-{$IFDEF UNIX}
-  pid: PID_T;
-  Max: Integer;
-  I: Integer;
-  parg: PPCharArray;
-  argnum: Integer;
-  returnvalue : Integer;
-  arguments : array[0..1] of string;
-{$ENDIF}
-{$ENDIF}
+  Parameters : array[0..1] of string;
 begin
   MovieProcess := ExtractFilePath( ParamStr( 0 ) ) + BinkPlayer;
-  {$IFDEF WIN32}
-  // Initialize the structures
-  FillChar(ProcessInfo, sizeof(TProcessInformation), 0);
-  FillChar(Startupinfo, sizeof(TStartupInfo), 0);
-  Startupinfo.cb := sizeof(TStartupInfo);
-
-  // Attempts to create the process
-  Startupinfo.dwFlags := STARTF_USESHOWWINDOW;
-  Startupinfo.wShowWindow := 1;
-  if CreateProcess( nil, PChar( MovieProcess + ' ' + aMoviePath + ' ' + aSwitches ), nil, nil, False, {CREATE_NEW_CONSOLE or} NORMAL_PRIORITY_CLASS
-    , nil, nil, Startupinfo, ProcessInfo ) then
-  begin
-    // The process has been successfully created
-    // No let's wait till it ends...
-    WaitForSingleObject(ProcessInfo.hProcess, INFINITE);
-
-    // Process has finished. Now we should close it.
-    GetExitCodeProcess(ProcessInfo.hProcess, ExitCode);  // Optional
-    CloseHandle(ProcessInfo.hThread);
-    CloseHandle(ProcessInfo.hProcess);
-  end;
-  {$ELSE}
-  {$IFDEF UNIX}
-  arguments[0] := aMoviePath;
-  arguments[1] := aSwitches;
-  
-  pid := fork;
-
-  if pid = 0 then
-  begin
-    Max := sysconf(_SC_OPEN_MAX);
-    for i := (STDERR_FILENO+1) to Max do
-    begin
-      fcntl(i, F_SETFD, FD_CLOEXEC);
-    end;
-
-    argnum := High(arguments) + 1;
-
-    GetMem(parg,(2 + argnum) * sizeof(PChar));
-    parg[0] := PChar(MovieProcess);
-
-    i := 0;
-
-    while i <= high(arguments) do
-    begin
-      inc(i);
-      parg[i] := PChar(arguments[i-1]);
-    end;
-
-    parg[i+1] := nil;
-    execvp(PChar(MovieProcess),PPChar(@parg[0]));
-    halt;
-  end;
-
-  if pid > 0 then
-  begin
-    waitpid(pid,@returnvalue,0);
-  end;
-  {$ENDIF}
-  {$ENDIF}
+  Parameters[0] := aMoviePath;
+  Parameters[1] := aSwitches;
+  ExecAndWait( MovieProcess, Parameters );
 end;
 
 
@@ -224,7 +145,7 @@ procedure PlayOpeningMovie;
 var
   Movie : string;
 begin
-  Movie := SoASettings.MoviePath + '\' + SoASettings.OpeningMovie;
+  Movie := DIR_CUR + SoASettings.MoviePath + DIR_SEP + SoASettings.OpeningMovie;
   if FileExists( Movie )
   and ( bShowIntro ) then
   begin
@@ -239,7 +160,7 @@ procedure PlayClosingMovie;
 var
   Movie : string;
 begin
-  Movie := SoASettings.MoviePath + '\' + SoASettings.ClosingMovie;
+  Movie := DIR_CUR + SoASettings.MoviePath + DIR_SEP + SoASettings.ClosingMovie;
   if FileExists( Movie )
   and ( bShowOuttro ) then
   begin
