@@ -63,6 +63,9 @@ unit NewGame;
 {                                                                              }
 {
   $Log$
+  Revision 1.12  2005/06/02 22:51:54  savage
+  More Cross-Platform additions and amendments
+
   Revision 1.11  2005/06/01 20:24:27  savage
   Fix for Linux case sensitivity issues
 
@@ -141,6 +144,10 @@ type
     moMysticismPlus,
     moCombatPlus,
     moStealthPlus,
+    moFighter,
+    moScout,
+    moMagician,
+    moBlueShirt,
     moContinue,
     moCancel,
     moLeftArrow,
@@ -236,7 +243,7 @@ type
     DXPickList : PSDL_Surface;
     DXPlayerName : PSDL_Surface;
     TextMessage : array[ 0..104 ] of WideString;
-    DXTextMessage : array[ 0..7 ] of PSDL_Surface;
+    DXTextMessage : array[ 0..9 ] of PSDL_Surface;
     ContinueRect, CancelRect, LeftArrowRect, RightArrowRect, OKRect : TSDL_Rect;
     InfoPanel : TSDL_Rect;
     MouseOverOptions : TMouseOverNewOptions;
@@ -265,7 +272,7 @@ type
     ixSelectedBeard : integer;
     ixSelectedTraining : integer;
     RenderMode : TRenderMode;
-    iPickListLow, iPickListHigh : integer;
+    iPickListLow, iPickListHigh, moItem : integer;
     procedure LoadBaseValues; //saves the base stats of the character
     procedure LoadNames;
     procedure CreateCollisionRects; //create the rects for the collision detection
@@ -561,21 +568,21 @@ begin
 
     //Training
     inc( i );
-    SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 67 ], InfoPanel.w, InfoPanel.h );
+    SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 67 ], InfoPanel.w, InfoPanel.h - 20 );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 83 ] );
     SelectRect[ i ].FRect.x := 480;
-    SelectRect[ i ].FRect.y := 160;
+    SelectRect[ i ].FRect.y := 27;
     SelectRect[ i ].FRect.w := 96;
     SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 68 ], InfoPanel.w, InfoPanel.h );
+    SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 68 ], InfoPanel.w, InfoPanel.h - 20 );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 84 ] );
     SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
     SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
     SelectRect[ i ].FRect.w := 96;
     SelectRect[ i ].FRect.h := 21;
     inc( i );
-    SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 69 ], InfoPanel.w, InfoPanel.h );
+    SelectRect[ i ].FInfo := GameFont.DrawText( TextMessage[ 69 ], InfoPanel.w, InfoPanel.h - 20 );
     SelectRect[ i ].FText := GameFont.DrawText( TextMessage[ 85 ] );
     SelectRect[ i ].FRect.x := SelectRect[ i - 1 ].FRect.x;
     SelectRect[ i ].FRect.y := SelectRect[ i - 1 ].FRect.y + SelectRect[ i - 1 ].FRect.h;
@@ -849,7 +856,7 @@ begin
     {if SoASettings.UseSmallFont then
       GameFont.FontSize := 13
     else}
-    GameFont.FontSize := 18;
+      GameFont.FontSize := 18;
 
     ExText.Open( 'CharCreation' );
     for i := Low( TextMessage ) to High( TextMessage ) do
@@ -859,7 +866,10 @@ begin
 
     for i := Low( DXTextMessage ) to High( DXTextMessage ) do
     begin
-      DXTextMessage[ i ] := GameFont.DrawText( TextMessage[ i ] );
+      if i > 7 then
+        DXTextMessage[ i ] := GameFont.DrawText( TextMessage[ i ], 190, 274 )
+      else
+        DXTextMessage[ i ] := GameFont.DrawText( TextMessage[ i ] );
     end;
 
     DXBack := SDL_LoadBMP( PChar( SoASettings.InterfacePath + DIR_SEP + SoASettings.LanguagePath + DIR_SEP + 'charcreate.bmp' ) );
@@ -1266,9 +1276,7 @@ begin
       rmNormal :
       begin
         MouseOverOptions := moNone;
-        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h )
-        and ( Player.Name <> '' )
-        and ( Player.TrainingPoints = 0 ) then
+        if PointIsInRect( CurrentPos, ContinueRect.x, ContinueRect.y, ContinueRect.x + ContinueRect.w, ContinueRect.y + ContinueRect.h ) then
           MouseOverOptions := moContinue
         else if PointIsInRect( CurrentPos, CancelRect.x, CancelRect.y, CancelRect.x + CancelRect.w, CancelRect.y + CancelRect.h ) then
           MouseOverOptions := moCancel
@@ -1300,7 +1308,15 @@ begin
 
       rmPickList :
       begin
-      
+        moItem := -1;
+        for x := iPickListLow to iPickListHigh do
+        begin
+          if PointIsInRect( CurrentPos, SelectRect[ x ].FRect.x, SelectRect[ x ].FRect.y, SelectRect[ x ].FRect.x + SelectRect[ x ].FRect.w, SelectRect[ x ].FRect.y + SelectRect[ x ].FRect.h ) then
+          begin
+            moItem := x;
+            exit;
+          end;
+        end;
       end;
     end;
   except
@@ -1368,7 +1384,13 @@ begin
 
           moContinue :
             begin
-              SDL_BlitSurface( DXContinue, nil, MainWindow.DisplaySurface, @ContinueRect );
+              if ( Player.Name <> '' )
+              and ( Player.TrainingPoints = 0 ) then
+                SDL_BlitSurface( DXContinue, nil, MainWindow.DisplaySurface, @ContinueRect )
+              else if ( Player.Name = '' ) then
+                SDL_BlitSurface( DXTextMessage[ 8 ], nil, MainWindow.DisplaySurface, @InfoPanel )
+              else if ( Player.TrainingPoints <> 0 ) then
+                SDL_BlitSurface( DXTextMessage[ 9 ], nil, MainWindow.DisplaySurface, @InfoPanel );
             end;
 
           moCancel :
@@ -1427,7 +1449,7 @@ begin
           moTrainingStyle :
           begin
             lRect.x := 467;
-            lRect.y := 134;
+            lRect.y := 0;
             lRect.w := DXPickList.w;
             lRect.h := DXPickList.h;
           end;
@@ -1449,7 +1471,22 @@ begin
 
         for x := iPickListLow to iPickListHigh do
         begin
-          SDL_BlitSurface( SelectRect[ x ].FText, nil, MainWindow.DisplaySurface, @SelectRect[ x ].FRect );
+          lRect := SelectRect[ x ].FRect;
+          SDL_BlitSurface( SelectRect[ x ].FText, nil, MainWindow.DisplaySurface, @lRect );
+        end;
+
+        if moItem > -1 then
+        begin
+          if moItem < 18 then
+          begin
+            lRect := InfoPanel;
+          end
+          else
+          begin
+            lRect := InfoPanel;
+            lRect.y := 180;
+          end;
+          SDL_BlitSurface( SelectRect[ moItem ].FInfo, nil, MainWindow.DisplaySurface, @lRect );
         end;
       end;
     end;
@@ -1518,17 +1555,19 @@ begin
     SDL_FillRect( MainWindow.DisplaySurface, @lRect, SDL_MapRGB( MainWindow.DisplaySurface.format, 0, 0, 0 ) );
     //lRect.x := InfoRect[ Ord( moTrainingStyle ) ].FRect.x + SelectRect[ ixSelectedHairStyle ].FText.w + 3;
     //SDL_BlitSurface( SelectRect[ ixSelectedTraining ].FText, nil, MainWindow.DisplaySurface, @lRect );
-    if ixSelectedTraining = 18 then
-    begin
-      SDL_BlitSurface( DXTextMessage[ 5 ], nil, MainWindow.DisplaySurface, @lRect )
-    end;
-    if ixSelectedTraining = 19 then
-    begin
-      SDL_BlitSurface( DXTextMessage[ 6 ], nil, MainWindow.DisplaySurface, @lRect )
-    end;
-    if ixSelectedTraining = 20 then
-    begin
-      SDL_BlitSurface( DXTextMessage[ 7 ], nil, MainWindow.DisplaySurface, @lRect )
+    case ixSelectedTraining of
+      18 :
+      begin
+        SDL_BlitSurface( DXTextMessage[ 5 ], nil, MainWindow.DisplaySurface, @lRect )
+      end;
+      19 :
+      begin
+        SDL_BlitSurface( DXTextMessage[ 6 ], nil, MainWindow.DisplaySurface, @lRect )
+      end;
+      20 :
+      begin
+        SDL_BlitSurface( DXTextMessage[ 7 ], nil, MainWindow.DisplaySurface, @lRect )
+      end;
     end;
 
     if Player.Name <> '' then
