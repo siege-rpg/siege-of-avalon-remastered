@@ -59,6 +59,9 @@ unit GameMainMenu;
 {                                                                              }
 {
   $Log$
+  Revision 1.8  2005/06/02 22:51:54  savage
+  More Cross-Platform additions and amendments
+
   Revision 1.7  2005/05/28 16:16:56  savage
   If InGame and we click Exit we want to go back to the MainMenu.
 
@@ -346,8 +349,8 @@ begin
   try
     if FMenuChoice <> FPrevChoice then
     begin
-      Rect.x := MenuItems[ FMenuChoice ].Rect.x + 105;
-      Rect.y := MenuItems[ FMenuChoice ].Rect.y + 45;
+      Rect.x := MenuItems[ FMenuChoice ].Rect.x + 106;
+      Rect.y := MenuItems[ FMenuChoice ].Rect.y + 41;
       Rect.w := MenuItems[ FMenuChoice ].Rect.w - MenuItems[ FMenuChoice ].Rect.x;
       Rect.h := MenuItems[ FMenuChoice ].Rect.h - MenuItems[ FMenuChoice ].Rect.y;
       SDL_BlitSurface( MenuItems[ FMenuChoice ].Image, nil, MainWindow.DisplaySurface, @Rect );
