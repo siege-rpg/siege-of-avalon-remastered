@@ -62,6 +62,9 @@ unit registryuserpreferences;
 {   September   23 2004 - DL : Initial Creation                                }
 {
   $Log$
+  Revision 1.1  2005/05/25 23:15:42  savage
+  Latest Changes
+
   Revision 1.1  2004/09/30 22:35:47  savage
   Changes, enhancements and additions as required to get SoAoS working.
 
@@ -102,6 +105,7 @@ type
     function GetDefaultString( const Index : Integer ) : string; override;
     function GetString( const Index : Integer ) : string; override;
     procedure SetString( const Index : Integer; const Value : string ); override;
+    function GetBinaryStream( const Index : Integer ) : TStream; override;
   public
     Registry : {$IFDEF REG}TRegIniFile{$ELSE}TIniFile{$ENDIF};
     constructor Create( const FileName : string = '' ); reintroduce;
@@ -135,6 +139,15 @@ begin
   Registry.Free;
   Registry := nil;
   inherited;
+end;
+
+function TRegistryUserPreferences.GetBinaryStream( const Index: Integer): TStream;
+var
+  ReturnValue : TStream;
+begin
+  ReturnValue := nil; 
+  Registry.ReadBinaryStream( GetSection( Index ), GetIdentifier( Index ), ReturnValue );
+  result := ReturnValue;
 end;
 
 function TRegistryUserPreferences.GetBoolean( const Index : Integer ) : Boolean;
