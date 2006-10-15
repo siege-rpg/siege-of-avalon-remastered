@@ -63,6 +63,9 @@ program SoAoS;
 {                                                                              }
 {
   $Log$
+  Revision 1.12  2005/06/02 22:37:49  savage
+  More Cross-Platform additions and amendments
+
   Revision 1.11  2005/06/01 20:24:19  savage
   Fix for Linux case sensitivity issues
 
@@ -83,7 +86,6 @@ program SoAoS;
 {******************************************************************************}
 
 uses
-  IniFiles,
   SysUtils,
   sdl in 'sdl/sdl.pas',
   sdlwindow in 'sdl/sdlwindow.pas',
@@ -98,7 +100,7 @@ uses
   AdventureLog in 'engine/AdventureLog.pas',
   GameIntro in 'interface/GameIntro.pas',
   GameMainMenu in 'interface/GameMainMenu.pas',
-  NewGame in 'interface/NewGame.pas',
+  NewGame in 'interface\NewGame.pas',
   LoadSaveGame in 'interface/LoadSaveGame.pas',
   GameOptions in 'interface/GameOptions.pas',
   GameJournal in 'interface/GameJournal.pas',
