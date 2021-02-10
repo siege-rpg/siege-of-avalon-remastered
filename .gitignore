@@ -1,3 +1,10 @@
-game/
+*.a
+*.compiled
+*.log
+*.lps
+*.o
+*.obj
+*.ppu
+*.res
 AutomaticConversion.log
 ConverterBackup/

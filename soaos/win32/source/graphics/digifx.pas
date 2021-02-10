@@ -199,7 +199,7 @@ type
 const
   // Due to the fact that Delphi ignores the case of identifiers I had
   // to change these consts from DFX_??? to DLL_???
-  // DLL_GetInfo = 0;
+  DLL_GetInfo = 0;
   DLL_Init = 1;
   DLL_Done = 2;
   DLL_CreateRLE = 3;
@@ -263,14 +263,12 @@ begin
       if ( @StartupLib <> nil ) then
       begin
         DFX := StartupLib( );
-        (*
         asm
           mov rax, FindHnd;
           mov rax, DFX;
-          call dword ptr [rax + DLL_GetInfo*4];
+          call qword ptr [rax + DLL_GetInfo*4];
           mov StrPtr, rsi;
         end;
-        *)
         if ( StrLComp( StrPtr, 'DigitalFX', 9 ) = 0 ) then
         begin
           StrCopy( DrvFilesTab[ DriversCnt ].Info, StrPtr );
@@ -328,7 +326,7 @@ begin
     if ( ( DrvFilesTab[ i ].RefCnt > 0 ) and ( i < DriversCnt ) ) then
     begin
       TmpProcPtr := DWORD( DrvFilesTab[ i ].DFX );
-      (*
+      (* TODO: Rewrite the pushad to work in 64 bit
       asm
         pushad
       	mov     eax, ProcNo

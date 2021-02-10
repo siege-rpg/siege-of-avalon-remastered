@@ -4575,7 +4575,6 @@ begin
   else
   begin
     Log.Log( '*** Error: Map buffer created in System RAM!' );
-    (*
     if ReturnCode = DDERR_INCOMPATIBLEPRIMARY then
       Log.Log( 'DDERR_INCOMPATIBLEPRIMARY' )
     else if ReturnCode = DDERR_INVALIDCAPS then
@@ -4612,7 +4611,7 @@ begin
       Log.Log( 'DDERR_PRIMARYSURFACEALREADYEXISTS' )
     else if ReturnCode = DDERR_UNSUPPORTEDMODE then
       Log.Log( 'DDERR_UNSUPPORTEDMODE' );
-    *)
+
     ddsd.ddsCaps.dwCaps := DDSCAPS_OFFSCREENPLAIN or DDSCAPS_SYSTEMMEMORY;
     lpdd.CreateSurface( ddsd, lpDDSMap, nil );
   end;
@@ -4709,7 +4708,6 @@ TZone(FMap.Zones[19]).ExportItems('f:\zone19items.bmp'); }
     else
     begin
       Log.Log( '*** Error: Map buffer created in System RAM!' );
-      (*
       if ReturnCode = DDERR_INCOMPATIBLEPRIMARY then
         Log.Log( 'DDERR_INCOMPATIBLEPRIMARY' )
       else if ReturnCode = DDERR_INVALIDCAPS then
@@ -4746,7 +4744,7 @@ TZone(FMap.Zones[19]).ExportItems('f:\zone19items.bmp'); }
         Log.Log( 'DDERR_PRIMARYSURFACEALREADYEXISTS' )
       else if ReturnCode = DDERR_UNSUPPORTEDMODE then
         Log.Log( 'DDERR_UNSUPPORTEDMODE' );
-      *)
+
       ddsd.ddsCaps.dwCaps := DDSCAPS_OFFSCREENPLAIN or DDSCAPS_SYSTEMMEMORY;
       lpdd.CreateSurface( ddsd, lpDDSMap, nil );
     end;
