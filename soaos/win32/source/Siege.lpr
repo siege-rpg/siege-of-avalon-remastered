@@ -1,11 +1,14 @@
 program Siege;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -61,10 +64,10 @@ program Siege;
 
 uses
   Forms,
-  Windows,
+  LCLIntf, LCLType, LMessages, Windows,
   SysUtils,
   IniFiles,
-  Controls,
+  Controls, Interfaces,
   AniDemo in 'engine\AniDemo.pas' {frmMain},
   Loader in 'engine\Loader.pas',
   Resource in 'engine\Resource.pas',
@@ -72,7 +75,7 @@ uses
   AdventureLog in 'engine\AdventureLog.pas',
   DFX in 'graphics\DFX.pas',
   GameText in 'engine\GameText.pas',
-  Character in 'ai\Character.pas',
+  CharacterAI in 'ai\CharacterAI.pas',
   AI1 in 'ai\AI1.pas',
   UndeadAI in 'ai\UndeadAI.pas',
   BasicHumanoidAI in 'AI\BasicHumanoidAI.pas',
@@ -126,7 +129,7 @@ uses
   Transit in 'interface\Transit.pas';
 
 
-{$R *.RES}
+{$R *.res}
 
 const
   MUTEXNAME = 'DigitalTomeSiegeOfAvalon';
@@ -209,7 +212,7 @@ begin
   hMutex := OpenMutex( MUTEX_ALL_ACCESS, False, MUTEXNAME );
   if hMutex <> 0 then
   begin
-    CloseHandle( hMutex );
+    FileClose(hMutex ); { *Converted from CloseHandle* }
     Exit;
   end;
   hMutex := CreateMutex( nil, True, PChar( MUTEXNAME ) );
@@ -224,7 +227,7 @@ begin
   Application.Run;
 
   ReleaseMutex( hMutex );
-  CloseHandle( hMutex );
+  FileClose(hMutex ); { *Converted from CloseHandle* }
 
   PlayClosingMovie;
 

@@ -1,11 +1,14 @@
 unit DFX;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -64,8 +67,7 @@ unit DFX;
 interface
 
 uses
-  Windows,
-  Messages,
+  LCLIntf, LCLType, Windows,
   SysUtils,
   Classes,
   Graphics,
@@ -74,7 +76,6 @@ uses
   Dialogs,
   digifx,
 {$IFDEF DirectX}
-  DirectX,
   DXUtil,
   Anigrp30,
 {$ENDIF}
@@ -298,7 +299,7 @@ begin
   ReadFile( TmpFile, lpSpr^, Size, BytesCnt, nil );
   GetMem( lpRLE, BuffSize );
   ReadFile( TmpFile, lpRLE^, BuffSize, BytesCnt, nil );
-  CloseHandle( TmpFile );
+  FileClose(TmpFile ); { *Converted from CloseHandle* }
 
   FMemSize := BuffSize;
 
@@ -422,7 +423,7 @@ begin
   WriteFile( TmpFile, BuffSize, SizeOf( BuffSize ), BytesCnt, nil );
   WriteFile( TmpFile, lpSpr^, PicCnt * SizeOf( RLEHDR ), BytesCnt, nil );
   WriteFile( TmpFile, lpSpr.DataPtr^, BuffSize, BytesCnt, nil );
-  CloseHandle( TmpFile );
+  FileClose(TmpFile ); { *Converted from CloseHandle* }
 end;
 
 constructor TRLESprite.Create;

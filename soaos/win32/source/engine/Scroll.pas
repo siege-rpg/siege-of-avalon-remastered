@@ -1,11 +1,14 @@
 unit Scroll;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -67,18 +70,17 @@ uses
 {$IFDEF DirectX}
   DirectX,
   DXUtil,
-  DXEffects,
 {$ENDIF}
-  Windows,
+  LCLIntf, LCLType,
   Forms,
   Classes,
   Graphics,
   SysUtils,
-  Character,
+  CharacterAI,
   GameText,
   Anigrp30,
   Engine,
-  Logfile,
+  LogFile,
   Display;
 
 type
@@ -884,13 +886,13 @@ begin
     Log.LogEntry( FailName );
 {$ENDIF}
   try
-    OldTime := GetTickCount;
+    OldTime := GetTickCount64;
     Adj := 0;
     while KeepOnScrolling do
     begin
-      TimeDif := GetTickCount - OldTime;
+      TimeDif := GetTickCount64 - OldTime;
       Adj := Adj + 80 * ( TimeDif / 1000 );
-      OldTime := GetTickCount;
+      OldTime := GetTickCount64;
       if Adj >= 1 then
       begin
         ScrollFactor := ScrollFactor + ScrollAmount * Trunc( Adj );

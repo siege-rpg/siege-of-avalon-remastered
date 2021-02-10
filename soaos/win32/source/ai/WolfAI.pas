@@ -1,11 +1,14 @@
 unit WolfAI;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -64,7 +67,7 @@ interface
 uses
   Classes,
   SysUtils,
-  Character,
+  CharacterAI,
   Engine,
   Anigrp30,
   LogFile,
@@ -273,7 +276,7 @@ begin
     X := Round( r * cos( T ) ) + CenterX;
     Y := Round( r * sin( T ) ) + CenterY;
     Character.walkTo( X, Y, 16 );
-    character.say( '...', clblack ); //clear text
+    Character.say( '...', clblack ); //clear text
     delay := Random( 200 ) + 200;
     Walking := True;
   except
@@ -295,11 +298,11 @@ begin
     if assigned( Character.Track ) then
       Character.Face( Character.Track.X, Character.Track.Y );
     //Better runAway code
-    if Pos( 'E', character.FacingString ) <> 0 then
+    if Pos( 'E', Character.FacingString ) <> 0 then
       Character.RunTo( Character.X - 250, Character.Y + random( 500 ) - 250, 64 )
-    else if Pos( 'W', character.FacingString ) <> 0 then
+    else if Pos( 'W', Character.FacingString ) <> 0 then
       Character.RunTo( Character.X + 250, Character.Y + random( 500 ) - 250, 64 )
-    else if Pos( 'SS', character.FacingString ) <> 0 then
+    else if Pos( 'SS', Character.FacingString ) <> 0 then
       Character.RunTo( Character.X + random( 500 ) - 250, Character.Y - 250, 64 )
     else
       Character.RunTo( Character.X + random( 500 ) - 250, Character.Y + 250, 64 );
@@ -337,7 +340,7 @@ begin
         else
           Character.Track := TCharacter( List.objects[ random( List.count ) ] );
         list.free;
-        character.AIMode := aiCombat;
+        Character.AIMode := aiCombat;
       end;
     end;
   except
@@ -361,7 +364,7 @@ begin
 
     CenterX := Character.X;
     CenterY := Character.Y;
-    TCharacterResource( character.Resource ).speed := 7;
+    TCharacterResource( Character.Resource ).speed := 7;
     S := Character.Properties[ 'LeashLength' ];
     try
       if S = '' then
@@ -427,7 +430,7 @@ begin
     Log.LogEntry( FailName );
 {$ENDIF}
   try
-    character.WalkTo( Target.x, Target.Y, 16 );
+    Character.WalkTo( Target.x, Target.Y, 16 );
     walking := True;
   except
     on E : Exception do
@@ -481,7 +484,7 @@ begin
   try
     inherited;
     if Source is TCharacter then
-      character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
+      Character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
 
     if bCombative then
     begin
@@ -557,7 +560,7 @@ begin
 {$ENDIF}
   try
     if Source is TCharacter then
-      character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
+      Character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
   except
     on E : Exception do
       Log.log( FailName + E.Message );
@@ -626,11 +629,11 @@ begin
       Character.Track := nil;
     end;
     //Better runAway code
-    if Pos( 'E', character.FacingString ) <> 0 then
+    if Pos( 'E', Character.FacingString ) <> 0 then
       Character.RunTo( Character.X - 250, Character.Y + random( 500 ) - 250, 16 )
-    else if Pos( 'W', character.FacingString ) <> 0 then
+    else if Pos( 'W', Character.FacingString ) <> 0 then
       Character.RunTo( Character.X + 250, Character.Y + random( 500 ) - 250, 16 )
-    else if Pos( 'SS', character.FacingString ) <> 0 then
+    else if Pos( 'SS', Character.FacingString ) <> 0 then
       Character.RunTo( Character.X + random( 500 ) - 250, Character.Y - 250, 16 )
     else
       Character.RunTo( Character.X + random( 500 ) - 250, Character.Y + 250, 16 );
@@ -667,7 +670,7 @@ begin
           Character.Track := TCharacter( List.objects[ 0 ] )
         else
           Character.Track := TCharacter( List.objects[ random( List.count ) ] );
-        character.AIMode := aiCombat;
+        Character.AIMode := aiCombat;
         list.free;
       end;
     end;
@@ -714,7 +717,7 @@ begin
     begin
       if Character.InRange( Character.Track ) then
       begin
-        character.Face( Character.Track.x, Character.Track.y );
+        Character.Face( Character.Track.x, Character.Track.y );
         Character.Attack( TCharacter( Character.Track ) );
         delay := ( AttackDelay - TCharacter( Character.Track ).Combat );
         if Delay < 0 then
@@ -785,7 +788,7 @@ begin
 {$ENDIF}
   try
 
-    TCharacterResource( character.Resource ).speed := 7;
+    TCharacterResource( Character.Resource ).speed := 7;
     S := Character.Properties[ 'AttackDelay' ];
     try
       if ( S = '' ) or ( s = '0' ) then
@@ -799,7 +802,7 @@ begin
     S := Character.Properties[ 'iSpeed' ];
     try
       if S <> '' then
-        TCharacterResource( character.Resource ).Speed := StrToInt( S );
+        TCharacterResource( Character.Resource ).Speed := StrToInt( S );
     except
     end;
 
@@ -810,9 +813,9 @@ begin
         i := StrToInt( s );
         if i >= 0 then
         begin
-          character.Mysticism := player.Mysticism + i;
-          character.Stealth := player.Stealth + i;
-          character.combat := player.combat + i;
+          Character.Mysticism := player.Mysticism + i;
+          Character.Stealth := player.Stealth + i;
+          Character.combat := player.combat + i;
         end;
       end;
     except
@@ -913,7 +916,7 @@ begin
       inherited;
 
     if Source is TCharacter then
-      character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
+      Character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
 
     if Source is TCharacter then
     begin
@@ -951,7 +954,7 @@ begin
       inherited;
 
     if Source is TCharacter then
-      character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
+      Character.Face( TCharacter( Source ).x, TCharacter( Source ).y );
   except
     on E : Exception do
       Log.log( FailName + E.Message );

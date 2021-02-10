@@ -1,11 +1,14 @@
 unit Spells;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -63,7 +66,7 @@ interface
 
 uses
   Classes,
-  Windows,
+  LCLIntf, LCLType, Windows,
   SysUtils,
   Anigrp30,
 {$IFDEF DirectX}
@@ -74,7 +77,7 @@ uses
   digifx,
   DFX,
   Engine,
-  Character,
+  CharacterAI,
   Resource,
   LogFile;
 
@@ -2888,7 +2891,7 @@ begin
           R := R * Speed;
           sX := round( R * dX / D );
           sY := round( R * dY / D );
-          Facing := Character.GetFacing( sX, sY, 0, 0 );
+          Facing := CharacterAI.GetFacing( sX, sY, 0, 0 );
           MoveTo( X + sX, Y + sY, Z );
         end;
       end;
@@ -5984,7 +5987,7 @@ var
   S : string;
 begin
   result := false;
-  Direction := Character.GetFacing( FCharacter.X, FCharacter.Y, Source.X, Source.Y );
+  Direction := CharacterAI.GetFacing( FCharacter.X, FCharacter.Y, Source.X, Source.Y );
   case Direction of
     fSS : S := 'SS';
     fSE : S := 'SE';
@@ -6102,7 +6105,7 @@ begin
     TrackingDegree := 0;
     Move( X, Y, Z );
 
-    FFAcing := Character.GetFacing( Self.X, Self.Y, X, Y );
+    FFAcing := CharacterAI.GetFacing( Self.X, Self.Y, X, Y );
     if ActionExists( 'Cast' ) then
       DoAction( 'Cast' )
     else
@@ -7945,7 +7948,7 @@ begin
       else
       begin
         Power := Power - TProjectile( Source ).Magic;
-        Direction := Character.GetFacing( FCharacter.X, FCharacter.Y, Source.X, Source.Y );
+        Direction := CharacterAI.GetFacing( FCharacter.X, FCharacter.Y, Source.X, Source.Y );
         case Direction of
           fSS : S := 'SS';
           fSE : S := 'SE';

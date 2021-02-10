@@ -1,11 +1,14 @@
 unit AniDemo;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -65,6 +68,7 @@ interface
 
 uses
   Windows,
+  LCLIntf, LCLType,
   Messages,
   SysUtils,
   Classes,
@@ -85,14 +89,13 @@ uses
 {$ENDIF}
   Anigrp30,
   AniDec30,
-  Character,
-  Effects,
+  CharacterAI,
   Loader,
   Resource,
   Display,
   Inventory,
   Converse,
-  Gametext,
+  GameText,
   Statistics,
   ObjInventory,
   Map,
@@ -101,7 +104,6 @@ uses
   Journal,
   CharCreation,
   Intro,
-  FileCtrl,
   Options,
   NPCBehavior,
   LoaderBox,
@@ -358,7 +360,6 @@ uses
   strFunctions,
   digifx,
   DFX,
-  Titles,
   Parts,
   Sound,
   Music,
@@ -367,7 +368,7 @@ uses
   MousePtr,
   SaveFile;
 
-{$R *.DFM}
+{$R *.lfm}
 
 var
   DlgConverse : TConverseBox;
@@ -1713,7 +1714,7 @@ begin
  //  Player.AddTitle('Firefly');
  //  Player.Frozen:=false;
  //  ShowQuickMessage('EmHmImKmXmYm0123456789',8000);
- //  ShowQuickMessage('AÄOÖUÜBßaäoöuüO',8000);
+ //  ShowQuickMessage('AÃ„OÃ–UÃœBÃŸaÃ¤oÃ¶uÃ¼O',8000);
  //  ShowQuickMessage('Ab Kb Lb Qb Rb Xb Yb',8000);
  //  ShowQuickMessage('m0m1m2m3m4m5m6m78m9m',8000);
  //  Player.Mysticism:=100;

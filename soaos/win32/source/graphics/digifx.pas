@@ -1,11 +1,14 @@
 unit digifx;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -70,7 +73,7 @@ unit digifx;
 interface
 
 uses
-  windows,
+  LCLIntf, LCLType, Windows,
   sysutils;
 
 const
@@ -196,7 +199,7 @@ type
 const
   // Due to the fact that Delphi ignores the case of identifiers I had
   // to change these consts from DFX_??? to DLL_???
-  DLL_GetInfo = 0;
+  // DLL_GetInfo = 0;
   DLL_Init = 1;
   DLL_Done = 2;
   DLL_CreateRLE = 3;
@@ -260,12 +263,14 @@ begin
       if ( @StartupLib <> nil ) then
       begin
         DFX := StartupLib( );
+        (*
         asm
-          mov eax, FindHnd;
-          mov eax, DFX;
-          call dword ptr [eax + DLL_GetInfo*4];
-          mov StrPtr, esi;
+          mov rax, FindHnd;
+          mov rax, DFX;
+          call dword ptr [rax + DLL_GetInfo*4];
+          mov StrPtr, rsi;
         end;
+        *)
         if ( StrLComp( StrPtr, 'DigitalFX', 9 ) = 0 ) then
         begin
           StrCopy( DrvFilesTab[ DriversCnt ].Info, StrPtr );
@@ -323,6 +328,7 @@ begin
     if ( ( DrvFilesTab[ i ].RefCnt > 0 ) and ( i < DriversCnt ) ) then
     begin
       TmpProcPtr := DWORD( DrvFilesTab[ i ].DFX );
+      (*
       asm
         pushad
       	mov     eax, ProcNo
@@ -353,6 +359,7 @@ begin
 			@Exit:
         popad
       end;
+      *)
       if ( ErrPtr <> nil ) then
       begin
         result := false;

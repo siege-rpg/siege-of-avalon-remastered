@@ -1,11 +1,14 @@
 unit OpenAnim;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -69,9 +72,7 @@ uses
   DXUtil,
   DXEffects,
 {$ENDIF}
-  Windows,
-  MMSystem,
-  Messages,
+  LCLIntf, LCLType,
   SysUtils,
   Classes,
   Graphics,
@@ -79,14 +80,12 @@ uses
   Forms,
   Dialogs,
   ExtCtrls,
-  Character,
   StdCtrls,
   Display,
   Anigrp30,
-  math,
   Music,
   Resource,
-  logfile;
+  LogFile;
   
 type
   TOpenAnim = class( TDisplay )
@@ -282,8 +281,8 @@ begin
     StartFinalCount := 0;
     lpDDSBack.BltFast( 0, 0, DXBack, Rect( 0, 0, 800, 600 ), DDBLTFAST_WAIT );
     MusicStillPlaying := true;
-    MusicStartTime := GetTickCount;
-    OldTime := GetTickCount;
+    MusicStartTime := GetTickCount64;
+    OldTime := GetTickCount64;
     Adj := 0;
     Alpha := 0;
     Phase := 0;
@@ -291,7 +290,7 @@ begin
     begin
       if MusicStillPlaying then
       begin
-        if GetTickCount - MusicStartTime > 19500 then
+        if GetTickCount64 - MusicStartTime > 19500 then
         begin
                //pMusic.PauseThisSong;
           MusicStillPlaying := false;
@@ -301,7 +300,7 @@ begin
       end;
       if Phase = 0 then
       begin
-        TimeDif := GetTickCount - OldTime;
+        TimeDif := GetTickCount64 - OldTime;
         if TimeDif > 1980 then
         begin
           Phase := 1;
@@ -310,14 +309,14 @@ begin
       else if Phase = 1 then
       begin
         application.ProcessMessages;
-        TimeDif := GetTickCount - OldTime;
+        TimeDif := GetTickCount64 - OldTime;
         if Alpha < 100 then
           Adj := Adj + 24 * ( TimeDif / 1000 )
         else if Alpha < 200 then
           Adj := Adj + 92 * ( TimeDif / 1000 )
         else
           Adj := Adj + 172 * ( TimeDif / 1000 );
-        OldTime := GetTickCount;
+        OldTime := GetTickCount64;
         if Adj >= 1 then
         begin
           Alpha := Alpha + round( Adj );
@@ -347,12 +346,12 @@ begin
       end
       else if Phase = 2 then
       begin
-        TimeDif := GetTickCount - OldTime;
+        TimeDif := GetTickCount64 - OldTime;
         if Alpha > 100 then
           Adj := Adj + 92 * ( TimeDif / 1000 )
         else
           Adj := Adj + 62 * ( TimeDif / 1000 );
-        OldTime := GetTickCount;
+        OldTime := GetTickCount64;
         if Adj >= 1 then
         begin
           application.ProcessMessages;
@@ -385,21 +384,21 @@ begin
           Phase := 3;
           Adj := 0;
           Alpha := 0;
-          OldTime := GetTickCount;
+          OldTime := GetTickCount64;
         end;
       end
       else if Phase = 3 then
       begin
-        TimeDif := GetTickCount - OldTime;
+        TimeDif := GetTickCount64 - OldTime;
         if TimeDif > 1500 then
         begin
           Phase := 4;
-          StartFinalCount := GetTickCount;
+          StartFinalCount := GetTickCount64;
         end;
       end
       else if Phase = 4 then
       begin
-        TimeDif := GetTickCount - OldTime;
+        TimeDif := GetTickCount64 - OldTime;
         if Alpha < 100 then
           Adj := Adj + 20 * ( TimeDif / 1000 )
         else if Alpha < 200 then
@@ -407,7 +406,7 @@ begin
         else
           Adj := Adj + 172 * ( TimeDif / 1000 );
 
-        OldTime := GetTickCount;
+        OldTime := GetTickCount64;
         if Adj >= 1 then
         begin
           application.ProcessMessages;
@@ -430,7 +429,7 @@ begin
           lpDDSBack.BltFast( 0, 0, lpDDSFront, Rect( 0, 0, 800, 600 ), DDBLTFAST_WAIT );
           application.ProcessMessages;
         end;
-        if GetTickCount - StartFinalCount > 9000 then
+        if GetTickCount64 - StartFinalCount > 9000 then
         begin
           KeepOnPlaying := false;
           if assigned( pMusic ) then

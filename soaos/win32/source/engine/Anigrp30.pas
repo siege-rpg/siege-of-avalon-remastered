@@ -1,11 +1,14 @@
 unit Anigrp30;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -64,7 +67,7 @@ unit Anigrp30;
 interface
 
 uses
-  Windows,
+  LCLIntf, LCLType, Windows,
   Classes,
   SysUtils,
   Forms,
@@ -78,7 +81,6 @@ uses
 {$IFDEF DirectX}
   DirectX,
   DXUtil,
-  DXEffects,
 {$ENDIF}
   LogFile;
 
@@ -682,9 +684,6 @@ var
 
 implementation
 
-uses
-  Character;
-
 function MakeScript( const Frames : array of Word ) : ScriptInfo;
 var
   i, j : Integer;
@@ -1279,7 +1278,7 @@ begin
 
     //Apply lighting to tiles
     Log.Log( 'Start Tiles' );
-    TimeCount := GetTickCount;
+    TimeCount := GetTickCount64;
     for Zone := 1 to SortedZones.Count - 1 do
     begin
       ZoneTile := SortedZones.Items[ Zone ];
@@ -1458,7 +1457,7 @@ begin
                                 begin
                                   if PixelFormat = pf555 then
                                     asm
-                                    push    EBX
+                                    push    RBX
                                     mov     BX,C16
                                     mov     AL,BL
                                     and     EAX,$1F
@@ -1498,11 +1497,11 @@ begin
                                   @@Continue:
                                     mov     EAX,p16
                                     mov     [EAX],CX
-                                    pop     EBX
+                                    pop     RBX
                                     end
                                   else
                                     asm
-                                    push    EBX
+                                    push    RBX
                                     mov     BX,C16
                                     mov     AL,BL
                                     and     EAX,$1F
@@ -1542,7 +1541,7 @@ begin
                                   @@Continue:
                                     mov     EAX,p16
                                     mov     [EAX],CX
-                                    pop     EBX
+                                    pop     RBX
                                     end;
                                 end;
                               end;
@@ -1578,12 +1577,12 @@ begin
     end;
     GlobalUnlock( FMapData );
     SortedZones.free;
-    TimeCount := GetTickCount - TimeCount;
+    TimeCount := GetTickCount64 - TimeCount;
     Log.Log( 'End Tiles: ' + inttostr( TimeCount ) );
 
     //Apply lighting to items
     Log.Log( 'Start Items' );
-    TimeCount := GetTickCount;
+    TimeCount := GetTickCount64;
     ItemCount := 0;
     m := FStripWidth div 2;
     if ( LightZones.Count > 0 ) then
@@ -1720,7 +1719,7 @@ begin
                       begin
                         if PixelFormat = pf555 then
                           asm
-                          push    EBX
+                          push    RBX
                           mov     BX,C16
                           mov     AL,BL
                           and     EAX,$1F
@@ -1760,11 +1759,11 @@ begin
                         @@Continue:
                           mov     EAX,p16
                           mov     [EAX],CX
-                          pop     EBX
+                          pop     RBX
                           end
                         else
                           asm
-                          push    EBX
+                          push    RBX
                           mov     BX,C16
                           mov     AL,BL
                           and     EAX,$1F
@@ -1804,7 +1803,7 @@ begin
                         @@Continue:
                           mov     EAX,p16
                           mov     [EAX],CX
-                          pop     EBX
+                          pop     RBX
                           end;
                       end;
                     end;
@@ -1840,7 +1839,7 @@ begin
       end;
     end;
     OverlapTile.Free;
-    TimeCount := GetTickCount - TimeCount;
+    TimeCount := GetTickCount64 - TimeCount;
     Log.Log( 'End Items: ' + inttostr( TimeCount ) );
 
     //Construct item list for all light zones
@@ -1866,7 +1865,7 @@ begin
   begin
     //Render ambient color in all zones
     Log.Log( 'Start Ambient' );
-    TimeCount := GetTickCount;
+    TimeCount := GetTickCount64;
     for Zone := 0 to Zones.Count - 1 do
     begin
       ZoneTile := Zones.Items[ Zone ];
@@ -1887,25 +1886,25 @@ begin
               begin
                 if PixelFormat = pf555 then
                   asm
-                  push    EBX
-                  push    ESI
-                  push    EDI
+                  push    RBX
+                  push    RSI
+                  push    RDI
 
-                  mov     ECX,j
+                  mov     RCX,j
                 @@OuterLoop:
-                  push    ECX
-                  dec     ECX
+                  push    RCX
+                  dec     RCX
                   mov     EAX,Pitch
-                  mul     ECX
-                  mov     ESI,p16
-                  add     ESI,EAX
+                  mul     RCX
+                  mov     RSI,p16
+                  add     RSI,EAX
 
-                  mov     EDI,i
+                  mov     RDI,i
                 @@InnerLoop:
-                  mov     EBX,[ESI]
-                  cmp     EBX,DblColorMatch
+                  mov     RBX,[RSI]
+                  cmp     RBX,DblColorMatch
                   je      @@Next2
-                  mov     ECX,EBX
+                  mov     RCX,RBX
                   cmp     BX,ColorMatch
                   je      @@Next1
                   mov     AL,BL
@@ -1945,8 +1944,8 @@ begin
                   or      CH,AH
 
                 @@Next1:
-                  rol     ECX,16
-                  rol     EBX,16
+                  rol     RCX,16
+                  rol     RBX,16
                   cmp     BX,ColorMatch
                   je      @@Continue
                   mov     AL,BL
@@ -1985,42 +1984,42 @@ begin
                   shl     AH,2 //*
                   or      CH,AH
                 @@Continue:
-                  ror     ECX,16
-                  mov     [ESI],ECX
+                  ror     RCX,16
+                  mov     [RSI],RCX
                 @@Next2:
-                  add     ESI,4
-                  sub     EDI,2
+                  add     RSI,4
+                  sub     RDI,2
                   jnz     @@InnerLoop
 
-                  pop     ECX
-                  dec     ECX
+                  pop     RCX
+                  dec     RCX
                   jnz     @@OuterLoop
 
-                  pop     EDI
-                  pop     ESI
-                  pop     EBX
+                  pop     RDI
+                  pop     RSI
+                  pop     RBX
                   end
                 else
                   asm
-                  push    EBX
-                  push    ESI
-                  push    EDI
+                  push    RBX
+                  push    RSI
+                  push    RDI
 
-                  mov     ECX,j
+                  mov     RCX,j
                 @@OuterLoop:
-                  push    ECX
-                  dec     ECX
+                  push    RCX
+                  dec     RCX
                   mov     EAX,Pitch
-                  mul     ECX
-                  mov     ESI,p16
-                  add     ESI,EAX
+                  mul     RCX
+                  mov     RSI,p16
+                  add     RSI,EAX
 
-                  mov     EDI,i
+                  mov     RDI,i
                 @@InnerLoop:
-                  mov     EBX,[ESI]
-                  cmp     EBX,DblColorMatch
+                  mov     RBX,[RSI]
+                  cmp     RBX,DblColorMatch
                   je      @@Next2
-                  mov     ECX,EBX
+                  mov     RCX,RBX
                   cmp     BX,ColorMatch
                   je      @@Next1
                   mov     AL,BL
@@ -2060,8 +2059,8 @@ begin
                   or      CH,AH
 
                 @@Next1:
-                  rol     ECX,16
-                  rol     EBX,16
+                  rol     RCX,16
+                  rol     RBX,16
                   cmp     BX,ColorMatch
                   je      @@Continue
                   mov     AL,BL
@@ -2100,20 +2099,20 @@ begin
                   shl     AH,3 //*
                   or      CH,AH
                 @@Continue:
-                  ror     ECX,16
-                  mov     [ESI],ECX
+                  ror     RCX,16
+                  mov     [RSI],RCX
                 @@Next2:
-                  add     ESI,4
-                  sub     EDI,2
+                  add     RSI,4
+                  sub     RDI,2
                   jnz     @@InnerLoop
 
-                  pop     ECX
-                  dec     ECX
+                  pop     RCX
+                  dec     RCX
                   jnz     @@OuterLoop
 
-                  pop     EDI
-                  pop     ESI
-                  pop     EBX
+                  pop     RDI
+                  pop     RSI
+                  pop     RBX
                   end;
               end;
             finally
@@ -2137,25 +2136,25 @@ begin
               begin
                 if PixelFormat = pf555 then
                   asm
-                  push    EBX
-                  push    ESI
-                  push    EDI
+                  push    RBX
+                  push    RSI
+                  push    RDI
 
-                  mov     ECX,j
+                  mov     RCX,j
                 @@OuterLoop:
-                  push    ECX
-                  dec     ECX
+                  push    RCX
+                  dec     RCX
                   mov     EAX,Pitch
-                  mul     ECX
-                  mov     ESI,p16
-                  add     ESI,EAX
+                  mul     RCX
+                  mov     RSI,p16
+                  add     RSI,EAX
 
-                  mov     EDI,i
+                  mov     RDI,i
                 @@InnerLoop:
-                  mov     EBX,[ESI]
-                  cmp     EBX,DblColorMatch
+                  mov     RBX,[RSI]
+                  cmp     RBX,DblColorMatch
                   je      @@Next2
-                  mov     ECX,EBX
+                  mov     RCX,RBX
                   cmp     BX,ColorMatch
                   je      @@Next1
                   mov     AL,BL
@@ -2195,8 +2194,8 @@ begin
                   or      CH,AH
 
                 @@Next1:
-                  rol     ECX,16
-                  rol     EBX,16
+                  rol     RCX,16
+                  rol     RBX,16
                   cmp     BX,ColorMatch
                   je      @@Continue
                   mov     AL,BL
@@ -2235,42 +2234,42 @@ begin
                   shl     AH,2 //*
                   or      CH,AH
                 @@Continue:
-                  ror     ECX,16
-                  mov     [ESI],ECX
+                  ror     RCX,16
+                  mov     [RSI],RCX
                 @@Next2:
-                  add     ESI,4
-                  sub     EDI,2
+                  add     RSI,4
+                  sub     RDI,2
                   jnz     @@InnerLoop
 
-                  pop     ECX
-                  dec     ECX
+                  pop     RCX
+                  dec     RCX
                   jnz     @@OuterLoop
 
-                  pop     EDI
-                  pop     ESI
-                  pop     EBX
+                  pop     RDI
+                  pop     RSI
+                  pop     RBX
                   end
                 else
                   asm
-                  push    EBX
-                  push    ESI
-                  push    EDI
+                  push    RBX
+                  push    RSI
+                  push    RDI
 
-                  mov     ECX,j
+                  mov     RCX,j
                 @@OuterLoop:
-                  push    ECX
-                  dec     ECX
+                  push    RCX
+                  dec     RCX
                   mov     EAX,Pitch
-                  mul     ECX
-                  mov     ESI,p16
-                  add     ESI,EAX
+                  mul     RCX
+                  mov     RSI,p16
+                  add     RSI,EAX
 
-                  mov     EDI,i
+                  mov     RDI,i
                 @@InnerLoop:
-                  mov     EBX,[ESI]
-                  cmp     EBX,DblColorMatch
+                  mov     RBX,[RSI]
+                  cmp     RBX,DblColorMatch
                   je      @@Next2
-                  mov     ECX,EBX
+                  mov     RCX,RBX
                   cmp     BX,ColorMatch
                   je      @@Next1
                   mov     AL,BL
@@ -2310,8 +2309,8 @@ begin
                   or      CH,AH
 
                 @@Next1:
-                  rol     ECX,16
-                  rol     EBX,16
+                  rol     RCX,16
+                  rol     RBX,16
                   cmp     BX,ColorMatch
                   je      @@Continue
                   mov     AL,BL
@@ -2350,20 +2349,20 @@ begin
                   shl     AH,3 //*
                   or      CH,AH
                 @@Continue:
-                  ror     ECX,16
-                  mov     [ESI],ECX
+                  ror     RCX,16
+                  mov     [RSI],RCX
                 @@Next2:
-                  add     ESI,4
-                  sub     EDI,2
+                  add     RSI,4
+                  sub     RDI,2
                   jnz     @@InnerLoop
 
-                  pop     ECX
-                  dec     ECX
+                  pop     RCX
+                  dec     RCX
                   jnz     @@OuterLoop
 
-                  pop     EDI
-                  pop     ESI
-                  pop     EBX
+                  pop     RDI
+                  pop     RSI
+                  pop     RBX
                   end;
               end;
             finally
@@ -2373,7 +2372,7 @@ begin
         end;
       end;
     end;
-    TimeCount := GetTickCount - TimeCount;
+    TimeCount := GetTickCount64 - TimeCount;
     Log.Log( 'End Ambient: ' + inttostr( TimeCount ) );
   end;
 
@@ -3715,7 +3714,7 @@ var
   NextTickCount : longword;
 begin
   NextTickCount := LastTickCount + Interval;
-  while GetTickCount < NextTickCount do
+  while GetTickCount64 < NextTickCount do
   begin
     if assigned( OnWaitFortimer ) then
       OnWaitFortimer( self )
@@ -3758,7 +3757,7 @@ var
 begin
   if FDrawing then
     exit;
-  LastTickCount := GetTickCount;
+  LastTickCount := GetTickCount64;
   FDrawing := True;
 
   //Calculate postion of key figure
@@ -4576,6 +4575,7 @@ begin
   else
   begin
     Log.Log( '*** Error: Map buffer created in System RAM!' );
+    (*
     if ReturnCode = DDERR_INCOMPATIBLEPRIMARY then
       Log.Log( 'DDERR_INCOMPATIBLEPRIMARY' )
     else if ReturnCode = DDERR_INVALIDCAPS then
@@ -4612,7 +4612,7 @@ begin
       Log.Log( 'DDERR_PRIMARYSURFACEALREADYEXISTS' )
     else if ReturnCode = DDERR_UNSUPPORTEDMODE then
       Log.Log( 'DDERR_UNSUPPORTEDMODE' );
-
+    *)
     ddsd.ddsCaps.dwCaps := DDSCAPS_OFFSCREENPLAIN or DDSCAPS_SYSTEMMEMORY;
     lpdd.CreateSurface( ddsd, lpDDSMap, nil );
   end;
@@ -4709,6 +4709,7 @@ TZone(FMap.Zones[19]).ExportItems('f:\zone19items.bmp'); }
     else
     begin
       Log.Log( '*** Error: Map buffer created in System RAM!' );
+      (*
       if ReturnCode = DDERR_INCOMPATIBLEPRIMARY then
         Log.Log( 'DDERR_INCOMPATIBLEPRIMARY' )
       else if ReturnCode = DDERR_INVALIDCAPS then
@@ -4745,7 +4746,7 @@ TZone(FMap.Zones[19]).ExportItems('f:\zone19items.bmp'); }
         Log.Log( 'DDERR_PRIMARYSURFACEALREADYEXISTS' )
       else if ReturnCode = DDERR_UNSUPPORTEDMODE then
         Log.Log( 'DDERR_UNSUPPORTEDMODE' );
-
+      *)
       ddsd.ddsCaps.dwCaps := DDSCAPS_OFFSCREENPLAIN or DDSCAPS_SYSTEMMEMORY;
       lpdd.CreateSurface( ddsd, lpDDSMap, nil );
     end;

@@ -1,11 +1,14 @@
 unit DirectX;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -113,7 +116,7 @@ unit DirectX;
   {$UNDEF DirectX5}
 {$ENDIF}
 
-uses Windows, MMSystem;
+uses LCLIntf, LCLType, Windows;
 
 (*==========================================================================;
  *
@@ -223,20 +226,20 @@ type
       dwAlphaSrcConstBitDepth: DWORD;        // Bit depth used to specify alpha constant for source
       dwAlphaSrcConst: DWORD;                // Constant to use as Alpha Channel
       dwFillColor: DWORD;                    // color in RGB or Palettized
-      ddckDestColorkey: TDDColorKey;          // DestColorkey override
-      ddckSrcColorkey: TDDColorKey;           // SrcColorkey override
+      ddckDestColorkey: TDDColorKey;         // DestColorkey override
+      ddckSrcColorkey: TDDColorKey;          // SrcColorkey override
       );
     1: (
-      lpDDSZBufferDest: IDirectDrawSurface;  // Surface to use as Z buffer for dest
+      lpDDSZBufferDest: Pointer;             // IDirectDrawSurface to use as Z buffer for dest
       _union1b: DWORD;
-      lpDDSZBufferSrc: IDirectDrawSurface;   // Surface to use as Z buffer for src
+      lpDDSZBufferSrc: Pointer;              // IDirectDrawSurface to use as Z buffer for src
       _union1d: DWORD;
       _union1e: DWORD;
       _union1f: DWORD;
       _union1g: DWORD;
-      lpDDSAlphaDest: IDirectDrawSurface;    // Surface to use as Alpha Channel
+      lpDDSAlphaDest: Pointer;               // IDirectDrawSurface to use as Alpha Channel
       _union1i: DWORD;
-      lpDDSAlphaSrc: IDirectDrawSurface;     // Surface to use as Alpha Channel
+      lpDDSAlphaSrc: Pointer;                // IDirectDrawSurface to use as Alpha Channel
       dwFillDepth: DWORD;                    // depth value for z-buffer
       );
     2: (
@@ -250,7 +253,7 @@ type
       _union2h: DWORD;
       _union2i: DWORD;
       _union2j: DWORD;
-      lpDDSPattern: IDirectDrawSurface;       // Surface to use as pattern
+      lpDDSPattern: Pointer;                 // IDirectDrawSurface to use as pattern
       );
   end;
 
@@ -580,9 +583,9 @@ type
       dwFlags: DWORD;                      // flags
       );
     1: (
-      lpDDSAlphaDest: IDirectDrawSurface;  // Surface to use as alpha channel for dest
+      lpDDSAlphaDest: Pointer;             // IDirectDrawSurface to use as alpha channel for dest
       _union1b: DWORD;
-      lpDDSAlphaSrc: IDirectDrawSurface;   // Surface to use as alpha channel for src
+      lpDDSAlphaSrc: Pointer;              // IDirectDrawSurface to use as alpha channel for src
       );
   end;
 

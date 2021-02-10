@@ -1,11 +1,14 @@
-unit Character;
+unit CharacterAI;
+
+{$MODE Delphi}
+
 {******************************************************************************}
 {                                                                              }
 {               Siege Of Avalon : Open Source Edition                          }
 {               -------------------------------------                          }
 {                                                                              }
 { Portions created by Digital Tome L.P. Texas USA are                          }
-{ Copyright ©1999-2000 Digital Tome L.P. Texas USA                             }
+{ Copyright Â©1999-2000 Digital Tome L.P. Texas USA                             }
 { All Rights Reserved.                                                         }
 {                                                                              }
 { Portions created by Team SOAOS are                                           }
@@ -64,8 +67,9 @@ unit Character;
 interface
 
 uses
-  Classes,
   Windows,
+  Classes,
+  LCLIntf, LCLType,
   SysUtils,
   Anigrp30,
   AniDec30,
@@ -73,7 +77,6 @@ uses
 {$IFDEF DirectX}
   DirectX,
   DXUtil,
-  DXEffects,
 {$ENDIF}
   digifx,
   DFX,
@@ -1103,9 +1106,7 @@ implementation
 
 uses
   Engine,
-  ItemDatabase,
   Titles,
-  Loader,
   Display,
   Parts,
   Sound,
@@ -1116,7 +1117,6 @@ uses
   WolfAI,
   MiscAI,
   AniDemo,
-  Effects,
   Spells;
 
 //fix for bad character names
@@ -2814,7 +2814,6 @@ var
   Event : string;
   i : integer;
   Changed : boolean;
-  S : string;
   NewDamage : TDamageProfile;
 const
   FailName : string = 'TCharacter.DoFrame';
@@ -11918,7 +11917,7 @@ begin
   end;
 end;
 
-procedure TTrigger.Execute;
+function TTrigger.Execute;
 var
   event : string;
 const
